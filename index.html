@@ -142,6 +142,39 @@ td.nw{white-space:nowrap}
 .count{font-family:var(--head);font-size:3rem;font-weight:800;color:var(--amber);line-height:1;margin:6px 0 4px}
 .small{font-size:13px;color:var(--muted)}
 
+.sheet.tall{max-height:calc(92vh - env(safe-area-inset-top,0px));max-height:calc(92dvh - env(safe-area-inset-top,0px));overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* Cog, profile, games */
+.cog{position:absolute;top:12px;right:12px;z-index:2;width:46px;height:46px;border-radius:50%;border:1.5px solid var(--line);background:rgba(23,44,68,.8);display:grid;place-items:center;cursor:pointer;padding:0}
+.cog svg{width:24px;height:24px}
+.games-label{margin-top:22px}
+.me-line{color:var(--muted);font-size:14px;margin:0 0 2px}
+.field{display:block;margin:14px 0 6px;font-size:14px;color:var(--muted);font-weight:700}
+.inp{width:100%;background:var(--sky2);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;font-size:17px;color:var(--text)}
+.inp.num{width:110px}
+textarea.inp{min-height:150px;font-size:14px;line-height:1.4;resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;border:1.5px solid var(--line);background:var(--sky2);border-radius:12px;padding:12px;font-weight:700;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ice);color:#0D1B2A;border-color:var(--ice)}
+.qgroup{margin:16px 0 0}
+.qgroup-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.qgroup-head b{font-family:var(--head);font-size:1.05rem}
+.qgroup-head .linkish{padding:4px;font-size:14px}
+.tchips{display:flex;flex-wrap:wrap;gap:8px}
+.tchip{border:1.5px solid var(--line);background:var(--sky2);border-radius:999px;padding:8px 14px;font-size:15px;cursor:pointer;text-align:left;line-height:1.3}
+.tchip small{color:var(--muted);font-size:12.5px;margin-left:4px}
+.tchip[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:#1A1306}
+.tchip[aria-pressed="true"] small{color:#5A4218}
+.tchip:disabled{opacity:.4;cursor:default}
+.msg{font-size:14px;margin:10px 0 0;color:var(--done)}
+.msg.warn{color:var(--amber)}
+.msg ul{margin:6px 0 0;padding-left:20px}
+.counts{font-size:14px;color:#C9D5E3;margin:8px 0 0;padding-left:20px}
+.counts li{margin-bottom:2px}
+.steps{padding-left:20px;margin:6px 0 0;color:#C9D5E3}
+.steps li{margin-bottom:4px}
+.sheet hr{border:0;border-top:1px solid var(--line);margin:22px 0 4px}
+
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 @media (min-width:700px){.earth{height:34vh}}
 @media (max-width:360px){.compare{grid-template-columns:1fr}}
@@ -151,24 +184,36 @@ td.nw{white-space:nowrap}
 
 <section id="title" class="view" aria-labelledby="app-title">
   <div class="stars" id="stars" aria-hidden="true"></div>
+  <button class="cog" id="cogBtn" data-i18n-label="cogLabel" aria-label="Review questions"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#9AD9EA" d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6a.5.5 0 0 0 .1-.6l-2-3.5a.5.5 0 0 0-.6-.2l-2.5 1a7.3 7.3 0 0 0-1.7-1l-.4-2.6a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.4l-.4 2.7a7.6 7.6 0 0 0-1.7 1l-2.5-1a.5.5 0 0 0-.6.2l-2 3.5a.5.5 0 0 0 .1.6L4.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6a.5.5 0 0 0-.1.6l2 3.5a.5.5 0 0 0 .6.2l2.5-1a7.3 7.3 0 0 0 1.7 1l.4 2.6a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.4l.4-2.7a7.6 7.6 0 0 0 1.7-1l2.5 1a.5.5 0 0 0 .6-.2l2-3.5a.5.5 0 0 0-.1-.6ZM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"/></svg></button>
   <div class="title-inner">
-    <h1 id="app-title">Earth Space Science <span>Notebook</span></h1>
-    <p class="lede">Notes, review games, and activities for each quarter. Your progress saves on this device.</p>
-    <label for="quarter" class="small" style="display:block;margin-bottom:6px">Open a quarter</label>
+    <h1 id="app-title" data-i18n="appTitle">Earth Space Science <span>Notebook</span></h1>
+    <p class="lede" data-i18n="lede">Notes, review games, and activities for each quarter. Your progress saves on this device.</p>
+    <label for="quarter" class="small" style="display:block;margin-bottom:6px" data-i18n="openQuarter">Open a quarter</label>
     <div class="picker">
       <div class="select-wrap">
         <select id="quarter">
-          <option value="">Choose…</option>
-          <option value="q1">Quarter 1</option>
-          <option value="q2">Quarter 2</option>
-          <option value="q3">Quarter 3</option>
-          <option value="q4">Quarter 4</option>
+          <option value="" data-i18n="choose">Choose…</option>
+          <option value="q1" data-i18n="q1">Quarter 1</option>
+          <option value="q2" data-i18n="q2">Quarter 2</option>
+          <option value="q3" data-i18n="q3">Quarter 3</option>
+          <option value="q4" data-i18n="q4">Quarter 4</option>
         </select>
       </div>
-      <button class="btn" id="openQ" disabled>Open</button>
+      <button class="btn" id="openQ" disabled data-i18n="open">Open</button>
+    </div>
+    <label for="game" class="small games-label" style="display:block;margin-bottom:6px" data-i18n="playGame">Play a review game</label>
+    <div class="picker">
+      <div class="select-wrap">
+        <select id="game">
+          <option value="" data-i18n="choose">Choose…</option>
+          <option value="hoops" data-i18n="hoops">Basketball</option>
+          <option value="derby" data-i18n="derby">Home Run Derby</option>
+        </select>
+      </div>
+      <button class="btn" id="playG" disabled data-i18n="play">Play</button>
     </div>
   </div>
-  <div class="title-foot"><button class="linkish" id="saveCheckBtn">Save check</button></div>
+  <div class="title-foot"><p class="me-line" id="meLine"></p><button class="linkish" id="profileBtn" data-i18n="changeMe">Change name, period, or language</button> <button class="linkish" id="saveCheckBtn" data-i18n="saveCheck">Save check</button></div>
   <svg class="earth" viewBox="0 0 400 120" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
     <defs>
       <radialGradient id="ocean" cx="50%" cy="15%" r="60%"><stop offset="0" stop-color="#2F7FB0"/><stop offset=".6" stop-color="#174B73"/><stop offset="1" stop-color="#0D2A45"/></radialGradient>
@@ -186,7 +231,7 @@ td.nw{white-space:nowrap}
 <section id="toc" class="view">
   <div class="page">
     <div class="topbar">
-      <button class="back" data-go="">Quarters</button>
+      <button class="back" data-go="" data-i18n="quarters">Quarters</button>
       <span class="crumb" id="tocCrumb"></span>
     </div>
     <div class="toc-head">
@@ -194,22 +239,22 @@ td.nw{white-space:nowrap}
       <p id="tocProgress"></p>
     </div>
     <div class="meter" aria-hidden="true"><i id="meterFill" style="width:0"></i></div>
-    <p class="hint">Press and hold a topic, then drag to move it.</p>
+    <p class="hint" data-i18n="dragHint">Press and hold a topic, then drag to move it.</p>
     <ul class="toc" id="tocList"></ul>
-    <div class="reset-row"><button class="linkish" id="resetOrder" hidden>Reset to Mr. T’s order</button></div>
+    <div class="reset-row"><button class="linkish" id="resetOrder" hidden data-i18n="resetOrder">Reset to Mr. T’s order</button></div>
   </div>
 </section>
 
 <section id="cardView" class="view">
   <div class="page">
     <div class="topbar">
-      <button class="back" id="cardBack">Contents</button>
+      <button class="back" id="cardBack" data-i18n="contents">Contents</button>
       <span class="crumb" id="cardCrumb"></span>
     </div>
     <article class="card" id="cardBody"></article>
     <div class="next-row">
-      <button class="btn wide" id="nextBtn">Next</button>
-      <p class="next-note">Activities for this topic are coming soon.</p>
+      <button class="btn wide" id="nextBtn" data-i18n="next">Next</button>
+      <p class="next-note" data-i18n="actSoon">Activities for this topic are coming soon.</p>
     </div>
   </div>
 </section>
@@ -244,22 +289,23 @@ const TEACHER_ORDER = {
   q3: [],
   q4: []
 };
-const QUARTER_NAMES = { q1: "Quarter 1", q2: "Quarter 2", q3: "Quarter 3", q4: "Quarter 4" };
 
 /* =========================================================
    SAVE SYSTEM
    ========================================================= */
-const APP_VERSION = "0.2";
+const APP_VERSION = "0.3";
 const SAVE_KEY = "essNotebook.save";
-const SAVE_VERSION = 2;
+const SAVE_VERSION = 3;
 let storageOK = true;
 
-function blankSave(){ return { v: SAVE_VERSION, items: {}, order: {}, lastQuarter: "", saveTest: 0 }; }
+function blankSave(){ return { v: SAVE_VERSION, items: {}, order: {}, lastQuarter: "", saveTest: 0, profile: null, addedQ: [], game: {} }; }
 function migrate(d){
   if (!d || typeof d !== "object") return blankSave();
   if (!d.v || d.v < 2) { d.order = d.order || {}; }   // v1 -> v2: adds custom topic order
   d.items = d.items || {}; d.order = d.order || {};
   d.lastQuarter = d.lastQuarter || ""; d.saveTest = d.saveTest || 0;
+  // v2 -> v3: adds the student's name/period/language, review questions added from the cog, and last game settings
+  d.profile = d.profile || null; d.addedQ = Array.isArray(d.addedQ) ? d.addedQ : []; d.game = d.game || {};
   d.v = SAVE_VERSION;
   return d;
 }
@@ -267,6 +313,37 @@ function loadSave(){ try { return migrate(JSON.parse(localStorage.getItem(SAVE_K
 function writeSave(){ try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); storageOK = true; } catch(e){ storageOK = false; } }
 let save = loadSave();
 writeSave();
+
+/* =========================================================
+   LANGUAGE  (English / Español, chosen on first open)
+   T("English", "Español") picks the text for the current language.
+   ========================================================= */
+const LANG = save.profile && save.profile.lang === "es" ? "es" : "en";
+document.documentElement.lang = LANG;
+function T(en, es){ return LANG === "es" ? es : en; }
+const UI = {
+  appTitle: ["Earth Space Science <span>Notebook</span>", "Ciencias de la Tierra y el Espacio <span>Cuaderno</span>"],
+  lede: ["Notes, review games, and activities for each quarter. Your progress saves on this device.", "Notas, juegos de repaso y actividades para cada trimestre. Tu progreso se guarda en este aparato."],
+  openQuarter: ["Open a quarter", "Abre un trimestre"],
+  choose: ["Choose…", "Elige…"],
+  q1: ["Quarter 1", "Trimestre 1"], q2: ["Quarter 2", "Trimestre 2"], q3: ["Quarter 3", "Trimestre 3"], q4: ["Quarter 4", "Trimestre 4"],
+  open: ["Open", "Abrir"], play: ["Play", "Jugar"],
+  playGame: ["Play a review game", "Juega un juego de repaso"],
+  hoops: ["Basketball", "Baloncesto"], derby: ["Home Run Derby", "Derby de jonrones"],
+  changeMe: ["Change name, period, or language", "Cambiar nombre, período o idioma"],
+  saveCheck: ["Save check", "Prueba de guardado"],
+  cogLabel: ["Review questions", "Preguntas de repaso"],
+  quarters: ["Quarters", "Trimestres"], contents: ["Contents", "Contenido"], next: ["Next", "Siguiente"],
+  dragHint: ["Press and hold a topic, then drag to move it.", "Mantén presionado un tema y arrástralo para moverlo."],
+  resetOrder: ["Reset to Mr. T’s order", "Volver al orden de Mr. T"],
+  actSoon: ["Activities for this topic are coming soon.", "Las actividades de este tema llegarán pronto."]
+};
+function applyUI(){
+  document.querySelectorAll("[data-i18n]").forEach(el => { const v = UI[el.dataset.i18n]; if (v) el.innerHTML = v[LANG === "es" ? 1 : 0]; });
+  document.querySelectorAll("[data-i18n-label]").forEach(el => { const v = UI[el.dataset.i18nLabel]; if (v) el.setAttribute("aria-label", v[LANG === "es" ? 1 : 0]); });
+}
+function qName(q){ return UI[q] ? UI[q][LANG === "es" ? 1 : 0] : q; }
+function esc(s){ return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
 
 function markDone(key){ save.items[key] = Object.assign(save.items[key] || {}, { viewed: true, at: Date.now() }); writeSave(); }
 function isDone(key){ return !!(save.items[key] && save.items[key].viewed); }
@@ -375,8 +452,8 @@ const ART = {
   thermo:`<svg viewBox="0 0 80 80" aria-hidden="true"><rect x="34" y="6" width="12" height="56" rx="6" fill="#E8EEF5"/><rect x="38" y="24" width="4" height="40" fill="#FF6B6B"/><circle cx="40" cy="64" r="10" fill="#FF6B6B"/><g stroke="#97A9BF" stroke-width="1.5"><line x1="48" y1="14" x2="53" y2="14"/><line x1="48" y1="22" x2="53" y2="22"/><line x1="48" y1="30" x2="53" y2="30"/><line x1="48" y1="38" x2="53" y2="38"/><line x1="48" y1="46" x2="53" y2="46"/></g></svg>`,
   baro:`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="31" fill="#E8EEF5" stroke="#97A9BF" stroke-width="3"/><g stroke="#4A6585" stroke-width="1.6"><line x1="40" y1="13" x2="40" y2="18"/><line x1="17" y1="34" x2="21" y2="35"/><line x1="63" y1="34" x2="59" y2="35"/><line x1="23" y1="58" x2="27" y2="55"/><line x1="57" y1="58" x2="53" y2="55"/></g><line x1="40" y1="40" x2="56" y2="26" stroke="#E8584A" stroke-width="2.6" stroke-linecap="round"/><circle cx="40" cy="40" r="3.5" fill="#172C44"/><text x="40" y="60" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#4A6585">mb</text></svg>`,
   anemo:`<svg viewBox="0 0 80 80" aria-hidden="true"><line x1="40" y1="76" x2="40" y2="30" stroke="#97A9BF" stroke-width="3"/><g stroke="#E8EEF5" stroke-width="2.4"><line x1="40" y1="30" x2="14" y2="30"/><line x1="40" y1="30" x2="66" y2="30"/><line x1="40" y1="30" x2="40" y2="12"/></g><g fill="#9AD9EA"><path d="M8 30 A6 6 0 0 1 20 30Z"/><path d="M60 30 A6 6 0 0 0 72 30Z" transform="rotate(180 66 30)"/><circle cx="40" cy="12" r="6"/></g><circle cx="40" cy="30" r="3.5" fill="#F4B860"/></svg>`,
-  vane:`<svg viewBox="0 0 80 80" aria-hidden="true"><line x1="40" y1="76" x2="40" y2="26" stroke="#97A9BF" stroke-width="3"/><line x1="16" y1="26" x2="62" y2="26" stroke="#E8EEF5" stroke-width="3"/><path d="M8 26 L20 19 L20 33 Z" fill="#F4B860"/><path d="M58 26 L72 14 L72 38 Z" fill="#E8EEF5"/><g stroke="#4A6585" stroke-width="2"><line x1="26" y1="52" x2="54" y2="52"/></g>${''}<text x="58" y="56" font-family="sans-serif" font-size="10" fill="#97A9BF">E</text><text x="16" y="56" font-family="sans-serif" font-size="10" fill="#97A9BF">W</text></svg>`,
-  hygro:`<svg viewBox="0 0 80 80" aria-hidden="true"><rect x="20" y="8" width="11" height="50" rx="5.5" fill="#E8EEF5"/><rect x="23.5" y="26" width="4" height="34" fill="#FF6B6B"/><circle cx="25.5" cy="62" r="8" fill="#FF6B6B"/><rect x="49" y="8" width="11" height="50" rx="5.5" fill="#E8EEF5"/><rect x="52.5" y="34" width="4" height="26" fill="#FF6B6B"/><circle cx="54.5" cy="62" r="8" fill="#FF6B6B"/><rect x="45" y="56" width="19" height="16" rx="5" fill="#9AD9EA" opacity=".85"/><text x="25" y="78" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#97A9BF">dry</text><text x="55" y="80" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#97A9BF">wet</text></svg>`,
+  vane:`<svg viewBox="0 0 80 80" aria-hidden="true"><line x1="40" y1="76" x2="40" y2="26" stroke="#97A9BF" stroke-width="3"/><line x1="16" y1="26" x2="62" y2="26" stroke="#E8EEF5" stroke-width="3"/><path d="M8 26 L20 19 L20 33 Z" fill="#F4B860"/><path d="M58 26 L72 14 L72 38 Z" fill="#E8EEF5"/><g stroke="#4A6585" stroke-width="2"><line x1="26" y1="52" x2="54" y2="52"/></g>${''}<text x="58" y="56" font-family="sans-serif" font-size="10" fill="#97A9BF">E</text><text x="16" y="56" font-family="sans-serif" font-size="10" fill="#97A9BF">${T("W","O")}</text></svg>`,
+  hygro:`<svg viewBox="0 0 80 80" aria-hidden="true"><rect x="20" y="8" width="11" height="50" rx="5.5" fill="#E8EEF5"/><rect x="23.5" y="26" width="4" height="34" fill="#FF6B6B"/><circle cx="25.5" cy="62" r="8" fill="#FF6B6B"/><rect x="49" y="8" width="11" height="50" rx="5.5" fill="#E8EEF5"/><rect x="52.5" y="34" width="4" height="26" fill="#FF6B6B"/><circle cx="54.5" cy="62" r="8" fill="#FF6B6B"/><rect x="45" y="56" width="19" height="16" rx="5" fill="#9AD9EA" opacity=".85"/><text x="25" y="78" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#97A9BF">${T("dry","seco")}</text><text x="55" y="80" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#97A9BF">${T("wet","húm.")}</text></svg>`,
   rain:`<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M22 12 H58 L47 22 H33 Z" fill="#97A9BF"/><rect x="29" y="22" width="22" height="52" rx="3" fill="none" stroke="#E8EEF5" stroke-width="2"/><rect x="31" y="48" width="18" height="24" rx="2" fill="#9AD9EA" opacity=".8"/><g stroke="#E8EEF5" stroke-width="1.2"><line x1="51" y1="32" x2="56" y2="32"/><line x1="51" y1="42" x2="56" y2="42"/><line x1="51" y1="52" x2="56" y2="52"/><line x1="51" y1="62" x2="56" y2="62"/></g><g stroke="#9AD9EA" stroke-width="2" stroke-linecap="round"><line x1="30" y1="2" x2="28" y2="7"/><line x1="40" y1="0" x2="38" y2="6"/><line x1="50" y1="2" x2="48" y2="7"/></g></svg>`,
   balloon:`<svg viewBox="0 0 80 80" aria-hidden="true"><ellipse cx="40" cy="26" rx="19" ry="21" fill="#E8EEF5"/><path d="M36 46 L44 46 L40 50 Z" fill="#E8EEF5"/><line x1="40" y1="50" x2="40" y2="64" stroke="#97A9BF" stroke-width="1.4"/><rect x="34" y="64" width="12" height="10" rx="2" fill="#F4B860"/></svg>`,
   radar:`<svg viewBox="0 0 80 80" aria-hidden="true"><rect x="34" y="52" width="12" height="24" fill="#97A9BF"/><path d="M18 54 A22 22 0 0 1 62 54 Z" fill="#E8EEF5"/><g fill="none" stroke="#9AD9EA" stroke-width="2" stroke-linecap="round"><path d="M58 22 A14 14 0 0 1 66 34"/><path d="M60 12 A24 24 0 0 1 75 32"/></g></svg>`,
@@ -397,54 +474,54 @@ const HERO = {};
 
 HERO.proxy = () => `<figure class="card-hero">
   <div style="display:flex;justify-content:space-around;align-items:end">
-    <div style="text-align:center;width:30%">${ART.treeRings}<div class="small">Tree rings</div></div>
-    <div style="text-align:center;width:30%">${ART.iceCore}<div class="small">Ice core</div></div>
-    <div style="text-align:center;width:30%">${ART.sediment}<div class="small">Sediment core</div></div>
+    <div style="text-align:center;width:30%">${ART.treeRings}<div class="small">${T("Tree rings","Anillos de árboles")}</div></div>
+    <div style="text-align:center;width:30%">${ART.iceCore}<div class="small">${T("Ice core","Núcleo de hielo")}</div></div>
+    <div style="text-align:center;width:30%">${ART.sediment}<div class="small">${T("Sediment core","Núcleo de sedimento")}</div></div>
   </div>
-  <svg viewBox="0 0 320 74" role="img" aria-label="Thermometer records cover about 150 years, a tiny speck compared with ice cores that reach back about 800,000 years" style="margin-top:14px">
-    ${txt(0,13,"Thermometer records ≈ 150 years",{size:11})}
+  <svg viewBox="0 0 320 74" role="img" aria-label="${T("Thermometer records cover about 150 years, a tiny speck compared with ice cores that reach back about 800,000 years","Los registros de termómetro cubren unos 150 años, un puntito comparado con los núcleos de hielo, que llegan a unos 800,000 años")}" style="margin-top:14px">
+    ${txt(0,13,T("Thermometer records ≈ 150 years","Registros de termómetro ≈ 150 años"),{size:11})}
     <rect x="0" y="19" width="2" height="12" fill="#F4B860"/>
-    ${txt(8,29,"← barely a speck at this scale",{size:10,fill:"#F4B860"})}
-    ${txt(0,51,"Ice cores ≈ 800,000 years",{size:11})}
+    ${txt(8,29,T("← barely a speck at this scale","← apenas un puntito a esta escala"),{size:10,fill:"#F4B860"})}
+    ${txt(0,51,T("Ice cores ≈ 800,000 years","Núcleos de hielo ≈ 800,000 años"),{size:11})}
     <rect x="0" y="57" width="320" height="12" rx="6" fill="#9AD9EA"/>
   </svg>
-  <figcaption>Proxies let scientists see far beyond the age of thermometers.</figcaption>
+  <figcaption>${T("Proxies let scientists see far beyond the age of thermometers.","Los indicadores dejan ver mucho más atrás que la época de los termómetros.")}</figcaption>
 </figure>`;
 
 HERO.ice = () => `<figure class="card-hero">
-  <svg viewBox="0 0 350 172" role="img" aria-label="Graph of Earth's temperature over 400,000 years showing a sawtooth pattern of long cold glacial periods and short warm interglacial periods">
+  <svg viewBox="0 0 350 172" role="img" aria-label="${T("Graph of Earth's temperature over 400,000 years showing a sawtooth pattern of long cold glacial periods and short warm interglacial periods","Gráfica de la temperatura de la Tierra durante 400,000 años con un patrón de dientes de sierra: largos periodos glaciales fríos y cortos periodos interglaciales cálidos")}">
     <rect x="20" y="40" width="312" height="22" fill="#F4B860" opacity=".07"/>
     <line x1="20" y1="60" x2="332" y2="60" stroke="#97A9BF" stroke-width="1" stroke-dasharray="4 4"/>
     <path d="M20 52 L35.6 84 L51.2 100 L62.9 124 L74.6 52 L98 92 L121.4 108 L133.1 124 L144.8 52 L176 92 L207.2 108 L222.8 132 L232.2 44 L254 84 L277.4 100 L300.8 108 L316.4 132 L323.4 60 L332 56 L332 150 L20 150 Z" fill="#9AD9EA" opacity=".12"/>
     <path d="M20 52 L35.6 84 L51.2 100 L62.9 124 L74.6 52 L98 92 L121.4 108 L133.1 124 L144.8 52 L176 92 L207.2 108 L222.8 132 L232.2 44 L254 84 L277.4 100 L300.8 108 L316.4 132 L323.4 60 L332 56" fill="none" stroke="#9AD9EA" stroke-width="2.4" stroke-linejoin="round"/>
     <circle cx="316.4" cy="132" r="4" fill="#F4B860"/><circle cx="332" cy="56" r="4" fill="#E8EEF5"/>
-    ${txt(22,34,"Warmer (interglacial)",{fill:"#F4B860"})}${txt(22,146,"Colder (glacial)")}
-    ${txt(20,166,"400,000 years ago")}${txt(332,166,"Today",{anchor:"end"})}
-    ${txt(306,124,"~20,000 yrs ago",{anchor:"end",fill:"#F4B860"})}
+    ${txt(22,34,T("Warmer (interglacial)","Más cálido (interglacial)"),{fill:"#F4B860"})}${txt(22,146,T("Colder (glacial)","Más frío (glacial)"))}
+    ${txt(20,166,T("400,000 years ago","Hace 400,000 años"))}${txt(332,166,T("Today","Hoy"),{anchor:"end"})}
+    ${txt(306,124,T("~20,000 yrs ago","Hace ~20,000 años"),{anchor:"end",fill:"#F4B860"})}
   </svg>
-  <figcaption>Earth has swung between long cold glacial periods and short warm interglacials about every 100,000 years. Dashed line ≈ today’s temperature.</figcaption>
+  <figcaption>${T("Earth has swung between long cold glacial periods and short warm interglacials about every 100,000 years. Dashed line ≈ today’s temperature.","La Tierra ha oscilado entre largos periodos glaciales fríos y cortos interglaciales cálidos más o menos cada 100,000 años. Línea punteada ≈ temperatura de hoy.")}</figcaption>
 </figure>`;
 
 HERO.climate = () => {
   const rain = [2.5,2.7,3,2.1,3,6.8,7.5,8,6.3,2.6,1.9,2.4];
   const bars = rain.map((r,i) => { const h = r*11, x = 157 + i*14.6, wet = i >= 5 && i <= 8;
-    return `<rect x="${x}" y="${136-h}" width="9" height="${h}" rx="2" fill="${wet?'#9AD9EA':'#4A6585'}"/>${txt(x+4.5,150,"JFMAMJJASOND"[i],{anchor:"middle",size:9.5})}`; }).join("");
+    return `<rect x="${x}" y="${136-h}" width="9" height="${h}" rx="2" fill="${wet?'#9AD9EA':'#4A6585'}"/>${txt(x+4.5,150,T("JFMAMJJASOND","EFMAMJJASOND")[i],{anchor:"middle",size:9.5})}`; }).join("");
   return `<figure class="card-hero">
-  <svg viewBox="0 0 340 160" role="img" aria-label="Left: a thunderstorm today, which is weather. Right: Florida average monthly rainfall over decades, showing a wet season from June to September, which is climate">
-    ${txt(10,14,"Weather",{size:12,weight:700,fill:"#F4B860"})}${txt(10,28,"This afternoon")}
+  <svg viewBox="0 0 340 160" role="img" aria-label="${T("Left: a thunderstorm today, which is weather. Right: Florida average monthly rainfall over decades, showing a wet season from June to September, which is climate","Izquierda: una tormenta eléctrica hoy, que es tiempo atmosférico. Derecha: la lluvia mensual promedio de Florida durante décadas, con una temporada de lluvias de junio a septiembre, que es clima")}">
+    ${txt(10,14,T("Weather","Tiempo"),{size:12,weight:700,fill:"#F4B860"})}${txt(10,28,T("This afternoon","Esta tarde"))}
     <path d="M30 92 C14 92 14 70 32 70 C32 52 62 48 68 64 C78 54 100 60 98 76 C114 76 114 92 98 92 Z" fill="#8DA2BD"/>
     <path d="M62 92 L52 112 L62 112 L54 134 L76 104 L65 104 L72 92 Z" fill="#F4B860"/>
     <g stroke="#9AD9EA" stroke-width="2" stroke-linecap="round"><line x1="34" y1="98" x2="29" y2="110"/><line x1="44" y1="100" x2="39" y2="112"/><line x1="86" y1="98" x2="81" y2="110"/><line x1="96" y1="100" x2="91" y2="112"/></g>
     <line x1="140" y1="10" x2="140" y2="150" stroke="#2B4765" stroke-width="1.5"/>
-    ${txt(156,14,"Climate",{size:12,weight:700,fill:"#9AD9EA"})}${txt(156,28,"Avg. monthly rain, 30+ years")}
+    ${txt(156,14,T("Climate","Clima"),{size:12,weight:700,fill:"#9AD9EA"})}${txt(156,28,T("Avg. monthly rain, 30+ years","Lluvia mensual prom., 30+ años"))}
     ${bars}
   </svg>
-  <figcaption>One storm is weather. Florida’s summer wet season showing up in decades of averages is climate. (Rain values are approximate.)</figcaption>
+  <figcaption>${T("One storm is weather. Florida’s summer wet season showing up in decades of averages is climate. (Rain values are approximate.)","Una tormenta es tiempo atmosférico. La temporada de lluvias del verano de Florida, que aparece en décadas de promedios, es clima. (Los valores de lluvia son aproximados.)")}</figcaption>
 </figure>`;
 };
 
 HERO.water = () => `<figure class="card-hero">
-  <svg viewBox="0 0 360 240" role="img" aria-label="Water cycle diagram showing evaporation from the ocean, transpiration from a tree, condensation into clouds, precipitation on a mountain, runoff in a river, infiltration into the ground, and groundwater flowing through an aquifer back to the sea">
+  <svg viewBox="0 0 360 240" role="img" aria-label="${T("Water cycle diagram showing evaporation from the ocean, transpiration from a tree, condensation into clouds, precipitation on a mountain, runoff in a river, infiltration into the ground, and groundwater flowing through an aquifer back to the sea","Diagrama del ciclo del agua: evaporación del océano, transpiración de un árbol, condensación en nubes, precipitación sobre una montaña, escorrentía en un río, infiltración en el suelo y agua subterránea que fluye por un acuífero de vuelta al mar")}">
     <defs>${arrowDef("wcA","#F4B860")}${arrowDef("wcB","#9AD9EA")}</defs>
     <circle cx="30" cy="28" r="15" fill="#F4B860"/>
     <rect x="0" y="150" width="122" height="90" fill="#1F6A98"/>
@@ -465,29 +542,29 @@ HERO.water = () => `<figure class="card-hero">
     <path d="M168 104 C174 88 162 76 168 62" fill="none" stroke="#F4B860" stroke-width="2.2" stroke-dasharray="4 3" marker-end="url(#wcA)"/>
     <line x1="232" y1="154" x2="232" y2="182" stroke="#9AD9EA" stroke-width="2.2" marker-end="url(#wcB)"/>
     <path d="M330 200 L136 204" fill="none" stroke="#9AD9EA" stroke-width="2.2" marker-end="url(#wcB)"/>
-    ${txt(6,104,"Evaporation",{fill:"#F4B860"})}
-    ${txt(176,96,"Transpiration",{fill:"#F4B860"})}
-    ${txt(120,16,"Condensation",{fill:"#E8EEF5"})}
-    ${txt(248,78,"Precipitation",{anchor:"end",fill:"#E8EEF5"})}
-    ${txt(192,140,"Runoff",{fill:"#E8EEF5"})}
-    ${txt(238,166,"Infiltration",{fill:"#E8EEF5",size:10})}
-    ${txt(238,190,"Recharge",{fill:"#E8EEF5",size:10})}
-    ${txt(302,173,"Water table",{size:9.5})}
-    ${txt(150,216,"Aquifer: groundwater flows to the sea",{fill:"#E8EEF5",size:10})}
-    ${txt(8,190,"Collection",{fill:"#E8EEF5"})}
+    ${txt(6,104,T("Evaporation","Evaporación"),{fill:"#F4B860"})}
+    ${txt(176,96,T("Transpiration","Transpiración"),{fill:"#F4B860"})}
+    ${txt(120,16,T("Condensation","Condensación"),{fill:"#E8EEF5"})}
+    ${txt(248,78,T("Precipitation","Precipitación"),{anchor:"end",fill:"#E8EEF5"})}
+    ${txt(192,140,T("Runoff","Escorrentía"),{fill:"#E8EEF5"})}
+    ${txt(238,166,T("Infiltration","Infiltración"),{fill:"#E8EEF5",size:10})}
+    ${txt(238,190,T("Recharge","Recarga"),{fill:"#E8EEF5",size:10})}
+    ${txt(T(302,292),173,T("Water table","Nivel freático"),{size:9.5})}
+    ${txt(150,216,T("Aquifer: groundwater flows to the sea","Acuífero: el agua fluye al mar"),{fill:"#E8EEF5",size:10})}
+    ${txt(8,190,T("Collection","Acumulación"),{fill:"#E8EEF5"})}
   </svg>
-  <figcaption>The Sun powers evaporation; gravity pulls water back down and downhill.</figcaption>
+  <figcaption>${T("The Sun powers evaporation; gravity pulls water back down and downhill.","El Sol impulsa la evaporación; la gravedad hace que el agua baje y corra cuesta abajo.")}</figcaption>
 </figure>`;
 
 HERO.instruments = () => `<figure class="card-hero">
   <div style="display:flex;justify-content:space-around;align-items:end;gap:6px">
-    ${[["thermo","Thermometer"],["baro","Barometer"],["anemo","Anemometer"],["rain","Rain gauge"]].map(([a,l]) => `<div style="text-align:center;width:24%">${ART[a]}<div class="small">${l}</div></div>`).join("")}
+    ${[["thermo",T("Thermometer","Termómetro")],["baro",T("Barometer","Barómetro")],["anemo",T("Anemometer","Anemómetro")],["rain",T("Rain gauge","Pluviómetro")]].map(([a,l]) => `<div style="text-align:center;width:24%">${ART[a]}<div class="small">${l}</div></div>`).join("")}
   </div>
-  <figcaption>Each instrument measures one part of the weather. Together they describe the atmosphere at one place and time.</figcaption>
+  <figcaption>${T("Each instrument measures one part of the weather. Together they describe the atmosphere at one place and time.","Cada instrumento mide una parte del tiempo. Juntos describen la atmósfera en un lugar y momento.")}</figcaption>
 </figure>`;
 
 HERO.station = () => `<figure class="card-hero">
-  <svg viewBox="0 0 340 190" role="img" aria-label="Station model: temperature 84, dew point 75, pressure code 096, pressure rising 1.2 millibars, cloud cover 75 percent, rain falling, wind from the south at 15 knots">
+  <svg viewBox="0 0 340 190" role="img" aria-label="${T("Station model: temperature 84, dew point 75, pressure code 096, pressure rising 1.2 millibars, cloud cover 75 percent, rain falling, wind from the south at 15 knots","Modelo de estación: temperatura 84, punto de rocío 75, código de presión 096, presión subiendo 1.2 milibares, nubosidad 75 por ciento, lloviendo, viento del sur a 15 nudos")}">
     <circle cx="170" cy="95" r="14" fill="none" stroke="#E8EEF5" stroke-width="2.2"/>
     <path d="M170 95 L170 81 A14 14 0 1 1 156 95 Z" fill="#E8EEF5"/>
     <line x1="170" y1="109" x2="170" y2="166" stroke="#E8EEF5" stroke-width="2.2"/>
@@ -499,21 +576,21 @@ HERO.station = () => `<figure class="card-hero">
     ${txt(192,82,"096",{size:16,fill:"#F4B860",weight:700})}
     ${txt(192,121,"+12/",{size:16,fill:"#C58BFF",weight:700})}
     <g stroke="#4A6585" stroke-width="1"><line x1="96" y1="58" x2="128" y2="74"/><line x1="96" y1="96" x2="132" y2="96"/><line x1="96" y1="138" x2="128" y2="118"/><line x1="170" y1="40" x2="170" y2="79"/><line x1="244" y1="58" x2="226" y2="74"/><line x1="244" y1="132" x2="232" y2="118"/><line x1="226" y1="164" x2="176" y2="164"/></g>
-    ${txt(4,54,"Temperature",{fill:"#FF6B6B"})}${txt(4,66,"84°F")}
-    ${txt(4,92,"Weather now",{fill:"#9AD9EA"})}${txt(4,104,"rain")}
-    ${txt(4,140,"Dew point",{fill:"#86D4A9"})}${txt(4,152,"75°F")}
-    ${txt(170,22,"Cloud cover",{anchor:"middle",fill:"#E8EEF5"})}${txt(170,34,"75% (¾ shaded)",{anchor:"middle"})}
-    ${txt(248,54,"Air pressure",{fill:"#F4B860"})}${txt(248,66,"1009.6 mb")}
-    ${txt(248,128,"Pressure change",{fill:"#C58BFF"})}${txt(248,140,"+1.2 mb, rising")}
-    ${txt(230,162,"Wind: from the",{fill:"#E8EEF5"})}${txt(230,174,"south at 15 knots")}
+    ${txt(4,54,T("Temperature","Temperatura"),{fill:"#FF6B6B"})}${txt(4,66,"84°F")}
+    ${txt(4,92,T("Weather now","Tiempo actual"),{fill:"#9AD9EA"})}${txt(4,104,T("rain","lluvia"))}
+    ${txt(4,140,T("Dew point","Punto de rocío"),{fill:"#86D4A9"})}${txt(4,152,"75°F")}
+    ${txt(170,22,T("Cloud cover","Nubosidad"),{anchor:"middle",fill:"#E8EEF5"})}${txt(170,34,T("75% (¾ shaded)","75% (¾ sombreado)"),{anchor:"middle"})}
+    ${txt(248,54,T("Air pressure","Presión"),{fill:"#F4B860"})}${txt(248,66,"1009.6 mb")}
+    ${txt(248,128,T("Pressure change","Tendencia"),{fill:"#C58BFF"})}${txt(248,140,T("+1.2 mb, rising","+1.2 mb, sube"))}
+    ${txt(230,162,T("Wind: from the","Viento: del sur"),{fill:"#E8EEF5"})}${txt(230,174,T("south at 15 knots","a 15 nudos"))}
   </svg>
-  <figcaption>One station model packs a whole weather report into a tiny symbol on a map.</figcaption>
+  <figcaption>${T("One station model packs a whole weather report into a tiny symbol on a map.","Un modelo de estación mete todo un reporte del tiempo en un pequeño símbolo en el mapa.")}</figcaption>
 </figure>`;
 
 HERO.spaghetti = () => `<figure class="card-hero">
-  <svg viewBox="0 0 340 170" role="img" aria-label="Several computer model forecast tracks fanning out from a storm toward a coastline, inside a widening cone of uncertainty">
+  <svg viewBox="0 0 340 170" role="img" aria-label="${T("Several computer model forecast tracks fanning out from a storm toward a coastline, inside a widening cone of uncertainty","Varias trayectorias pronosticadas por modelos de computadora que se abren desde una tormenta hacia la costa, dentro de un cono de incertidumbre que se ensancha")}">
     <path d="M300 0 C292 40 300 70 288 100 C280 125 292 150 284 170 L340 170 L340 0 Z" fill="#2A4058"/>
-    ${txt(316,90,"Coast",{anchor:"middle",size:10})}
+    ${txt(316,90,T("Coast","Costa"),{anchor:"middle",size:10})}
     <path d="M40 140 L300 30 L300 150 Z" fill="#E8EEF5" opacity=".1"/>
     <path d="M40 140 L300 30 M40 140 L300 150" stroke="#E8EEF5" stroke-width="1" opacity=".35"/>
     <g fill="none" stroke-width="1.8" stroke-linecap="round">
@@ -526,14 +603,14 @@ HERO.spaghetti = () => `<figure class="card-hero">
       <path d="M40 140 C120 116 200 92 290 86" stroke="#fff" stroke-width="3"/>
     </g>
     ${spiral(40,140,16,3)}
-    ${txt(70,24,"Each colored line = one model’s forecast track",{size:10})}
-    ${txt(140,160,"White = consensus (average of models)",{size:10,fill:"#E8EEF5"})}
+    ${txt(70,24,T("Each colored line = one model’s forecast track","Cada color = la trayectoria de un modelo"),{size:10})}
+    ${txt(140,160,T("White = consensus (average of models)","Blanco = consenso (promedio)"),{size:10,fill:"#E8EEF5"})}
   </svg>
-  <figcaption>A “spaghetti plot.” The shaded cone shows where the storm’s center will probably go, but its winds, rain, and surge can reach far outside the cone.</figcaption>
+  <figcaption>${T("A “spaghetti plot.” The shaded cone shows where the storm’s center will probably go, but its winds, rain, and surge can reach far outside the cone.","Un “gráfico de espagueti.” El cono sombreado muestra hacia dónde irá probablemente el centro de la tormenta, pero sus vientos, lluvia y marejada pueden llegar mucho más allá del cono.")}</figcaption>
 </figure>`;
 
 HERO.fronts = () => `<figure class="card-hero">
-  <svg viewBox="0 0 340 210" role="img" aria-label="Weather map with a low pressure center, a warm front extending east, a cold front extending southwest, high pressure behind the cold front, cold dry air to the west and warm humid air between the fronts">
+  <svg viewBox="0 0 340 210" role="img" aria-label="${T("Weather map with a low pressure center, a warm front extending east, a cold front extending southwest, high pressure behind the cold front, cold dry air to the west and warm humid air between the fronts","Mapa del tiempo con un centro de baja presión, un frente cálido hacia el este, un frente frío hacia el suroeste, alta presión detrás del frente frío, aire frío y seco al oeste y aire cálido y húmedo entre los frentes")}">
     <defs>${arrowDef("frA","#97A9BF")}</defs>
     <rect x="0" y="0" width="340" height="210" fill="#12253A"/>
     ${front([[166,62],[214,70],[258,82],[304,98]],"warm",1,1)}
@@ -542,68 +619,69 @@ HERO.fronts = () => `<figure class="card-hero">
     <text x="40" y="70" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="30" fill="#5AA9FF">H</text>
     <path d="M120 40 A36 30 0 0 0 120 92" fill="none" stroke="#97A9BF" stroke-width="1.6" marker-end="url(#frA)"/>
     <path d="M184 92 A36 30 0 0 0 184 40" fill="none" stroke="#97A9BF" stroke-width="1.6" marker-end="url(#frA)"/>
-    ${txt(14,140,"Cold, dry air",{fill:"#9AD9EA",size:11})}
-    ${txt(188,156,"Warm, humid air",{fill:"#FF9B9B",size:11})}
-    ${txt(232,64,"Warm front",{fill:"#FF6B6B"})}
-    ${txt(52,196,"Cold front",{fill:"#5AA9FF"})}
-    ${txt(214,22,"Low: air rises, spins",{size:10})}${txt(214,34,"counterclockwise",{size:10})}
+    ${txt(14,140,T("Cold, dry air","Aire frío y seco"),{fill:"#9AD9EA",size:11})}
+    ${txt(188,156,T("Warm, humid air","Aire cálido y húmedo"),{fill:"#FF9B9B",size:11})}
+    ${txt(232,64,T("Warm front","Frente cálido"),{fill:"#FF6B6B"})}
+    ${txt(52,196,T("Cold front","Frente frío"),{fill:"#5AA9FF"})}
+    ${txt(214,22,T("Low: air rises, spins","Baja: aire sube y gira"),{size:10})}${txt(214,34,T("counterclockwise","en sentido antihorario"),{size:10})}
   </svg>
-  <figcaption>Fronts stretch out from a low-pressure center. In the U.S., the whole system usually travels west to east.</figcaption>
+  <figcaption>${T("Fronts stretch out from a low-pressure center. In the U.S., the whole system usually travels west to east.","Los frentes salen de un centro de baja presión. En EE. UU., todo el sistema suele viajar de oeste a este.")}</figcaption>
 </figure>`;
 
 HERO.air = () => {
   const b = (x,y,c,f,lab) => `<circle cx="${x}" cy="${y}" r="20" fill="${f}"/><text x="${x}" y="${y+6}" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="15" fill="#0D1B2A">${c}</text>${txt(x,y+33,lab,{anchor:"middle",size:9.5})}`;
   return `<figure class="card-hero">
-  <svg viewBox="0 0 340 236" role="img" aria-label="Simplified diagram of where air masses affecting the United States come from: continental arctic and continental polar from the north, maritime polar from the North Pacific and North Atlantic, continental tropical from the southwestern deserts, and maritime tropical from the Gulf, Caribbean and tropical Atlantic">
+  <svg viewBox="0 0 340 236" role="img" aria-label="${T("Simplified diagram of where air masses affecting the United States come from: continental arctic and continental polar from the north, maritime polar from the North Pacific and North Atlantic, continental tropical from the southwestern deserts, and maritime tropical from the Gulf, Caribbean and tropical Atlantic","Diagrama simplificado de dónde vienen las masas de aire que afectan a Estados Unidos: ártica continental y polar continental del norte, polar marítima del Pacífico Norte y el Atlántico Norte, tropical continental de los desiertos del suroeste y tropical marítima del Golfo, el Caribe y el Atlántico tropical")}">
     <defs>${arrowDef("amA","#97A9BF")}</defs>
     <rect x="96" y="92" width="150" height="74" rx="14" fill="#1E3653" stroke="#2B4765" stroke-width="1.5"/>
-    ${txt(171,124,"United States",{anchor:"middle",size:12,fill:"#E8EEF5",weight:700})}
+    ${txt(171,124,T("United States","Estados Unidos"),{anchor:"middle",size:12,fill:"#E8EEF5",weight:700})}
     <circle cx="226" cy="152" r="5" fill="#F4B860"/>${txt(214,156,"FL",{anchor:"end",size:10,fill:"#F4B860"})}
     <g stroke="#97A9BF" stroke-width="1.5" fill="none">
       <path d="M134 50 L150 90" marker-end="url(#amA)"/><path d="M210 50 L196 90" marker-end="url(#amA)"/>
       <path d="M58 92 L94 112" marker-end="url(#amA)"/><path d="M286 92 L248 112" marker-end="url(#amA)"/>
       <path d="M68 180 L100 160" marker-end="url(#amA)"/><path d="M190 196 L200 168" marker-end="url(#amA)"/><path d="M288 176 L248 156" marker-end="url(#amA)"/>
     </g>
-    ${b(126,26,"cA","#C9E6FF","Arctic")}${b(214,26,"cP","#5AA9FF","Canada")}
-    ${b(40,72,"mP","#7FC4D8","N. Pacific")}${b(300,72,"mP","#7FC4D8","N. Atlantic")}
-    ${b(50,190,"cT","#E8B26A","SW deserts")}${b(186,204,"mT","#F28C4E","Gulf & Caribbean")}${b(302,184,"mT","#F28C4E","Atlantic")}
+    ${b(126,26,"cA","#C9E6FF",T("Arctic","Ártico"))}${b(214,26,"cP","#5AA9FF",T("Canada","Canadá"))}
+    ${b(40,72,"mP","#7FC4D8",T("N. Pacific","Pacífico N."))}${b(300,72,"mP","#7FC4D8",T("N. Atlantic","Atlántico N."))}
+    ${b(50,190,"cT","#E8B26A",T("SW deserts","Desiertos SO"))}${b(186,204,"mT","#F28C4E",T("Gulf & Caribbean","Golfo y Caribe"))}${b(302,184,"mT","#F28C4E",T("Atlantic","Atlántico"))}
   </svg>
-  <figcaption>Simplified, not to scale. Each air mass takes on the temperature and moisture of the place it formed.</figcaption>
+  <figcaption>${T("Simplified, not to scale. Each air mass takes on the temperature and moisture of the place it formed.","Simplificado, no está a escala. Cada masa de aire toma la temperatura y la humedad del lugar donde se formó.")}</figcaption>
 </figure>`;
 };
 
 HERO.hurricane = () => `<figure class="card-hero">
-  <svg viewBox="0 0 340 220" role="img" aria-label="Top view of a hurricane with spiral rain bands, a ring-shaped eyewall, and a calm eye in the center">
+  <svg viewBox="0 0 340 220" role="img" aria-label="${T("Top view of a hurricane with spiral rain bands, a ring-shaped eyewall, and a calm eye in the center","Vista desde arriba de un huracán con bandas de lluvia en espiral, una pared del ojo en forma de anillo y un ojo tranquilo en el centro")}">
     ${spiral(150,112,96,10)}
     <g stroke="#97A9BF" stroke-width="1"><line x1="150" y1="112" x2="268" y2="40"/><line x1="166" y1="112" x2="268" y2="106"/><line x1="214" y1="160" x2="268" y2="176"/></g>
-    ${txt(272,36,"Eye",{fill:"#E8EEF5",weight:700,size:11})}${txt(272,48,"calm, lowest",{size:9.5})}${txt(272,59,"pressure",{size:9.5})}
-    ${txt(272,104,"Eyewall",{fill:"#E8EEF5",weight:700,size:11})}${txt(272,116,"strongest",{size:9.5})}${txt(272,127,"winds",{size:9.5})}
-    ${txt(272,174,"Rain bands",{fill:"#E8EEF5",weight:700,size:11})}${txt(272,186,"heavy rain,",{size:9.5})}${txt(272,197,"tornadoes",{size:9.5})}
-    ${txt(8,212,"Spins counterclockwise (Northern Hemisphere)",{size:10})}
+    ${txt(272,36,T("Eye","Ojo"),{fill:"#E8EEF5",weight:700,size:11})}${txt(272,48,T("calm, lowest","calma, menor"),{size:9.5})}${txt(272,59,T("pressure","presión"),{size:9.5})}
+    ${txt(272,104,T("Eyewall","Pared del ojo"),{fill:"#E8EEF5",weight:700,size:T(11,9.5)})}${txt(272,116,T("strongest","vientos más"),{size:9.5})}${txt(272,127,T("winds","fuertes"),{size:9.5})}
+    ${txt(272,174,T("Rain bands","Bandas"),{fill:"#E8EEF5",weight:700,size:11})}${txt(272,186,T("heavy rain,","de lluvia,"),{size:9.5})}${txt(272,197,T("tornadoes","tornados"),{size:9.5})}
+    ${txt(8,212,T("Spins counterclockwise (Northern Hemisphere)","Gira en sentido antihorario (hemisferio norte)"),{size:10})}
   </svg>
-  <figcaption>View from above. Air spirals inward along the surface, rises in the eyewall, and spreads out at the top.</figcaption>
+  <figcaption>${T("View from above. Air spirals inward along the surface, rises in the eyewall, and spreads out at the top.","Vista desde arriba. El aire gira en espiral hacia adentro cerca de la superficie, sube en la pared del ojo y se esparce arriba.")}</figcaption>
 </figure>`;
 
 /* Hurricane Ian track map (simplified coastlines) */
 const IAN_TRACK = [[12.3,-66.3,30],[12.9,-67.2,30],[13.7,-68.1,30],[14.2,-69.3,30],[14.6,-70.6,30],[14.7,-71.7,35],[14.7,-72.9,35],[14.5,-74.4,40],[14.4,-75.8,40],[14.6,-77.2,40],[14.6,-78.3,40],[15.0,-79.4,40],[15.8,-80.1,40],[16.8,-80.9,50],[17.7,-81.7,65],[18.7,-82.4,70],[19.7,-83.0,80],[20.8,-83.3,85],[21.8,-83.6,100],[22.2,-83.7,110],[22.6,-83.6,100],[23.5,-83.3,105],[24.4,-83.0,105],[24.6,-82.9,110],[25.2,-82.9,120],[26.0,-82.7,140],[26.6,-82.4,135],[26.7,-82.2,130],[26.8,-82.0,125],[27.2,-81.7,100],[27.7,-81.1,65],[28.4,-80.6,60],[28.9,-80.1,65],[29.6,-79.4,70],[30.3,-79.1,75],[31.5,-79.0,75],[33.3,-79.2,70],[34.4,-79.3,50],[35.3,-79.7,30]];
 const IAN_EVENTS = [
-  {k:"A",t:"Sep 23, 2 a.m.",lat:13.7,lon:-68.1,mb:1006,mph:35,stage:"Tropical depression",note:"Forms northeast of Aruba from a tropical wave that left Africa about a week earlier"},
-  {k:"B",t:"Sep 23, 8 p.m.",lat:14.7,lon:-71.7,mb:1005,mph:40,stage:"Tropical storm",note:"Named Ian, southeast of Jamaica"},
-  {k:"C",t:"Sep 25, 2 p.m.",lat:15.8,lon:-80.1,mb:1003,mph:45,stage:"Tropical storm",note:"Rapid strengthening begins over very warm water (30°C / 86°F and up)"},
-  {k:"D",t:"Sep 26, 2 a.m.",lat:17.7,lon:-81.7,mb:985,mph:75,stage:"Category 1",note:"Becomes a hurricane south-southwest of Grand Cayman"},
-  {k:"E",t:"Sep 27, 2 a.m.",lat:21.8,lon:-83.6,mb:956,mph:115,stage:"Category 3",note:"Becomes a major hurricane"},
-  {k:"F",t:"Sep 27, 4:30 a.m.",lat:22.2,lon:-83.7,mb:947,mph:125,stage:"Category 3",note:"Landfall in western Cuba near La Coloma"},
-  {k:"G",t:"Sep 27, 10 p.m.",lat:24.6,lon:-82.9,mb:952,mph:125,stage:"Category 3",note:"Eye passes over the Dry Tortugas, Florida"},
-  {k:"H",t:"Sep 28, 8 a.m.",lat:26.0,lon:-82.7,mb:937,mph:160,stage:"Category 5",note:"Peak strength over the Gulf; lowest pressure"},
-  {k:"I",t:"Sep 28, 3:05 p.m.",lat:26.7,lon:-82.2,mb:941,mph:150,stage:"Category 4",note:"Landfall on Cayo Costa, Florida"},
-  {k:"J",t:"Sep 28, 4:35 p.m.",lat:26.8,lon:-82.0,mb:945,mph:145,stage:"Category 4",note:"Landfall near Punta Gorda"},
-  {k:"K",t:"Sep 29, 8 a.m.",lat:28.4,lon:-80.6,mb:987,mph:70,stage:"Tropical storm",note:"Weakens over land, exits into the Atlantic near Cape Canaveral"},
-  {k:"L",t:"Sep 29, 2 p.m.",lat:28.9,lon:-80.1,mb:986,mph:75,stage:"Category 1",note:"Re-strengthens over warm Atlantic water"},
-  {k:"M",t:"Sep 30, 2:05 p.m.",lat:33.3,lon:-79.2,mb:978,mph:80,stage:"Category 1",note:"Final landfall near Georgetown, South Carolina"},
-  {k:"N",t:"Sep 30, 8 p.m.",lat:34.4,lon:-79.3,mb:990,mph:60,stage:"Post-tropical",note:"Merges with a front over North Carolina"}
+  {k:"A",t:"Sep 23, 2 a.m.",lat:13.7,lon:-68.1,mb:1006,mph:35,stage:"Tropical depression",note:"Forms northeast of Aruba from a tropical wave that left Africa about a week earlier",tEs:"23 sep, 2 a. m.",noteEs:"Se forma al noreste de Aruba a partir de una onda tropical que salió de África una semana antes"},
+  {k:"B",t:"Sep 23, 8 p.m.",lat:14.7,lon:-71.7,mb:1005,mph:40,stage:"Tropical storm",note:"Named Ian, southeast of Jamaica",tEs:"23 sep, 8 p. m.",noteEs:"Recibe el nombre Ian, al sureste de Jamaica"},
+  {k:"C",t:"Sep 25, 2 p.m.",lat:15.8,lon:-80.1,mb:1003,mph:45,stage:"Tropical storm",note:"Rapid strengthening begins over very warm water (30°C / 86°F and up)",tEs:"25 sep, 2 p. m.",noteEs:"Empieza a fortalecerse rápido sobre agua muy cálida (30 °C / 86 °F o más)"},
+  {k:"D",t:"Sep 26, 2 a.m.",lat:17.7,lon:-81.7,mb:985,mph:75,stage:"Category 1",note:"Becomes a hurricane south-southwest of Grand Cayman",tEs:"26 sep, 2 a. m.",noteEs:"Se convierte en huracán al sur-suroeste de Gran Caimán"},
+  {k:"E",t:"Sep 27, 2 a.m.",lat:21.8,lon:-83.6,mb:956,mph:115,stage:"Category 3",note:"Becomes a major hurricane",tEs:"27 sep, 2 a. m.",noteEs:"Se convierte en un huracán mayor"},
+  {k:"F",t:"Sep 27, 4:30 a.m.",lat:22.2,lon:-83.7,mb:947,mph:125,stage:"Category 3",note:"Landfall in western Cuba near La Coloma",tEs:"27 sep, 4:30 a. m.",noteEs:"Toca tierra en el oeste de Cuba, cerca de La Coloma"},
+  {k:"G",t:"Sep 27, 10 p.m.",lat:24.6,lon:-82.9,mb:952,mph:125,stage:"Category 3",note:"Eye passes over the Dry Tortugas, Florida",tEs:"27 sep, 10 p. m.",noteEs:"El ojo pasa sobre las Dry Tortugas, Florida"},
+  {k:"H",t:"Sep 28, 8 a.m.",lat:26.0,lon:-82.7,mb:937,mph:160,stage:"Category 5",note:"Peak strength over the Gulf; lowest pressure",tEs:"28 sep, 8 a. m.",noteEs:"Fuerza máxima sobre el Golfo; la presión más baja"},
+  {k:"I",t:"Sep 28, 3:05 p.m.",lat:26.7,lon:-82.2,mb:941,mph:150,stage:"Category 4",note:"Landfall on Cayo Costa, Florida",tEs:"28 sep, 3:05 p. m.",noteEs:"Toca tierra en Cayo Costa, Florida"},
+  {k:"J",t:"Sep 28, 4:35 p.m.",lat:26.8,lon:-82.0,mb:945,mph:145,stage:"Category 4",note:"Landfall near Punta Gorda",tEs:"28 sep, 4:35 p. m.",noteEs:"Toca tierra cerca de Punta Gorda"},
+  {k:"K",t:"Sep 29, 8 a.m.",lat:28.4,lon:-80.6,mb:987,mph:70,stage:"Tropical storm",note:"Weakens over land, exits into the Atlantic near Cape Canaveral",tEs:"29 sep, 8 a. m.",noteEs:"Se debilita sobre tierra y sale al Atlántico cerca de Cabo Cañaveral"},
+  {k:"L",t:"Sep 29, 2 p.m.",lat:28.9,lon:-80.1,mb:986,mph:75,stage:"Category 1",note:"Re-strengthens over warm Atlantic water",tEs:"29 sep, 2 p. m.",noteEs:"Se vuelve a fortalecer sobre el agua cálida del Atlántico"},
+  {k:"M",t:"Sep 30, 2:05 p.m.",lat:33.3,lon:-79.2,mb:978,mph:80,stage:"Category 1",note:"Final landfall near Georgetown, South Carolina",tEs:"30 sep, 2:05 p. m.",noteEs:"Último impacto en tierra cerca de Georgetown, Carolina del Sur"},
+  {k:"N",t:"Sep 30, 8 p.m.",lat:34.4,lon:-79.3,mb:990,mph:60,stage:"Post-tropical",note:"Merges with a front over North Carolina",tEs:"30 sep, 8 p. m.",noteEs:"Se une a un frente sobre Carolina del Norte"}
 ];
 const CAT_COLORS = { td:"#8DA2BD", ts:"#9AD9EA", c1:"#F7E08A", c2:"#F4B860", c3:"#F28C4E", c4:"#E8584A", c5:"#D24DCF", pt:"#97A9BF" };
 function ktClass(kt){ return kt < 34 ? "td" : kt < 64 ? "ts" : kt < 83 ? "c1" : kt < 96 ? "c2" : kt < 113 ? "c3" : kt < 137 ? "c4" : "c5"; }
+function stageEs(s){ return s.startsWith("Category") ? "Categoría " + s.slice(-1) : { "Tropical storm": "Tormenta tropical", "Tropical depression": "Depresión tropical", "Post-tropical": "Postropical" }[s] || s; }
 function stageClass(s){ return s.startsWith("Category") ? "c" + s.slice(-1) : s === "Tropical storm" ? "ts" : s === "Tropical depression" ? "td" : "pt"; }
 
 HERO.ianMap = () => {
@@ -626,22 +704,22 @@ HERO.ianMap = () => {
   const side = { A:[0.2,1.1],B:[0,-1.1],C:[1,0.4],D:[1,-0.2],E:[1,0],F:[-1,0],G:[-1.1,0.7],H:[-1.1,0],I:[-1.1,-1],J:[1.1,0.5],K:[-1.1,0.4],L:[1.1,-0.2],M:[1,0.3],N:[1,-0.3] };
   const marks = IAN_EVENTS.map(e => { const [x,y] = P(e.lat,e.lon), [dx,dy] = side[e.k], lx = x + dx*13, ly = y + dy*13;
     return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.4" fill="#fff"/><circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="7.5" fill="#F4B860"/><text x="${lx.toFixed(1)}" y="${(ly+3.5).toFixed(1)}" text-anchor="middle" ${F} font-weight="700" font-size="9.5" fill="#1A1306">${e.k}</text>`; }).join("");
-  const legend = [["td","TD"],["ts","TS"],["c1","Cat 1"],["c2","Cat 2"],["c3","Cat 3"],["c4","Cat 4"],["c5","Cat 5"]]
+  const legend = [["td",T("TD","DT")],["ts",T("TS","TT")],["c1","Cat 1"],["c2","Cat 2"],["c3","Cat 3"],["c4","Cat 4"],["c5","Cat 5"]]
     .map(([c,l],i) => `<rect x="${12 + i*42}" y="350" width="10" height="10" rx="2" fill="${CAT_COLORS[c]}"/>${txt(25 + i*42,359,l,{size:8.5})}`).join("");
   return `<figure class="card-hero">
-  <svg viewBox="0 0 308 366" role="img" aria-label="Map of Hurricane Ian's track from near Aruba northwest across the Caribbean, over western Cuba, north through the Gulf to southwest Florida, across the Florida peninsula, and north to South Carolina, colored by strength">
+  <svg viewBox="0 0 308 366" role="img" aria-label="${T("Map of Hurricane Ian's track from near Aruba northwest across the Caribbean, over western Cuba, north through the Gulf to southwest Florida, across the Florida peninsula, and north to South Carolina, colored by strength","Mapa de la trayectoria del huracán Ian desde cerca de Aruba hacia el noroeste por el Caribe, sobre el oeste de Cuba, al norte por el Golfo hasta el suroeste de Florida, a través de la península y al norte hasta Carolina del Sur, con colores según su fuerza")}">
     <rect x="0" y="0" width="308" height="344" fill="#12304A"/>
     ${poly(us,land)}${poly(cuba,land)}${poly(hisp,land)}${poly(pr,land)}${poly(jam,land)}${poly(sa,land)}${poly(yuc,land)}
-    ${txt(24,30,"UNITED STATES",{size:9})}${txt(150,300,"Caribbean Sea",{size:9.5,fill:"#7FA7C9"})}${txt(30,140,"Gulf",{size:9.5,fill:"#7FA7C9"})}${txt(230,120,"Atlantic",{size:9.5,fill:"#7FA7C9"})}${txt(118,150,"FL",{size:9.5})}${txt(122,190,"CUBA",{size:8.5})}
+    ${txt(24,30,T("UNITED STATES","ESTADOS UNIDOS"),{size:9})}${txt(150,300,T("Caribbean Sea","Mar Caribe"),{size:9.5,fill:"#7FA7C9"})}${txt(30,140,T("Gulf","Golfo"),{size:9.5,fill:"#7FA7C9"})}${txt(230,120,T("Atlantic","Atlántico"),{size:9.5,fill:"#7FA7C9"})}${txt(118,150,"FL",{size:9.5})}${txt(122,190,"CUBA",{size:8.5})}
     ${segs}${marks}
     ${legend}
   </svg>
-  <figcaption>Simplified map. Letters match the table below; line colors show strength along the track (TD = tropical depression, TS = tropical storm).</figcaption>
+  <figcaption>${T("Simplified map. Letters match the table below; line colors show strength along the track (TD = tropical depression, TS = tropical storm).","Mapa simplificado. Las letras coinciden con la tabla de abajo; los colores de la línea muestran la fuerza a lo largo de la trayectoria (DT = depresión tropical, TT = tormenta tropical).")}</figcaption>
 </figure>`;
 };
 
 HERO.karst = () => `<figure class="card-hero">
-  <svg viewBox="0 0 360 232" role="img" aria-label="Cross-section of Florida karst: rain soaks through sand into limestone with water-filled caves, a sinkhole lake at the surface, a pumping well creating a cone of depression in the water table, and a spring flowing into a river">
+  <svg viewBox="0 0 360 232" role="img" aria-label="${T("Cross-section of Florida karst: rain soaks through sand into limestone with water-filled caves, a sinkhole lake at the surface, a pumping well creating a cone of depression in the water table, and a spring flowing into a river","Corte del karst de Florida: la lluvia se filtra por la arena hasta la caliza con cuevas llenas de agua, un lago de sumidero en la superficie, un pozo de bombeo que crea un cono de depresión en el nivel freático y un manantial que fluye a un río")}">
     <defs>${arrowDef("kaA","#F4B860")}${arrowDef("kaB","#9AD9EA")}</defs>
     <rect x="0" y="96" width="360" height="136" fill="#8C8577"/>
     <path d="M0 60 L70 60 C80 60 86 90 105 90 C124 90 130 60 140 60 L296 60 L304 72 L360 72 L360 102 L0 102 Z" fill="#C9A66B"/>
@@ -660,32 +738,32 @@ HERO.karst = () => `<figure class="card-hero">
     <line x1="30" y1="64" x2="30" y2="96" stroke="#F4B860" stroke-width="2" marker-end="url(#kaA)"/>
     <line x1="52" y1="64" x2="52" y2="96" stroke="#F4B860" stroke-width="2" marker-end="url(#kaA)"/>
     <line x1="326" y1="96" x2="326" y2="56" stroke="#9AD9EA" stroke-width="2.4" marker-end="url(#kaB)"/>
-    ${txt(74,22,"Rain recharges the aquifer",{fill:"#E8EEF5"})}
-    ${txt(105,52,"Sinkhole lake",{anchor:"middle",fill:"#E8EEF5"})}
-    ${txt(156,84,"Sand & clay",{fill:"#3B2A1D"})}
-    ${txt(130,118,"Water table",{fill:"#E8EEF5",size:10})}
-    ${txt(262,40,"Pumping well",{fill:"#F4B860"})}
-    ${txt(258,160,"Cone of",{fill:"#E8EEF5",size:10})}${txt(258,171,"depression",{fill:"#E8EEF5",size:10})}
-    ${txt(310,46,"Spring",{fill:"#9AD9EA",weight:700})}
-    ${txt(8,216,"Limestone (Floridan aquifer)",{fill:"#2B2318",weight:700})}
-    ${txt(118,214,"Water-filled caves",{fill:"#E8EEF5",size:10})}
+    ${txt(74,22,T("Rain recharges the aquifer","La lluvia recarga el acuífero"),{fill:"#E8EEF5"})}
+    ${txt(105,52,T("Sinkhole lake","Lago de sumidero"),{anchor:"middle",fill:"#E8EEF5"})}
+    ${txt(156,84,T("Sand & clay","Arena y arcilla"),{fill:"#3B2A1D"})}
+    ${txt(130,118,T("Water table","Nivel freático"),{fill:"#E8EEF5",size:10})}
+    ${txt(T(262,243),40,T("Pumping well","Pozo de bombeo"),{fill:"#F4B860",anchor:T("","end")})}
+    ${txt(258,160,T("Cone of","Cono de"),{fill:"#E8EEF5",size:10})}${txt(258,171,T("depression","depresión"),{fill:"#E8EEF5",size:10})}
+    ${txt(T(310,298),46,T("Spring","Manantial"),{fill:"#9AD9EA",weight:700})}
+    ${txt(8,216,T("Limestone (Floridan aquifer)","Caliza (acuífero)"),{fill:"#2B2318",weight:700})}
+    ${txt(T(118,134),214,T("Water-filled caves","Cuevas llenas de agua"),{fill:"#E8EEF5",size:10})}
   </svg>
-  <figcaption>Slightly acidic water dissolves limestone into caves and conduits. Pumping lowers the water table around a well.</figcaption>
+  <figcaption>${T("Slightly acidic water dissolves limestone into caves and conduits. Pumping lowers the water table around a well.","El agua un poco ácida disuelve la caliza y forma cuevas y conductos. El bombeo baja el nivel freático alrededor de un pozo.")}</figcaption>
 </figure>`;
 
 HERO.spheres = () => {
   const node = (x,y,r,f,l,ink="#0D1B2A") => `<circle cx="${x}" cy="${y}" r="${r}" fill="${f}"/><text x="${x}" y="${y+4}" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="700" font-size="${r>30?12:10}" fill="${ink}">${l}</text>`;
   return `<figure class="card-hero">
-  <svg viewBox="0 0 340 236" role="img" aria-label="Diagram of Earth's spheres: atmosphere, hydrosphere with cryosphere, biosphere, and geosphere, each connected to every other">
+  <svg viewBox="0 0 340 236" role="img" aria-label="${T("Diagram of Earth's spheres: atmosphere, hydrosphere with cryosphere, biosphere, and geosphere, each connected to every other","Diagrama de las esferas de la Tierra: atmósfera, hidrosfera con criosfera, biosfera y geosfera, cada una conectada con todas las demás")}">
     <g stroke="#4A6585" stroke-width="2"><line x1="170" y1="36" x2="62" y2="118"/><line x1="170" y1="36" x2="278" y2="118"/><line x1="170" y1="36" x2="170" y2="200"/><line x1="62" y1="118" x2="278" y2="118"/><line x1="62" y1="118" x2="170" y2="200"/><line x1="278" y1="118" x2="170" y2="200"/><line x1="62" y1="118" x2="36" y2="196"/></g>
-    ${node(170,36,34,"#5AA9FF","Atmosphere")}${node(62,118,34,"#2F7FB0","Hydrosphere","#E8EEF5")}${node(278,118,34,"#3E9A62","Biosphere","#E8EEF5")}${node(170,200,34,"#A07A4E","Geosphere","#E8EEF5")}${node(36,198,24,"#DDF3FA","Cryosphere")}
+    ${node(170,36,34,"#5AA9FF",T("Atmosphere","Atmósfera"))}${node(62,118,34,"#2F7FB0",T("Hydrosphere","Hidrosfera"),"#E8EEF5")}${node(278,118,34,"#3E9A62",T("Biosphere","Biosfera"),"#E8EEF5")}${node(170,200,34,"#A07A4E",T("Geosphere","Geosfera"),"#E8EEF5")}${node(36,198,24,"#DDF3FA",T("Cryosphere","Criosfera"))}
   </svg>
-  <figcaption>Every sphere connects to every other. The cryosphere, Earth’s frozen water, is often counted as part of the hydrosphere.</figcaption>
+  <figcaption>${T("Every sphere connects to every other. The cryosphere, Earth’s frozen water, is often counted as part of the hydrosphere.","Cada esfera se conecta con todas las demás. La criosfera, el agua congelada de la Tierra, a menudo se cuenta como parte de la hidrosfera.")}</figcaption>
 </figure>`;
 };
 
 HERO.sun = () => `<figure class="card-hero">
-  <svg viewBox="0 0 360 222" role="img" aria-label="Sun radiating energy to the ocean and land; hot sand warming the air above it by conduction; warm air rising by convection to form a cloud; a sea breeze blowing from the ocean onto land">
+  <svg viewBox="0 0 360 222" role="img" aria-label="${T("Sun radiating energy to the ocean and land; hot sand warming the air above it by conduction; warm air rising by convection to form a cloud; a sea breeze blowing from the ocean onto land","El Sol irradia energía al océano y a la tierra; la arena caliente calienta el aire de arriba por conducción; el aire cálido sube por convección y forma una nube; una brisa marina sopla del océano hacia la tierra")}">
     <defs>${arrowDef("suA","#FF6B6B")}${arrowDef("suB","#9AD9EA")}</defs>
     <circle cx="40" cy="36" r="22" fill="#F4B860"/>
     ${waveRay(64,52,30,10)}${waveRay(62,58,42,9)}${waveRay(54,62,58,7)}
@@ -696,16 +774,16 @@ HERO.sun = () => `<figure class="card-hero">
     <path d="M238 150 C230 120 250 104 262 72" fill="none" stroke="#FF6B6B" stroke-width="2.4" marker-end="url(#suA)"/>
     <path d="M312 150 C320 120 300 104 296 72" fill="none" stroke="#FF6B6B" stroke-width="2.4" marker-end="url(#suA)"/>
     <line x1="70" y1="146" x2="206" y2="146" stroke="#9AD9EA" stroke-width="2.4" marker-end="url(#suB)"/>
-    ${txt(120,92,"Radiation",{fill:"#F4B860",weight:700,size:11})}
-    ${txt(70,138,"Sea breeze (cooler air)",{fill:"#9AD9EA",size:10})}
-    ${txt(270,104,"Convection",{fill:"#FF6B6B",weight:700,size:11,anchor:"middle"})}
-    ${txt(270,116,"warm air rises",{anchor:"middle",size:9.5,fill:"#E8EEF5"})}
-    ${txt(270,186,"Conduction",{anchor:"middle",fill:"#3B2A1D",weight:700,size:11})}
-    ${txt(270,199,"hot sand warms the air",{anchor:"middle",fill:"#3B2A1D",size:9.5})}
-    ${txt(270,210,"touching it",{anchor:"middle",fill:"#3B2A1D",size:9.5})}
-    ${txt(90,196,"Ocean heats slowly",{anchor:"middle",fill:"#E8EEF5",size:10})}
+    ${txt(120,92,T("Radiation","Radiación"),{fill:"#F4B860",weight:700,size:11})}
+    ${txt(70,138,T("Sea breeze (cooler air)","Brisa marina (aire fresco)"),{fill:"#9AD9EA",size:10})}
+    ${txt(270,104,T("Convection","Convección"),{fill:"#FF6B6B",weight:700,size:11,anchor:"middle"})}
+    ${txt(270,116,T("warm air rises","el aire cálido sube"),{anchor:"middle",size:9.5,fill:"#E8EEF5"})}
+    ${txt(270,186,T("Conduction","Conducción"),{anchor:"middle",fill:"#3B2A1D",weight:700,size:11})}
+    ${txt(270,199,T("hot sand warms the air","la arena caliente calienta"),{anchor:"middle",fill:"#3B2A1D",size:9.5})}
+    ${txt(270,210,T("touching it","el aire que la toca"),{anchor:"middle",fill:"#3B2A1D",size:9.5})}
+    ${txt(90,196,T("Ocean heats slowly","El océano se calienta lento"),{anchor:"middle",fill:"#E8EEF5",size:10})}
   </svg>
-  <figcaption>Florida’s summer sea breeze in one picture: all three kinds of energy transfer at work.</figcaption>
+  <figcaption>${T("Florida’s summer sea breeze in one picture: all three kinds of energy transfer at work.","La brisa marina del verano en Florida en una imagen: los tres tipos de transferencia de energía en acción.")}</figcaption>
 </figure>`;
 
 /* =========================================================
@@ -751,7 +829,43 @@ const CARDS = {
     </div>
     <div class="callout"><p><strong>Florida connection.</strong> About 90% of Floridians get their drinking water from groundwater, mostly from the Floridan aquifer, one of the most productive aquifers in the world. Every rain that soaks in helps refill it.</p></div>
     <h3>What powers the cycle?</h3>
-    <p>The <b>Sun</b> provides the energy that evaporates water and drives winds that carry vapor around the planet. <b>Gravity</b> pulls precipitation down, makes runoff flow downhill, and pulls water down into the ground.</p>`
+    <p>The <b>Sun</b> provides the energy that evaporates water and drives winds that carry vapor around the planet. <b>Gravity</b> pulls precipitation down, makes runoff flow downhill, and pulls water down into the ground.</p>`,
+  es: {
+    title: "El ciclo del agua",
+    blurb: "Cómo se mueve el agua entre el océano, el cielo, la tierra y el subsuelo",
+    body: () => `${HERO.water()}
+    <h2>El ciclo del agua</h2>
+    <p class="intro">El agua de la Tierra siempre está en movimiento. El <b>ciclo del agua</b> es el camino continuo que sigue el agua entre los océanos, el aire, la tierra, los seres vivos y el subsuelo. El agua no se gasta; solo cambia de forma y de lugar.</p>
+    <h3>Subiendo al aire</h3>
+    <div class="defs">
+      ${def("Evaporación","el agua líquida absorbe energía calórica del Sol y se convierte en vapor de agua, un gas. La mayor parte de la evaporación viene de los océanos.")}
+      ${def("Transpiración","las plantas suben agua desde sus raíces y sueltan vapor de agua por pequeños poros en sus hojas.")}
+      ${def("Evapotranspiración","la evaporación y la transpiración juntas; toda el agua que vuelve al aire desde la tierra.")}
+      ${def("Sublimación","el hielo se convierte directamente en vapor de agua sin derretirse primero.")}
+    </div>
+    <h3>En el cielo y de vuelta abajo</h3>
+    <div class="defs">
+      ${def("Condensación","el vapor de agua se enfría y vuelve a formar gotitas líquidas, que forman nubes, niebla y rocío.")}
+      ${def("Precipitación","el agua cae de las nubes como lluvia, nieve, aguanieve o granizo cuando las gotas se vuelven muy pesadas para quedarse arriba.")}
+    </div>
+    <h3>En el suelo</h3>
+    <div class="defs">
+      ${def("Escorrentía","agua que corre por la superficie hacia arroyos, ríos, lagos y el océano en vez de filtrarse. El pavimento y el suelo saturado aumentan la escorrentía.")}
+      ${def("Acumulación","el agua se junta en océanos, lagos, ríos y humedales.")}
+      ${def("Infiltración","el agua se filtra en el suelo desde la superficie.")}
+      ${def("Percolación","el agua sigue bajando a través de las capas de suelo y roca.")}
+    </div>
+    <h3>Bajo tierra</h3>
+    <div class="defs">
+      ${def("Agua subterránea","agua guardada en los espacios entre las partículas del suelo y las grietas de la roca, debajo del nivel freático.")}
+      ${def("Nivel freático","la parte de arriba de la zona donde el suelo está completamente lleno (saturado) de agua.")}
+      ${def("Acuífero","una capa de roca o sedimento que guarda agua subterránea y la deja fluir, así que puede abastecer pozos y manantiales.")}
+      ${def("Recarga del agua subterránea","agua de la superficie que vuelve a llenar un acuífero. La recarga es más rápida donde los suelos son arenosos y el agua se filtra fácilmente.")}
+    </div>
+    <div class="callout"><p><strong>Conexión con Florida.</strong> Cerca del 90% de los floridanos obtienen su agua potable del agua subterránea, sobre todo del acuífero de Florida, uno de los acuíferos más productivos del mundo. Cada lluvia que se filtra ayuda a rellenarlo.</p></div>
+    <h3>¿Qué impulsa el ciclo?</h3>
+    <p>El <b>Sol</b> da la energía que evapora el agua y mueve los vientos que llevan el vapor por todo el planeta. La <b>gravedad</b> hace caer la precipitación, hace que la escorrentía corra cuesta abajo y lleva el agua hacia el subsuelo.</p>`
+  }
 },
 
 "weather-instruments": {
@@ -781,7 +895,35 @@ const CARDS = {
       ${def("Relative humidity","how much water vapor the air holds compared with the most it could hold at that temperature.")}
       ${def("Dew point","the temperature the air must cool to for water vapor to condense. Florida summer dew points in the 70s °F feel sticky.")}
       ${def("Standard air pressure","about 1013 mb (29.92 inches of mercury) at sea level.")}
+    </div>`,
+  es: {
+    title: "Instrumentos del tiempo",
+    blurb: "Las herramientas que miden la temperatura, la presión, el viento, la humedad y la lluvia",
+    body: () => `${HERO.instruments()}
+    <h2>Instrumentos del tiempo</h2>
+    <p class="intro">Los meteorólogos no pueden predecir el tiempo hasta que lo miden. Cada instrumento de abajo mide una variable de la atmósfera.</p>
+    <h3>En una estación meteorológica</h3>
+    <div class="tiles">
+      ${tile(ART.thermo,"Termómetro","Mide la temperatura del aire. Las estaciones lo mantienen a la sombra para que el sol no lo caliente directamente.","°F o °C")}
+      ${tile(ART.baro,"Barómetro","Mide la presión del aire, el peso del aire de arriba. Si la presión baja, a menudo viene mal tiempo; si sube, suele despejarse.","milibares (mb) o pulgadas de mercurio")}
+      ${tile(ART.anemo,"Anemómetro","Mide la velocidad del viento. Las tazas giran más rápido cuando el viento sopla más fuerte.","mph o nudos")}
+      ${tile(ART.vane,"Veleta","Muestra la dirección del viento. La flecha apunta hacia el viento, hacia donde viene el viento.","N, NE, E…")}
+      ${tile(ART.hygro,"Higrómetro / psicrómetro","Mide la humedad. Un psicrómetro compara un termómetro seco con uno envuelto en una tela mojada; mientras más diferencia hay, más seco está el aire.","% de humedad relativa")}
+      ${tile(ART.rain,"Pluviómetro","Recoge y mide cuánta precipitación cayó.","pulgadas o mm")}
+    </div>
+    <h3>Mirando desde arriba</h3>
+    <div class="tiles">
+      ${tile(ART.balloon,"Globo meteorológico","Lleva una radiosonda por la atmósfera, que envía por radio la temperatura, la presión, la humedad y el viento. Se lanzan dos veces al día en todo el mundo.","aire en altura")}
+      ${tile(ART.radar,"Radar Doppler","Rebota ondas de radio en las gotas de lluvia para mostrar dónde hay precipitación, qué tan fuerte es y hacia dónde se mueve, incluso la rotación dentro de las tormentas.","precipitación y movimiento")}
+      ${tile(ART.sat,"Satélite meteorológico","Toma fotos de las nubes y mide temperaturas desde el espacio. Los satélites GOES vigilan las Américas sin parar y detectan los huracanes cuando se forman.","nubes y tormentas")}
+    </div>
+    <h3>Ideas clave</h3>
+    <div class="defs">
+      ${def("Humedad relativa","cuánto vapor de agua tiene el aire comparado con lo máximo que podría tener a esa temperatura.")}
+      ${def("Punto de rocío","la temperatura a la que el aire debe enfriarse para que el vapor de agua se condense. En el verano de Florida, los puntos de rocío de más de 70 °F se sienten pegajosos.")}
+      ${def("Presión atmosférica normal","unos 1013 mb (29.92 pulgadas de mercurio) al nivel del mar.")}
     </div>`
+  }
 },
 
 "station-models": {
@@ -810,7 +952,34 @@ const CARDS = {
       ${tile("","Consensus","Averages several different models. Averaging usually beats any single model for hurricane track forecasts.","best guess")}
     </div>
     ${HERO.spaghetti()}
-    <div class="callout"><p><strong>Hurricane Hunters.</strong> Air Force Reserve and NOAA aircraft fly straight into hurricanes, dropping instruments that measure pressure and wind. Their data go right into the models and improve the forecast.</p></div>`
+    <div class="callout"><p><strong>Hurricane Hunters.</strong> Air Force Reserve and NOAA aircraft fly straight into hurricanes, dropping instruments that measure pressure and wind. Their data go right into the models and improve the forecast.</p></div>`,
+  es: {
+    title: "Modelos de estación y modelos de pronóstico",
+    blurb: "Cómo leer los símbolos del mapa del tiempo y cómo las computadoras predicen tormentas",
+    body: () => `${HERO.station()}
+    <h2>Modelos de estación y modelos de pronóstico</h2>
+    <p class="intro">Un <b>modelo de estación</b> es un símbolo abreviado que muestra el tiempo medido en una estación meteorológica. Los meteorólogos ponen miles de ellos en un mapa para ver el panorama completo.</p>
+    <h3>Cómo leer un modelo de estación</h3>
+    <div class="defs">
+      ${def("Círculo del centro","la nubosidad. Vacío = cielo despejado, todo sombreado = nublado; cada cuarto sombreado es cerca de 25% más de nubes.")}
+      ${def("Arriba a la izquierda","la temperatura del aire, en °F en EE. UU.")}
+      ${def("Abajo a la izquierda","la temperatura del punto de rocío. Mientras más cerca esté de la temperatura, más húmedo está el aire.")}
+      ${def("Entre los dos","el símbolo del tiempo actual, como puntos para lluvia, estrellas para nieve o ≡ para niebla.")}
+      ${def("Arriba a la derecha","el código de presión del aire. Pon un 9 o un 10 al frente, el que dé un número más cerca de 1000, y agrega un punto decimal antes del último dígito: 096 → 1009.6 mb; 872 → 987.2 mb.")}
+      ${def("Abajo a la derecha","el cambio de presión en las últimas 3 horas, en décimas de milibar. +12/ significa que subió 1.2 mb y sigue subiendo.")}
+      ${def("Barba de viento","la línea apunta hacia donde viene el viento. Cada pluma completa = 10 nudos, media pluma = 5 nudos, bandera = 50 nudos.")}
+    </div>
+    <h3>Modelos de pronóstico por computadora</h3>
+    <p>Un <b>modelo de pronóstico</b> es un programa de computadora que usa las leyes de la física para predecir cómo cambiará la atmósfera. Empieza con millones de observaciones de estaciones, globos, satélites, radares, boyas, barcos y aviones, y luego calcula el futuro paso a paso en una cuadrícula que cubre el planeta.</p>
+    <div class="tiles">
+      ${tile("","Modelos globales","Cubren todo el planeta y predicen de días a semanas. Ejemplos conocidos: el GFS estadounidense, el ECMWF europeo (el “Euro”) y el modelo de la Oficina Meteorológica del Reino Unido.","todo el mundo")}
+      ${tile("","Modelos de huracanes","Se enfocan en una sola tormenta con mucho más detalle. El modelo HAFS de NOAA está hecho para predecir la trayectoria, la fuerza y la estructura de un huracán.","una tormenta")}
+      ${tile("","Conjuntos (ensembles)","Corren el mismo modelo muchas veces con datos iniciales un poco distintos. Si los resultados coinciden, los meteorólogos tienen más confianza.","muchas corridas")}
+      ${tile("","Consenso","Promedia varios modelos distintos. Para la trayectoria de un huracán, el promedio suele ser mejor que cualquier modelo solo.","la mejor estimación")}
+    </div>
+    ${HERO.spaghetti()}
+    <div class="callout"><p><strong>Cazadores de huracanes.</strong> Aviones de la Reserva de la Fuerza Aérea y de NOAA vuelan directo dentro de los huracanes y sueltan instrumentos que miden la presión y el viento. Sus datos van directo a los modelos y mejoran el pronóstico.</p></div>`
+  }
 },
 
 "fronts": {
@@ -850,7 +1019,46 @@ const CARDS = {
       <tr><td><b>Pressure</b></td><td>Falling</td><td>Lowest</td><td>Rising</td></tr>
       <tr><td><b>Sky</b></td><td>Clouds build</td><td>Line of storms</td><td>Clearing</td></tr>
     </table></div>
-    <div class="callout"><p><strong>Forecasting tip.</strong> In the U.S., prevailing westerly winds carry most lows, highs, and fronts from west to east. Check the weather to your west to see what’s coming.</p></div>`
+    <div class="callout"><p><strong>Forecasting tip.</strong> In the U.S., prevailing westerly winds carry most lows, highs, and fronts from west to east. Check the weather to your west to see what’s coming.</p></div>`,
+  es: {
+    title: "Frentes y pronósticos",
+    blurb: "Frentes fríos, cálidos, estacionarios y ocluidos, y cómo los mueven las altas y bajas presiones",
+    body: () => `${HERO.fronts()}
+    <h2>Frentes y pronósticos</h2>
+    <p class="intro">Un <b>frente</b> es el límite donde se encuentran dos masas de aire con distinta temperatura y humedad. En los frentes ocurren muchos de los cambios del tiempo, así que los meteorólogos los siguen de cerca.</p>
+    <h3>Los cuatro tipos de frentes</h3>
+    <div class="tiles">
+      ${tile(`<svg viewBox="0 0 80 28" style="width:100%;height:auto" aria-hidden="true">${front([[4,18],[76,18]],"cold",1,1.5)}</svg>`,"Frente frío","El aire frío y denso se mete por debajo del aire cálido y lo empuja hacia arriba rápido. Trae una línea angosta de tormentas fuertes y luego aire más fresco y seco, un cambio de viento y presión que sube.","triángulos azules")}
+      ${tile(`<svg viewBox="0 0 80 28" style="width:100%;height:auto" aria-hidden="true">${front([[4,18],[76,18]],"warm",1,1.5)}</svg>`,"Frente cálido","El aire cálido sube despacio por encima del aire frío que se retira. Trae nubes extensas y lluvia larga y constante, y luego aire más cálido y húmedo.","semicírculos rojos")}
+      ${tile(`<svg viewBox="0 0 80 28" style="width:100%;height:auto" aria-hidden="true">${front([[4,14],[76,14]],"stat",1,1.5)}</svg>`,"Frente estacionario","Ninguna masa de aire tiene fuerza para empujar a la otra, así que el frente se detiene. Puede traer tiempo nublado y lluvioso por días.","alternados, en lados opuestos")}
+      ${tile(`<svg viewBox="0 0 80 28" style="width:100%;height:auto" aria-hidden="true">${front([[4,18],[76,18]],"occl",1,1.5)}</svg>`,"Frente ocluido","Un frente frío rápido alcanza a un frente cálido y levanta todo el aire cálido del suelo. Suele formarse cuando un sistema de tormentas madura.","morado, con las dos formas")}
+    </div>
+    <p style="margin-top:12px">Los símbolos apuntan hacia donde se mueve el frente.</p>
+    <h3>Cómo las altas y bajas presiones mueven los frentes</h3>
+    <div class="compare">
+      <div>
+        <h4 style="color:#FF6B6B">Baja presión (L)</h4>
+        <p class="when">El aire entra y sube</p>
+        <ul><li>Gira en sentido contrario a las agujas del reloj en el hemisferio norte</li><li>El aire que sube se enfría y forma nubes y tormentas</li><li>Los frentes salen de la baja y viajan con ella</li></ul>
+      </div>
+      <div>
+        <h4 style="color:#5AA9FF">Alta presión (H)</h4>
+        <p class="when">El aire baja y sale</p>
+        <ul><li>Gira en el sentido de las agujas del reloj en el hemisferio norte</li><li>El aire que baja se calienta y se seca, así que el cielo se despeja</li><li>Una alta fuerte empuja un frente frío hacia adelante, o bloquea un frente para que se detenga</li></ul>
+      </div>
+    </div>
+    <p class="source">En los mapas de EE. UU. se usan las letras en inglés: L (low) para baja presión y H (high) para alta presión.</p>
+    <h3>Un frente frío pasa por Florida</h3>
+    <div class="tablewrap"><table>
+      <tr><th></th><th>Antes</th><th>Durante</th><th>Después</th></tr>
+      <tr><td><b>Temperatura</b></td><td>Cálida</td><td>Bajando</td><td>Más fresca</td></tr>
+      <tr><td><b>Humedad</b></td><td>Húmedo</td><td>—</td><td>Más seco</td></tr>
+      <tr><td><b>Viento</b></td><td>S o SO</td><td>Ráfagas, cambia</td><td>NO o N</td></tr>
+      <tr><td><b>Presión</b></td><td>Bajando</td><td>La más baja</td><td>Subiendo</td></tr>
+      <tr><td><b>Cielo</b></td><td>Se forman nubes</td><td>Línea de tormentas</td><td>Se despeja</td></tr>
+    </table></div>
+    <div class="callout"><p><strong>Consejo para pronosticar.</strong> En EE. UU., los vientos del oeste que predominan llevan la mayoría de las bajas, las altas y los frentes de oeste a este. Mira el tiempo al oeste de ti para ver lo que viene.</p></div>`
+  }
 },
 
 "air-masses": {
@@ -877,7 +1085,32 @@ const CARDS = {
       ${tile(badge("mP","#7FC4D8"),"Maritime polar","Cool and moist. Forms over the North Pacific and North Atlantic. Brings rain and snow to the Pacific Northwest and New England.")}
       ${tile(badge("cT","#E8B26A"),"Continental tropical","Hot and dry. Forms over the deserts of Mexico and the southwestern U.S. Brings summer heat waves to the Southwest.")}
     </div>
-    <div class="callout"><p><strong>Air masses change as they travel.</strong> Cold, dry cP air crossing the warm Great Lakes picks up moisture and dumps “lake-effect” snow downwind. Where two air masses collide, a front forms.</p></div>`
+    <div class="callout"><p><strong>Air masses change as they travel.</strong> Cold, dry cP air crossing the warm Great Lakes picks up moisture and dumps “lake-effect” snow downwind. Where two air masses collide, a front forms.</p></div>`,
+  es: {
+    title: "Masas de aire",
+    blurb: "Enormes cuerpos de aire que se nombran según donde se forman",
+    body: () => `${HERO.air()}
+    <h2>Masas de aire</h2>
+    <p class="intro">Una <b>masa de aire</b> es un enorme cuerpo de aire, a menudo de más de 1,000 millas de ancho, con más o menos la misma temperatura y humedad en todas partes. Toma esas propiedades de la región donde se forma, llamada su <b>región de origen</b>.</p>
+    <h3>Descifrando el código</h3>
+    <div class="tablewrap"><table>
+      <tr><th>Letra</th><th>Significa</th><th>Te dice</th></tr>
+      <tr><td><b>c</b></td><td>continental</td><td>se formó sobre tierra, así que es seca</td></tr>
+      <tr><td><b>m</b></td><td>marítima</td><td>se formó sobre el océano, así que es húmeda</td></tr>
+      <tr><td><b>T</b></td><td>tropical</td><td>se formó cerca de los trópicos, así que es cálida</td></tr>
+      <tr><td><b>P</b></td><td>polar</td><td>se formó en latitudes altas, así que es fría</td></tr>
+      <tr><td><b>A</b></td><td>ártica</td><td>se formó sobre el Ártico, así que es muy fría</td></tr>
+    </table></div>
+    <h3>Los cinco tipos principales</h3>
+    <div class="tiles">
+      ${tile(badge("mT","#F28C4E"),"Tropical marítima","Cálida y húmeda. Se forma sobre el Golfo, el Caribe y el Atlántico tropical. Es el aire de todos los días del verano en Florida y alimenta las tormentas de la tarde.")}
+      ${tile(badge("cP","#5AA9FF"),"Polar continental","Fría y seca. Se forma sobre el norte de Canadá. Llega detrás de los frentes fríos del invierno y le da a Florida sus días frescos y secos.")}
+      ${tile(badge("cA","#C9E6FF"),"Ártica continental","Muy fría y muy seca. Se forma sobre el Ártico. Casi nunca llega a Florida, pero cuando llega puede causar heladas que dañan los cultivos.")}
+      ${tile(badge("mP","#7FC4D8"),"Polar marítima","Fresca y húmeda. Se forma sobre el Pacífico Norte y el Atlántico Norte. Trae lluvia y nieve al noroeste del Pacífico y a Nueva Inglaterra.")}
+      ${tile(badge("cT","#E8B26A"),"Tropical continental","Caliente y seca. Se forma sobre los desiertos de México y el suroeste de EE. UU. Trae olas de calor en el verano al suroeste.")}
+    </div>
+    <div class="callout"><p><strong>Las masas de aire cambian al viajar.</strong> El aire cP frío y seco que cruza los Grandes Lagos, más cálidos, recoge humedad y deja caer nieve por “efecto lago” del otro lado. Donde chocan dos masas de aire, se forma un frente.</p></div>`
+  }
 },
 
 "hurricanes": {
@@ -962,7 +1195,90 @@ const CARDS = {
       ${tile("","Storm surge","Water rose 10 to 15 feet above the ground on Fort Myers Beach. Surge caused most of the storm’s direct deaths.")}
       ${tile("","Rain","Up to about 27 inches fell near the landfall area, flooding rivers across central Florida.")}
       ${tile("","Cost","About $113 billion in U.S. damage, the costliest hurricane in Florida history.")}
+    </div>`,
+  es: {
+    title: "Huracanes",
+    blurb: "Cómo se forman, cómo se clasifican, cómo prepararse y la trayectoria del huracán Ian",
+    body: () => `${HERO.hurricane()}
+    <h2>Huracanes</h2>
+    <p class="intro">Un <b>huracán</b> es un poderoso <b>ciclón tropical</b>: un sistema giratorio de baja presión hecho de tormentas organizadas que se forma sobre océanos tropicales cálidos, con vientos sostenidos de al menos 74 mph.</p>
+    <h3>De perturbación a huracán</h3>
+    <div class="defs">
+      ${def("Perturbación tropical","un grupo de tormentas sobre agua cálida, a menudo una onda tropical que se mueve al oeste desde África.")}
+      ${def("Depresión tropical","se forma una circulación cerrada; vientos de hasta 38 mph.")}
+      ${def("Tormenta tropical","vientos de 39 a 73 mph. La tormenta recibe un nombre.")}
+      ${def("Huracán","vientos de 74 mph o más.")}
+    </div>
+    <h3>Ingredientes que necesita un huracán</h3>
+    <div class="chips">
+      <span>Agua del océano de al menos 80 °F (26.5 °C), cálida hasta unos 150 pies de profundidad</span>
+      <span>Aire húmedo</span>
+      <span>Poca cizalladura del viento (vientos que cambian poco con la altura)</span>
+      <span>Una perturbación inicial</span>
+      <span>Al menos unos 5° del ecuador, para que el giro de la Tierra pueda empezar la rotación</span>
+    </div>
+    <p style="margin-top:12px">La energía viene del agua cálida del océano: cuando el agua se evapora y luego se condensa en las nubes de la tormenta, suelta calor que alimenta al huracán. Por eso los huracanes se debilitan sobre tierra o sobre agua fría.</p>
+    <h3>Dónde se forman y cómo se llaman</h3>
+    <div class="tiles">
+      ${tile("","Huracán","Océano Atlántico, el Caribe, el Golfo y el Pacífico Norte oriental y central.")}
+      ${tile("","Tifón","Pacífico noroeste, cerca de Japón, Filipinas y China.")}
+      ${tile("","Ciclón","Océano Índico y el Pacífico Sur cerca de Australia.")}
+    </div>
+    <p style="margin-top:12px">La temporada de huracanes del Atlántico va del 1 de junio al 30 de noviembre, con su punto más fuerte de mediados de agosto a octubre.</p>
+    <h3>Partes de un huracán</h3>
+    <div class="defs">
+      ${def("Ojo","el centro tranquilo, a menudo despejado, con vientos suaves y la presión más baja. Suele medir de 20 a 40 millas.")}
+      ${def("Pared del ojo","un anillo de tormentas altísimas alrededor del ojo, con los vientos más fuertes y la lluvia más intensa.")}
+      ${def("Bandas de lluvia","bandas de tormentas en espiral que se extienden cientos de millas. Traen ráfagas de lluvia fuerte, viento y a veces tornados.")}
+      ${def("Flujo de salida","el aire que subió en la tormenta se esparce arriba y forma un escudo ancho de nubes altas y delgadas.")}
+      ${def("Lado delantero derecho","en una tormenta que avanza, el lado a la derecha de su trayectoria suele tener los vientos más fuertes y la marejada más alta.")}
+    </div>
+    <h3>La escala de vientos de huracanes Saffir-Simpson</h3>
+    <div class="tablewrap"><table>
+      <tr><th>Categoría</th><th>Vientos</th><th>Daños</th></tr>
+      <tr><td class="nw"><span class="cat" style="background:${CAT_COLORS.c1}"></span><b>1</b></td><td class="nw">74–95 mph</td><td>Vientos muy peligrosos dañan techos, paredes exteriores y canaletas; es probable que se vaya la luz</td></tr>
+      <tr><td class="nw"><span class="cat" style="background:${CAT_COLORS.c2}"></span><b>2</b></td><td class="nw">96–110 mph</td><td>Extremadamente peligroso; daños grandes en techos, muchos árboles arrancados, sin luz por días o semanas</td></tr>
+      <tr><td class="nw"><span class="cat" style="background:${CAT_COLORS.c3}"></span><b>3</b> mayor</td><td class="nw">111–129 mph</td><td>Devastador; las casas pueden perder el techo, sin agua ni luz por días o semanas</td></tr>
+      <tr><td class="nw"><span class="cat" style="background:${CAT_COLORS.c4}"></span><b>4</b> mayor</td><td class="nw">130–156 mph</td><td>Catastrófico; daños graves en casas, la mayoría de los árboles quebrados, la zona puede quedar inhabitable por semanas o meses</td></tr>
+      <tr><td class="nw"><span class="cat" style="background:${CAT_COLORS.c5}"></span><b>5</b> mayor</td><td class="nw">157+ mph</td><td>Catastrófico; muchas casas destruidas, la zona puede quedar inhabitable por semanas o meses</td></tr>
+    </table></div>
+    <p class="source">La escala solo mide el viento. No incluye la marejada ciclónica ni las inundaciones por lluvia, que a menudo causan la mayoría de las muertes.</p>
+    <h3>Otros peligros</h3>
+    <div class="tiles">
+      ${tile("","Marejada ciclónica","Una subida anormal del agua del mar empujada a la costa por los vientos de la tormenta. Es el peligro más mortal de un huracán.")}
+      ${tile("","Marea de tormenta","La marejada ciclónica más la marea normal. Una marejada que llega con la marea alta inunda más alto y más tierra adentro.")}
+      ${tile("","Inundación de agua dulce","Las tormentas lentas pueden dejar caer mucho más de un pie de lluvia e inundar ríos lejos de la costa.")}
+      ${tile("","Olas y corrientes de resaca","Olas grandes golpean la costa y se pueden formar corrientes de resaca peligrosas a cientos de millas.")}
+      ${tile("","Tornados","A menudo se forman tornados cortos en las bandas de lluvia exteriores.")}
+      ${tile("","Viento","Los escombros que vuelan y los árboles que caen dañan edificios y cortan la luz.")}
+    </div>
+    <h3>Cómo prepararse</h3>
+    <div class="compare">
+      <div><h4 style="color:var(--amber)">Vigilancia de huracán</h4><p class="when" style="margin:0">Las condiciones de huracán son <b>posibles</b>; se emite unas 48 horas antes. Termina de prepararte.</p></div>
+      <div><h4 style="color:#FF6B6B">Aviso de huracán</h4><p class="when" style="margin:0">Se <b>esperan</b> condiciones de huracán; se emite unas 36 horas antes. Completa tu plan o evacúa si te lo ordenan.</p></div>
+    </div>
+    <div class="defs" style="margin-top:12px">
+      <div class="def"><b>Antes de la temporada:</b><ul><li>Conoce tu zona de evacuación y a dónde irías.</li><li>Haz un plan familiar, incluyendo a las mascotas.</li><li>Arma un kit de suministros.</li></ul></div>
+      <div class="def"><b>Cuando se acerca una tormenta:</b><ul><li>Guarda los objetos de afuera y protege las ventanas.</li><li>Surte las recetas, carga los aparatos y llena el tanque de gasolina.</li><li>Sigue las órdenes de evacuación. Huye del agua, escóndete del viento.</li></ul></div>
+      <div class="def"><b>Después de la tormenta:</b><ul><li>No te metas en el agua de inundación; puede esconder cables eléctricos y escombros.</li><li>Usa los generadores solo afuera, lejos de las ventanas, para evitar el monóxido de carbono.</li><li>Espera a que las autoridades digan que es seguro regresar.</li></ul></div>
+    </div>
+    <p style="margin-top:10px"><b>Kit de suministros:</b></p>
+    <div class="chips"><span>Agua: 1 galón por persona por día</span><span>Comida que no se tenga que cocinar</span><span>Medicinas</span><span>Linternas y pilas</span><span>Radio de pilas</span><span>Botiquín de primeros auxilios</span><span>Cargadores y batería portátil</span><span>Documentos en una bolsa impermeable</span><span>Efectivo</span><span>Cosas para las mascotas</span></div>
+    <h3>Caso de estudio: el huracán Ian (2022)</h3>
+    <p>Ian creció de una onda tropical frente a África hasta convertirse en el huracán más costoso de la historia de Florida. Síguelo desde que nació hasta que tocó tierra.</p>
+    ${HERO.ianMap()}
+    <div class="tablewrap"><table class="wide-table">
+      <tr><th></th><th>Fecha y hora (EDT)</th><th>Lugar</th><th>Viento</th><th>Presión</th><th>Fuerza</th><th>Qué pasó</th></tr>
+      ${IAN_EVENTS.map(e => `<tr><td><span class="key">${e.k}</span></td><td class="nw">${e.tEs}</td><td class="nw">${e.lat.toFixed(1)}°N, ${Math.abs(e.lon).toFixed(1)}°O</td><td class="nw">${e.mph} mph</td><td class="nw">${e.mb} mb</td><td class="nw"><span class="cat" style="background:${CAT_COLORS[stageClass(e.stage)]}"></span>${stageEs(e.stage)}</td><td style="min-width:200px">${e.noteEs}</td></tr>`).join("")}
+    </table></div>
+    <p class="source">Desliza la tabla hacia el lado para ver todas las columnas. Vientos redondeados a las 5 mph más cercanas. Datos: Informe de ciclón tropical del Centro Nacional de Huracanes, huracán Ian.</p>
+    <div class="tiles">
+      ${tile("","Fíjate en el patrón","Mientras la presión bajó de 1006 mb a 937 mb, los vientos subieron de 35 a 160 mph. Menor presión significa una tormenta más fuerte.")}
+      ${tile("","Marejada ciclónica","El agua subió de 10 a 15 pies sobre el suelo en Fort Myers Beach. La marejada causó la mayoría de las muertes directas de la tormenta.")}
+      ${tile("","Lluvia","Cayeron hasta unas 27 pulgadas cerca de donde tocó tierra, e inundaron ríos en todo el centro de Florida.")}
+      ${tile("","Costo","Unos $113 mil millones en daños en EE. UU., el huracán más costoso de la historia de Florida.")}
     </div>`
+  }
 },
 
 "karst-florida": {
@@ -998,7 +1314,41 @@ const CARDS = {
       ${def("Saltwater intrusion","near the coast, over-pumping can let seawater move into the aquifer and spoil wells.")}
       ${def("Drying wetlands","lakes and wetlands connected to the water table can shrink.")}
     </div>
-    <div class="callout"><p><strong>Real example: Plant City, 2010.</strong> During a January freeze, strawberry farmers pumped huge amounts of groundwater to spray protective ice on their crops. The water table dropped about 60 feet, and roughly 140 sinkholes opened in the area.</p></div>`
+    <div class="callout"><p><strong>Real example: Plant City, 2010.</strong> During a January freeze, strawberry farmers pumped huge amounts of groundwater to spray protective ice on their crops. The water table dropped about 60 feet, and roughly 140 sinkholes opened in the area.</p></div>`,
+  es: {
+    title: "El karst, el acuífero y los sumideros de Florida",
+    blurb: "Cómo la caliza que se disuelve forma cuevas, manantiales y sumideros",
+    body: () => `${HERO.karst()}
+    <h2>El karst, el acuífero y los sumideros de Florida</h2>
+    <p class="intro">Gran parte de Florida está sobre gruesas capas de <b>caliza</b>, una roca formada por las conchas y esqueletos de animales marinos cuando Florida estaba bajo un mar poco profundo. El agua disuelve esta roca poco a poco y crea un paisaje llamado <b>topografía kárstica</b>.</p>
+    <h3>Cómo se disuelve la caliza</h3>
+    <p>El agua de lluvia absorbe dióxido de carbono del aire y del suelo y forma un ácido débil, el <b>ácido carbónico</b>. Cuando esta agua un poco ácida se filtra por las grietas de la caliza, disuelve la roca (meteorización química) y, con miles de años, convierte las grietas en canales, túneles y cuevas.</p>
+    <h3>Formas del karst</h3>
+    <div class="tiles">
+      ${tile("","Cuevas y conductos","Pasajes bajo tierra; en Florida, la mayoría están llenos de agua. El Parque Estatal Florida Caverns tiene cuevas secas que puedes recorrer.")}
+      ${tile("","Manantiales","Lugares donde el agua subterránea sale a la superficie. Florida tiene más de 1,000 manantiales, uno de los grupos más grandes del mundo.")}
+      ${tile("","Sumideros","Hundimientos u hoyos que se forman cuando el suelo se hunde en los espacios disueltos de la caliza de abajo.")}
+      ${tile("","Lagos de sumidero","Muchos de los lagos redondos de Florida son sumideros viejos que se llenaron de agua.")}
+      ${tile("","Ríos que desaparecen","Algunos ríos entran a un sumidero y viajan bajo tierra antes de volver a salir, como el río Santa Fe.")}
+    </div>
+    <h3>El acuífero de Florida</h3>
+    <p>La caliza tiene tantos huecos que guarda enormes cantidades de agua. El <b>acuífero de Florida</b> está debajo de todo el estado y de partes de Georgia, Alabama y Carolina del Sur, y es la fuente principal de agua potable de casi todo el estado. La lluvia lo recarga más rápido donde los suelos arenosos dejan que el agua se filtre directo, como en las lomas del centro de Florida.</p>
+    <h3>Tres tipos de sumideros</h3>
+    <div class="defs">
+      ${def("Por disolución","la caliza cerca de la superficie se disuelve poco a poco y forma un hundimiento lento y poco profundo que a menudo se llena de agua.")}
+      ${def("Por hundimiento de la cubierta","la arena cae poco a poco en los huecos de la caliza, así que el suelo se hunde despacio.")}
+      ${def("Por colapso de la cubierta","una cavidad crece debajo de una capa de arcilla hasta que el techo se cae de repente. Pueden aparecer en horas y son los más peligrosos.")}
+    </div>
+    <h3>Cómo el uso del agua subterránea afecta el karst</h3>
+    <p>El agua subterránea que llena los espacios bajo tierra ayuda a sostener la roca y el sedimento de arriba. Bombear mucha agua baja el nivel freático, sobre todo alrededor de un pozo (el <b>cono de depresión</b>), y puede quitar ese soporte.</p>
+    <div class="defs">
+      ${def("Más sumideros","los sumideros suelen aparecer después de grandes bajadas del nivel freático, o cuando llueve fuerte después de una sequía.")}
+      ${def("Manantiales más débiles","menos agua subterránea significa menos flujo en los manantiales, lo que daña los ríos y a animales como los manatíes, que dependen del agua tibia de los manantiales.")}
+      ${def("Intrusión de agua salada","cerca de la costa, bombear demasiado puede dejar que el agua de mar entre al acuífero y dañe los pozos.")}
+      ${def("Humedales que se secan","los lagos y humedales conectados al nivel freático pueden encogerse.")}
+    </div>
+    <div class="callout"><p><strong>Ejemplo real: Plant City, 2010.</strong> Durante una helada en enero, los productores de fresas bombearon muchísima agua subterránea para rociar hielo protector sobre sus cultivos. El nivel freático bajó unos 60 pies y se abrieron cerca de 140 sumideros en la zona.</p></div>`
+  }
 },
 
 "earth-spheres": {
@@ -1023,7 +1373,30 @@ const CARDS = {
       <div><b>A volcanic eruption</b><p>Ash and gases blast into the air (geosphere → atmosphere), can block sunlight and cool the climate, and affect crops and animals (→ biosphere).</p></div>
       <div><b>Melting ice sheets</b><p>Melting ice adds water to the ocean (cryosphere → hydrosphere), raising sea level and reshaping coastlines (→ geosphere).</p></div>
       <div><b>Sea turtle nests</b><p>The temperature of beach sand (geosphere) decides whether baby sea turtles (biosphere) hatch as males or females: warmer sand produces more females.</p></div>
+    </div>`,
+  es: {
+    title: "Las esferas de la Tierra",
+    blurb: "Geosfera, hidrosfera, criosfera, atmósfera, biosfera y cómo interactúan",
+    body: () => `${HERO.spheres()}
+    <h2>Las esferas de la Tierra</h2>
+    <p class="intro">Los científicos dividen el sistema de la Tierra en partes llamadas <b>esferas</b>. Cada una es diferente, pero intercambian materia y energía todo el tiempo, así que un cambio en una esfera afecta a las demás.</p>
+    <div class="tiles">
+      ${tile(`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="30" fill="#A07A4E"/><circle cx="40" cy="40" r="18" fill="#C86B3C"/><circle cx="40" cy="40" r="8" fill="#F4B860"/></svg>`,"Geosfera","La Tierra sólida: rocas, minerales, suelo, formas del terreno y las capas del interior (corteza, manto, núcleo). La caliza de Florida es parte de ella.")}
+      ${tile(ART.drop,"Hidrosfera","Toda el agua de la Tierra: océanos, lagos, ríos, agua subterránea y vapor de agua. Cerca del 97% es agua salada del océano.")}
+      ${tile(ART.snow,"Criosfera","El agua congelada: glaciares, capas de hielo, hielo marino, nieve y suelo congelado todo el año. A menudo se cuenta como parte de la hidrosfera. Su superficie brillante refleja la luz del sol.")}
+      ${tile(`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="50" r="22" fill="#2F7FB0"/><circle cx="40" cy="50" r="30" fill="none" stroke="#5AA9FF" stroke-width="5" opacity=".6"/><circle cx="40" cy="50" r="37" fill="none" stroke="#5AA9FF" stroke-width="3" opacity=".3"/></svg>`,"Atmósfera","La capa de gases que rodea la Tierra: cerca de 78% nitrógeno, 21% oxígeno y pequeñas cantidades de argón, dióxido de carbono y vapor de agua. El tiempo ocurre en su capa más baja, la troposfera.")}
+      ${tile(`<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 70 V36" stroke="#6E4A2C" stroke-width="5"/><circle cx="40" cy="28" r="18" fill="#3E9A62"/><circle cx="26" cy="38" r="10" fill="#4FB074"/><circle cx="54" cy="38" r="10" fill="#4FB074"/></svg>`,"Biosfera","Todos los seres vivos, desde las bacterias hasta las personas, y los lugares donde viven. La vida existe en las otras esferas: el suelo, el agua y el aire.")}
+    </div>
+    <h3>Las esferas en acción</h3>
+    <div class="chain">
+      <div><b>Un huracán</b><p>El agua cálida del océano se evapora al aire (hidrosfera → atmósfera) y alimenta la tormenta. Los vientos y la marejada erosionan las playas (atmósfera → geosfera) y dañan los manglares y los arrecifes (→ biosfera).</p></div>
+      <div><b>Las plantas respiran</b><p>Las plantas toman dióxido de carbono y sueltan oxígeno y vapor de agua (biosfera ↔ atmósfera), y sus raíces sacan agua del suelo (geosfera, hidrosfera).</p></div>
+      <div><b>Las cuevas de Florida</b><p>El dióxido de carbono del aire se disuelve en el agua de lluvia (atmósfera → hidrosfera), y esa agua ácida disuelve la caliza (→ geosfera).</p></div>
+      <div><b>Una erupción volcánica</b><p>La ceniza y los gases salen disparados al aire (geosfera → atmósfera), pueden tapar la luz del sol y enfriar el clima, y afectan los cultivos y los animales (→ biosfera).</p></div>
+      <div><b>Capas de hielo que se derriten</b><p>El hielo derretido agrega agua al océano (criosfera → hidrosfera), sube el nivel del mar y cambia la forma de las costas (→ geosfera).</p></div>
+      <div><b>Nidos de tortugas marinas</b><p>La temperatura de la arena de la playa (geosfera) decide si las tortuguitas (biosfera) nacen machos o hembras: la arena más caliente produce más hembras.</p></div>
     </div>`
+  }
 },
 
 "sun-energy": {
@@ -1054,7 +1427,36 @@ const CARDS = {
       <div><b>Cryosphere</b><p>Absorbed energy melts snow and ice; less ice means more sunlight absorbed.</p></div>
       <div><b>Biosphere</b><p>Plants capture sunlight through photosynthesis, the energy source for nearly every food chain.</p></div>
       <div><b>Geosphere</b><p>Heating and cooling, along with water and wind, weather and erode rock. (Plate movement is driven by Earth’s internal heat, not the Sun.)</p></div>
+    </div>`,
+  es: {
+    title: "La energía del Sol y la transferencia de calor",
+    blurb: "La radiación, la conducción y la convección mueven el tiempo y las esferas de la Tierra",
+    body: () => `${HERO.sun()}
+    <h2>La energía del Sol y la transferencia de calor</h2>
+    <p class="intro">Casi toda la energía que mueve el tiempo viene del Sol. Esa energía se mueve por el sistema de la Tierra de tres maneras: <b>radiación</b>, <b>conducción</b> y <b>convección</b>.</p>
+    <div class="tiles">
+      ${tile(`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="20" cy="22" r="13" fill="#F4B860"/>${waveRay(32,30,38,4)}</svg>`,"Radiación","Energía que viaja en ondas electromagnéticas, como la luz del sol. No necesita materia, así que cruza el espacio vacío. La superficie caliente de la Tierra también suelta radiación infrarroja.","sin contacto")}
+      ${tile(`<svg viewBox="0 0 80 80" aria-hidden="true"><rect x="6" y="50" width="68" height="20" rx="3" fill="#C9A66B"/><rect x="6" y="40" width="68" height="10" fill="#FF6B6B" opacity=".45"/><path d="M20 38 v-10 M40 38 v-10 M60 38 v-10" stroke="#FF6B6B" stroke-width="2.4" stroke-linecap="round"/></svg>`,"Conducción","Calor que pasa directo entre cosas que se tocan. La arena caliente calienta la capa delgada de aire justo encima. El aire conduce mal el calor, así que esto solo calienta el aire más bajo.","contacto directo")}
+      ${tile(`<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M24 64 C14 44 34 30 24 12" fill="none" stroke="#FF6B6B" stroke-width="3" stroke-linecap="round"/><path d="M56 12 C66 32 46 46 56 64" fill="none" stroke="#5AA9FF" stroke-width="3" stroke-linecap="round"/><path d="M24 12 Q40 2 56 12 M56 64 Q40 74 24 64" fill="none" stroke="#97A9BF" stroke-width="2" stroke-dasharray="3 3"/></svg>`,"Convección","Calor que lleva un fluido en movimiento (líquido o gas). El aire cálido es menos denso y sube; el aire frío baja para reemplazarlo y forma un ciclo llamado corriente de convección.","sube y baja")}
+    </div>
+    <h3>El calentamiento desigual mueve el tiempo</h3>
+    <p>La luz del sol llega casi directo al ecuador, pero llega inclinada a los polos y reparte la misma energía en más área. Los trópicos ganan más energía de la que pierden, y los polos pierden más de la que ganan. Los vientos y las corrientes del océano llevan calor todo el tiempo del ecuador hacia los polos. Ese movimiento es nuestro tiempo.</p>
+    <h3>Tierra contra agua</h3>
+    <p>El agua tiene un <b>calor específico</b> alto: se necesita mucha energía para calentarla, así que los océanos se calientan y se enfrían despacio. La tierra se calienta rápido. En un día soleado en Florida, la tierra se pone más caliente que el océano, el aire cálido sobre la tierra sube y el aire más fresco del océano entra como <b>brisa marina</b>. Cuando las brisas del Golfo y del Atlántico chocan sobre la península, empujan el aire hacia arriba y provocan las tormentas de la tarde en Florida.</p>
+    <h3>Dos ideas clave más</h3>
+    <div class="defs">
+      ${def("Albedo","cuánta luz del sol refleja una superficie. La nieve fresca refleja hasta cerca del 90%, el océano oscuro menos del 10%. La Tierra en total refleja cerca del 30%.")}
+      ${def("Calor latente","energía que se guarda cuando el agua se evapora y se suelta cuando el vapor se condensa en nubes. Este calor escondido alimenta las tormentas eléctricas y los huracanes.")}
+    </div>
+    <h3>Cómo la energía del Sol llega a cada esfera</h3>
+    <div class="chain">
+      <div><b>Atmósfera</b><p>El calentamiento desigual crea diferencias de presión, vientos, frentes y tormentas.</p></div>
+      <div><b>Hidrosfera</b><p>La luz del sol evapora el agua para mover el ciclo del agua y calienta la superficie del océano, lo que mueve las corrientes.</p></div>
+      <div><b>Criosfera</b><p>La energía absorbida derrite la nieve y el hielo; menos hielo significa que se absorbe más luz del sol.</p></div>
+      <div><b>Biosfera</b><p>Las plantas captan la luz del sol con la fotosíntesis, la fuente de energía de casi todas las cadenas alimenticias.</p></div>
+      <div><b>Geosfera</b><p>El calentamiento y el enfriamiento, junto con el agua y el viento, desgastan y erosionan las rocas. (El movimiento de las placas viene del calor interno de la Tierra, no del Sol.)</p></div>
     </div>`
+  }
 },
 
 /* ---------------- QUARTER 2 ---------------- */
@@ -1084,7 +1486,34 @@ const CARDS = {
       ${def("Proxy","a natural record used in place of direct measurements.")}
       ${def("Core sample","a long cylinder drilled out of ice, mud, rock, or soil so its layers can be studied in order.")}
       ${def("Annual layer","a layer that forms once per year, like a tree ring.")}
+    </div>`,
+  es: {
+    title: "Indicadores indirectos (proxies)",
+    blurb: "Cómo los científicos leen los climas del pasado en el hielo, los árboles, el lodo y más",
+    body: () => `${HERO.proxy()}
+    <h2>Indicadores indirectos (proxies)</h2>
+    <p class="intro">Un <b>proxy</b> es algo que toma el lugar de otra cosa. Nadie puede regresar en el tiempo y leer un termómetro, así que los científicos usan registros naturales que se formaron con el clima del pasado. Se llaman <b>indicadores indirectos</b>, o proxies del clima.</p>
+    <h3>¿Cómo funcionan?</h3>
+    <p>Muchos indicadores se forman en capas con el tiempo, a menudo una capa por año. Cada capa atrapa pistas de las condiciones cuando se formó. Cuenta las capas para saber la edad y luego estudia cada capa para leer el clima.</p>
+    <h3>Indicadores indirectos comunes</h3>
+    <div class="tiles">
+      ${tile(ART.iceCore,"Núcleos de hielo","Las burbujas de aire atrapadas en el hielo son muestras de la atmósfera antigua. El hielo mismo guarda las temperaturas del pasado.","Hasta ~800,000 años")}
+      ${tile(ART.treeRings,"Anillos de los árboles","Un árbol forma un anillo cada año. Los anillos anchos significan buenos años para crecer; los angostos señalan sequía o frío.","Miles de años")}
+      ${tile(ART.sediment,"Núcleos de sedimento","El lodo se acumula en el fondo de océanos y lagos y atrapa conchas de organismos diminutos cuya química guarda la temperatura del agua.","Millones de años")}
+      ${tile(ART.soil,"Núcleos de suelo","Las capas, los colores y los restos de plantas enterrados en el suelo muestran si una zona era más húmeda o más seca en el pasado.","Miles de años")}
+      ${tile(ART.coral,"Corales","Los corales forman una banda de crecimiento cada año. La química de cada banda guarda la temperatura del océano en el pasado.","Cientos de años")}
+      ${tile(ART.pollen,"Polen","El polen guardado en el lodo de los lagos muestra qué plantas crecían cerca, y las plantas revelan el clima.","Decenas de miles de años")}
+      ${tile(ART.cave,"Formaciones de cuevas","Las estalagmitas crecen en capas delgadas por el agua que gotea y guardan la lluvia y la temperatura del pasado.","Cientos de miles de años")}
+      ${tile(ART.records,"Registros históricos","Diarios, bitácoras de barcos y fechas de cosecha describen el tiempo que la gente vio antes de que los termómetros fueran comunes.","Cientos de años")}
+    </div>
+    <div class="callout"><p><strong>Más fuertes juntos.</strong> Ningún indicador cuenta toda la historia. Cuando los núcleos de hielo, los anillos de los árboles y los sedimentos señalan el mismo cambio, los científicos pueden confiar en que de verdad pasó.</p></div>
+    <h3>Palabras que debes saber</h3>
+    <div class="defs">
+      ${def("Indicador indirecto (proxy)","un registro natural que se usa en lugar de mediciones directas.")}
+      ${def("Muestra de núcleo","un cilindro largo que se saca perforando hielo, lodo, roca o suelo para estudiar sus capas en orden.")}
+      ${def("Capa anual","una capa que se forma una vez al año, como un anillo de árbol.")}
     </div>`
+  }
 },
 
 "ice-ages": {
@@ -1111,7 +1540,32 @@ const CARDS = {
     </div>
     <p style="margin-top:14px">Feedbacks make the swings bigger: bright ice reflects sunlight back to space, cooling Earth even more, and changes in carbon dioxide strengthen both warming and cooling.</p>
     <h3>How do we know?</h3>
-    <p>Proxy indicators! Ice cores and ocean sediment cores record the rhythm of glacial cycles, and landforms like moraines and scratched bedrock show where glaciers once flowed.</p>`
+    <p>Proxy indicators! Ice cores and ocean sediment cores record the rhythm of glacial cycles, and landforms like moraines and scratched bedrock show where glaciers once flowed.</p>`,
+  es: {
+    title: "Edades de hielo",
+    blurb: "Por qué la Tierra pasa de capas de hielo gigantes a épocas cálidas",
+    body: () => `${HERO.ice()}
+    <h2>Edades de hielo</h2>
+    <p class="intro">Una <b>edad de hielo</b> es un periodo largo en el que el clima de la Tierra es tan frío que enormes capas de hielo cubren grandes partes de los continentes.</p>
+    <div class="defs">
+      ${def("Periodo glacial","un periodo frío en el que las capas de hielo crecen y se extienden.")}
+      ${def("Periodo interglacial","un periodo más cálido en el que las capas de hielo se derriten y retroceden.")}
+    </div>
+    <p>Ahora vivimos en un interglacial cálido llamado el <b>Holoceno</b>, que empezó hace unos 11,700 años. Todavía hay capas de hielo sobre Groenlandia y la Antártida.</p>
+    <h3>La última gran congelación</h3>
+    <p>Hace unos 20,000 años, hielo de hasta 3 km (2 millas) de grosor cubría casi todo Canadá y el norte de Estados Unidos. Había tanta agua guardada como hielo que el nivel del mar estaba unos 120 m (400 pies) más bajo que hoy.</p>
+    <div class="callout"><p><strong>Florida durante la edad de hielo.</strong> Con el nivel del mar tan bajo, la costa del Golfo de Florida llegaba mucho más lejos, sobre lo que hoy es fondo marino, y la península era casi el doble de ancha que hoy.</p></div>
+    <h3>¿Qué causa las edades de hielo?</h3>
+    <p>Cambios lentos y repetidos en la órbita de la Tierra cambian cómo llega la luz del sol a la Tierra. Se llaman <b>ciclos de Milankovitch</b>.</p>
+    <div class="tiles">
+      ${tile(ART.orbit,"Forma de la órbita","El camino de la Tierra alrededor del Sol se estira en un óvalo y luego se vuelve más redondo. (Excentricidad)","~100,000 años")}
+      ${tile(ART.tilt,"Inclinación","El ángulo del eje de la Tierra cambia entre unos 22° y 24.5°. (Oblicuidad)","~41,000 años")}
+      ${tile(ART.wobble,"Bamboleo","El eje de la Tierra da vueltas despacio, como un trompo. (Precesión)","~26,000 años")}
+    </div>
+    <p style="margin-top:14px">Las retroalimentaciones hacen más grandes los cambios: el hielo brillante refleja la luz del sol al espacio y enfría todavía más la Tierra, y los cambios en el dióxido de carbono refuerzan tanto el calentamiento como el enfriamiento.</p>
+    <h3>¿Cómo lo sabemos?</h3>
+    <p>¡Con indicadores indirectos! Los núcleos de hielo y los núcleos de sedimento del océano guardan el ritmo de los ciclos glaciales, y formas del terreno como las morrenas y la roca rayada muestran por dónde pasaron los glaciares.</p>`
+  }
 },
 
 "climate-vs-weather": {
@@ -1139,9 +1593,821 @@ const CARDS = {
       ${def("Elevation","higher places are usually cooler.")}
       ${def("Prevailing winds","winds bring moist or dry air from other regions.")}
     </div>
-    <div class="callout"><p><strong>Watch out.</strong> One cold week doesn’t mean the climate is cooling, and one hot day doesn’t prove it’s warming. Climate shows up in long-term averages.</p></div>`
+    <div class="callout"><p><strong>Watch out.</strong> One cold week doesn’t mean the climate is cooling, and one hot day doesn’t prove it’s warming. Climate shows up in long-term averages.</p></div>`,
+  es: {
+    title: "Clima contra tiempo atmosférico",
+    blurb: "La misma atmósfera, distintas escalas de tiempo",
+    body: () => `${HERO.climate()}
+    <h2>Clima contra tiempo atmosférico</h2>
+    <p class="intro">El tiempo atmosférico y el clima describen la atmósfera. La diferencia es la <b>duración</b>.</p>
+    <div class="compare">
+      <div><h4 style="color:var(--amber)">Tiempo atmosférico</h4><p class="when">Las condiciones de ahora o de unos pocos días</p>
+        <ul><li>Llega una tormenta eléctrica hoy a las 3 p. m.</li><li>La máxima de mañana es 91 °F</li><li>Un frente frío la baja a 48 °F una mañana de enero</li></ul></div>
+      <div><h4 style="color:var(--ice)">Clima</h4><p class="when">El patrón promedio de 30 años o más</p>
+        <ul><li>Florida tiene una temporada de lluvias más o menos de mayo a octubre</li><li>Los veranos son calientes y húmedos</li><li>Los inviernos del sur de Florida son templados</li></ul></div>
+    </div>
+    <div class="callout big"><p>El clima es lo que esperas. El tiempo es lo que te toca.</p></div>
+    <h3>Qué se mide</h3>
+    <p>Los dos usan los mismos ingredientes. El tiempo los mira hoy; el clima los promedia durante décadas.</p>
+    <div class="chips"><span>Temperatura</span><span>Precipitación</span><span>Humedad</span><span>Viento</span><span>Presión del aire</span><span>Nubosidad</span></div>
+    <h3>Qué determina el clima de un lugar</h3>
+    <div class="defs">
+      ${def("Latitud","los lugares más cerca del ecuador reciben luz del sol más directa.")}
+      ${def("Cercanía al agua","los océanos se calientan y se enfrían despacio, así que las costas son más templadas.")}
+      ${def("Corrientes del océano","las corrientes cálidas como la del Golfo llevan calor a lo largo de las costas.")}
+      ${def("Altitud","los lugares más altos suelen ser más fríos.")}
+      ${def("Vientos predominantes","los vientos traen aire húmedo o seco de otras regiones.")}
+    </div>
+    <div class="callout"><p><strong>Cuidado.</strong> Una semana fría no significa que el clima se esté enfriando, y un día caliente no prueba que se esté calentando. El clima se ve en los promedios a largo plazo.</p></div>`
+  }
 }
 };
+
+/* =========================================================
+   STARTER REVIEW QUESTIONS  (5 per topic, English + Spanish)
+   Same format the cog accepts. The choices are shuffled in the game.
+   ========================================================= */
+const STARTER_TEXT = `
+Topic: water-cycle
+Question: Which process turns liquid water into water vapor using energy from the Sun?
+A: Condensation
+B: Evaporation
+C: Precipitation
+D: Infiltration
+Answer: B
+Pregunta: ¿Qué proceso convierte el agua líquida en vapor de agua usando la energía del Sol?
+A: Condensación
+B: Evaporación
+C: Precipitación
+D: Infiltración
+
+Topic: water-cycle
+Question: Plants releasing water vapor through tiny pores in their leaves is called what?
+A: Transpiration
+B: Sublimation
+C: Percolation
+D: Runoff
+Answer: A
+Pregunta: ¿Cómo se llama cuando las plantas liberan vapor de agua por pequeños poros en sus hojas?
+A: Transpiración
+B: Sublimación
+C: Percolación
+D: Escorrentía
+
+Topic: water-cycle
+Question: Clouds, fog, and dew form when water vapor cools. What is this process?
+A: Evaporation
+B: Infiltration
+C: Condensation
+D: Transpiration
+Answer: C
+Pregunta: Las nubes, la niebla y el rocío se forman cuando el vapor de agua se enfría. ¿Qué proceso es este?
+A: Evaporación
+B: Infiltración
+C: Condensación
+D: Transpiración
+
+Topic: water-cycle
+Question: Where do about 90% of Floridians get their drinking water?
+A: Rivers and lakes
+B: Rainwater tanks
+C: Desalinated seawater
+D: Groundwater from the Floridan aquifer
+Answer: D
+Pregunta: ¿De dónde obtiene su agua potable cerca del 90% de los floridanos?
+A: De ríos y lagos
+B: De tanques de agua de lluvia
+C: De agua de mar desalinizada
+D: Del agua subterránea del acuífero de Florida
+
+Topic: water-cycle
+Question: Which surface would cause the MOST runoff during a rainstorm?
+A: A paved parking lot
+B: A sandy field
+C: A forest floor
+D: A grassy lawn with dry soil
+Answer: A
+Pregunta: ¿Qué superficie causaría MÁS escorrentía durante una tormenta?
+A: Un estacionamiento pavimentado
+B: Un campo arenoso
+C: El suelo de un bosque
+D: Un césped con tierra seca
+
+Topic: weather-instruments
+Question: Which instrument measures air pressure?
+A: Anemometer
+B: Hygrometer
+C: Barometer
+D: Rain gauge
+Answer: C
+Pregunta: ¿Qué instrumento mide la presión del aire?
+A: Anemómetro
+B: Higrómetro
+C: Barómetro
+D: Pluviómetro
+
+Topic: weather-instruments
+Question: An anemometer's spinning cups measure what?
+A: Wind speed
+B: Wind direction
+C: Humidity
+D: Temperature
+Answer: A
+Pregunta: ¿Qué miden las tazas giratorias de un anemómetro?
+A: La velocidad del viento
+B: La dirección del viento
+C: La humedad
+D: La temperatura
+
+Topic: weather-instruments
+Question: The barometer reading is falling. What weather is most likely coming?
+A: Clear, sunny skies
+B: Stormy weather
+C: A drop in humidity only
+D: No change at all
+Answer: B
+Pregunta: La lectura del barómetro está bajando. ¿Qué tiempo es más probable que llegue?
+A: Cielos despejados y soleados
+B: Tiempo tormentoso
+C: Solo una baja de humedad
+D: Ningún cambio
+
+Topic: weather-instruments
+Question: Which tool bounces radio waves off raindrops to show where precipitation is and how it is moving?
+A: Weather satellite
+B: Weather balloon
+C: Psychrometer
+D: Doppler radar
+Answer: D
+Pregunta: ¿Qué herramienta rebota ondas de radio en las gotas de lluvia para mostrar dónde está la precipitación y cómo se mueve?
+A: Satélite meteorológico
+B: Globo meteorológico
+C: Psicrómetro
+D: Radar Doppler
+
+Topic: weather-instruments
+Question: What is the dew point?
+A: The temperature the air must cool to for water vapor to condense
+B: The amount of rain that falls in one day
+C: The highest temperature of the day
+D: The pressure of the air at sea level
+Answer: A
+Pregunta: ¿Qué es el punto de rocío?
+A: La temperatura a la que el aire debe enfriarse para que el vapor de agua se condense
+B: La cantidad de lluvia que cae en un día
+C: La temperatura más alta del día
+D: La presión del aire al nivel del mar
+
+Topic: station-models
+Question: On a station model, what does the center circle show?
+A: Air pressure
+B: Wind speed
+C: Cloud cover
+D: Dew point
+Answer: C
+Pregunta: En un modelo de estación, ¿qué muestra el círculo del centro?
+A: La presión del aire
+B: La velocidad del viento
+C: La nubosidad
+D: El punto de rocío
+
+Topic: station-models
+Question: A station model shows the pressure code 096. What is the air pressure?
+A: 1009.6 mb
+B: 996 mb
+C: 909.6 mb
+D: 1096 mb
+Answer: A
+Pregunta: Un modelo de estación muestra el código de presión 096. ¿Cuál es la presión del aire?
+A: 1009.6 mb
+B: 996 mb
+C: 909.6 mb
+D: 1096 mb
+
+Topic: station-models
+Question: On a wind barb, how many knots does each full feather stand for?
+A: 5 knots
+B: 10 knots
+C: 25 knots
+D: 50 knots
+Answer: B
+Pregunta: En una barba de viento, ¿cuántos nudos representa cada pluma completa?
+A: 5 nudos
+B: 10 nudos
+C: 25 nudos
+D: 50 nudos
+
+Topic: station-models
+Question: Why do forecasters average several different computer models (a consensus)?
+A: It is cheaper than running one model
+B: Each model only covers one state
+C: Averaging usually beats any single model for hurricane track forecasts
+D: Single models can't predict wind
+Answer: C
+Pregunta: ¿Por qué los meteorólogos promedian varios modelos de computadora distintos (un consenso)?
+A: Es más barato que usar un solo modelo
+B: Cada modelo cubre solo un estado
+C: El promedio suele ser mejor que cualquier modelo solo para pronosticar la trayectoria de un huracán
+D: Un solo modelo no puede predecir el viento
+
+Topic: station-models
+Question: On a station model, the number in the lower left is the dew point. If it is very close to the temperature, the air is...
+A: very dry
+B: very humid
+C: very windy
+D: clear
+Answer: B
+Pregunta: En un modelo de estación, el número de abajo a la izquierda es el punto de rocío. Si está muy cerca de la temperatura, el aire está...
+A: muy seco
+B: muy húmedo
+C: muy ventoso
+D: despejado
+
+Topic: fronts
+Question: Which front brings a narrow line of strong storms, then cooler, drier air?
+A: Warm front
+B: Stationary front
+C: Cold front
+D: Occluded front
+Answer: C
+Pregunta: ¿Qué frente trae una línea angosta de tormentas fuertes y luego aire más fresco y seco?
+A: Frente cálido
+B: Frente estacionario
+C: Frente frío
+D: Frente ocluido
+
+Topic: fronts
+Question: On a weather map, red half-circles show which kind of front?
+A: Warm front
+B: Cold front
+C: Occluded front
+D: Dry line
+Answer: A
+Pregunta: En un mapa del tiempo, ¿qué tipo de frente muestran los semicírculos rojos?
+A: Frente cálido
+B: Frente frío
+C: Frente ocluido
+D: Línea seca
+
+Topic: fronts
+Question: Neither air mass is strong enough to push the other, so the front stalls. What is it called?
+A: Occluded front
+B: Stationary front
+C: Cold front
+D: Warm front
+Answer: B
+Pregunta: Ninguna masa de aire tiene fuerza para empujar a la otra, así que el frente se detiene. ¿Cómo se llama?
+A: Frente ocluido
+B: Frente estacionario
+C: Frente frío
+D: Frente cálido
+
+Topic: fronts
+Question: In the Northern Hemisphere, which way does air spin around a low-pressure center?
+A: Clockwise
+B: It doesn't spin
+C: Straight up only
+D: Counterclockwise
+Answer: D
+Pregunta: En el hemisferio norte, ¿hacia dónde gira el aire alrededor de un centro de baja presión?
+A: En el sentido de las agujas del reloj
+B: No gira
+C: Solo hacia arriba
+D: En sentido contrario a las agujas del reloj
+
+Topic: fronts
+Question: After a cold front passes Florida, what usually happens to the air pressure?
+A: It rises
+B: It falls
+C: It stays the same
+D: It drops to zero
+Answer: A
+Pregunta: Después de que un frente frío pasa por Florida, ¿qué suele pasar con la presión del aire?
+A: Sube
+B: Baja
+C: Se queda igual
+D: Baja a cero
+
+Topic: air-masses
+Question: What does the letter "m" mean in an air mass name like mT?
+A: Mountain, so it is cold
+B: Maritime, so it formed over the ocean and is humid
+C: Middle, so it is mild
+D: Moving, so it is fast
+Answer: B
+Pregunta: ¿Qué significa la letra "m" en el nombre de una masa de aire como mT?
+A: Montaña, así que es fría
+B: Marítima, así que se formó sobre el océano y es húmeda
+C: Media, así que es templada
+D: Móvil, así que es rápida
+
+Topic: air-masses
+Question: Which air mass is Florida's everyday warm, humid summer air?
+A: Continental polar (cP)
+B: Continental tropical (cT)
+C: Maritime tropical (mT)
+D: Continental arctic (cA)
+Answer: C
+Pregunta: ¿Qué masa de aire es el aire cálido y húmedo de todos los días del verano en Florida?
+A: Polar continental (cP)
+B: Tropical continental (cT)
+C: Tropical marítima (mT)
+D: Ártica continental (cA)
+
+Topic: air-masses
+Question: Where does a continental tropical (cT) air mass form?
+A: Over the deserts of Mexico and the southwestern U.S.
+B: Over the Gulf and Caribbean
+C: Over northern Canada
+D: Over the North Atlantic
+Answer: A
+Pregunta: ¿Dónde se forma una masa de aire tropical continental (cT)?
+A: Sobre los desiertos de México y el suroeste de EE. UU.
+B: Sobre el Golfo y el Caribe
+C: Sobre el norte de Canadá
+D: Sobre el Atlántico Norte
+
+Topic: air-masses
+Question: What is an air mass's source region?
+A: The place where it causes the most storms
+B: The place where it finally breaks apart
+C: The front at its edge
+D: The region where it forms and gets its temperature and humidity
+Answer: D
+Pregunta: ¿Qué es la región de origen de una masa de aire?
+A: El lugar donde causa más tormentas
+B: El lugar donde por fin se deshace
+C: El frente en su borde
+D: La región donde se forma y obtiene su temperatura y humedad
+
+Topic: air-masses
+Question: Cold, dry cP air crosses the warm Great Lakes. What happens downwind?
+A: A heat wave
+B: Lake-effect snow
+C: A drought
+D: A hurricane forms
+Answer: B
+Pregunta: Aire cP frío y seco cruza los Grandes Lagos, que están más cálidos. ¿Qué pasa del otro lado?
+A: Una ola de calor
+B: Nieve por efecto lago
+C: Una sequía
+D: Se forma un huracán
+
+Topic: hurricanes
+Question: What is the minimum sustained wind speed for a storm to be called a hurricane?
+A: 39 mph
+B: 50 mph
+C: 74 mph
+D: 111 mph
+Answer: C
+Pregunta: ¿Cuál es la velocidad mínima del viento sostenido para que una tormenta se llame huracán?
+A: 39 mph
+B: 50 mph
+C: 74 mph
+D: 111 mph
+
+Topic: hurricanes
+Question: Which part of a hurricane has the strongest winds and heaviest rain?
+A: The eye
+B: The eyewall
+C: The outflow
+D: The outer rain bands
+Answer: B
+Pregunta: ¿Qué parte de un huracán tiene los vientos más fuertes y la lluvia más intensa?
+A: El ojo
+B: La pared del ojo
+C: El flujo de salida
+D: Las bandas de lluvia exteriores
+
+Topic: hurricanes
+Question: Which hurricane hazard is usually the deadliest?
+A: Storm surge
+B: Tornadoes
+C: Lightning
+D: Hail
+Answer: A
+Pregunta: ¿Qué peligro de un huracán suele ser el más mortal?
+A: La marejada ciclónica
+B: Los tornados
+C: Los rayos
+D: El granizo
+
+Topic: hurricanes
+Question: Why do hurricanes weaken when they move over land?
+A: Land has stronger wind shear only at night
+B: The ground pulls the eye apart with gravity
+C: Trees block the rain bands
+D: They lose their energy source, warm ocean water
+Answer: D
+Pregunta: ¿Por qué los huracanes se debilitan cuando pasan sobre tierra?
+A: La tierra tiene más cizalladura solo de noche
+B: El suelo separa el ojo con la gravedad
+C: Los árboles bloquean las bandas de lluvia
+D: Pierden su fuente de energía, el agua cálida del océano
+
+Topic: hurricanes
+Question: What does a hurricane WARNING mean?
+A: Hurricane conditions are possible in about 48 hours
+B: Hurricane conditions are expected, about 36 hours ahead
+C: The hurricane season has started
+D: The storm has already passed
+Answer: B
+Pregunta: ¿Qué significa un AVISO de huracán?
+A: Las condiciones de huracán son posibles en unas 48 horas
+B: Se esperan condiciones de huracán, unas 36 horas antes
+C: Empezó la temporada de huracanes
+D: La tormenta ya pasó
+
+Topic: karst-florida
+Question: What kind of rock lies under much of Florida and dissolves to form karst?
+A: Granite
+B: Basalt
+C: Limestone
+D: Sandstone
+Answer: C
+Pregunta: ¿Qué tipo de roca hay debajo de gran parte de Florida y se disuelve para formar karst?
+A: Granito
+B: Basalto
+C: Caliza
+D: Arenisca
+
+Topic: karst-florida
+Question: What weak acid in rainwater slowly dissolves limestone?
+A: Carbonic acid
+B: Hydrochloric acid
+C: Sulfuric acid
+D: Citric acid
+Answer: A
+Pregunta: ¿Qué ácido débil en el agua de lluvia disuelve poco a poco la caliza?
+A: Ácido carbónico
+B: Ácido clorhídrico
+C: Ácido sulfúrico
+D: Ácido cítrico
+
+Topic: karst-florida
+Question: Which type of sinkhole can open suddenly in hours and is the most dangerous?
+A: Dissolution sinkhole
+B: Cover-subsidence sinkhole
+C: Sinkhole lake
+D: Cover-collapse sinkhole
+Answer: D
+Pregunta: ¿Qué tipo de sumidero se puede abrir de repente en horas y es el más peligroso?
+A: Sumidero por disolución
+B: Sumidero por hundimiento lento de la cubierta
+C: Lago de sumidero
+D: Sumidero por colapso de la cubierta
+
+Topic: karst-florida
+Question: In 2010, farmers near Plant City pumped huge amounts of groundwater to protect strawberries from a freeze. What happened?
+A: The water table dropped and about 140 sinkholes opened
+B: The springs flowed faster than ever
+C: The aquifer filled up with fresh water
+D: Nothing changed underground
+Answer: A
+Pregunta: En 2010, agricultores cerca de Plant City bombearon muchísima agua subterránea para proteger las fresas de una helada. ¿Qué pasó?
+A: El nivel freático bajó y se abrieron unos 140 sumideros
+B: Los manantiales fluyeron más rápido que nunca
+C: El acuífero se llenó de agua dulce
+D: No cambió nada bajo tierra
+
+Topic: karst-florida
+Question: Near the coast, over-pumping a well can let seawater move into the aquifer. What is this called?
+A: Recharge
+B: Saltwater intrusion
+C: A cone of depression
+D: Percolation
+Answer: B
+Pregunta: Cerca de la costa, bombear demasiado un pozo puede dejar que el agua de mar entre al acuífero. ¿Cómo se llama esto?
+A: Recarga
+B: Intrusión de agua salada
+C: Cono de depresión
+D: Percolación
+
+Topic: earth-spheres
+Question: Which sphere includes all living things?
+A: Geosphere
+B: Hydrosphere
+C: Atmosphere
+D: Biosphere
+Answer: D
+Pregunta: ¿Qué esfera incluye a todos los seres vivos?
+A: Geosfera
+B: Hidrosfera
+C: Atmósfera
+D: Biosfera
+
+Topic: earth-spheres
+Question: Glaciers, sea ice, and snow belong to which sphere?
+A: Cryosphere
+B: Geosphere
+C: Biosphere
+D: Atmosphere
+Answer: A
+Pregunta: ¿A qué esfera pertenecen los glaciares, el hielo marino y la nieve?
+A: Criosfera
+B: Geosfera
+C: Biosfera
+D: Atmósfera
+
+Topic: earth-spheres
+Question: Which gas makes up about 78% of the atmosphere?
+A: Oxygen
+B: Carbon dioxide
+C: Nitrogen
+D: Argon
+Answer: C
+Pregunta: ¿Qué gas forma cerca del 78% de la atmósfera?
+A: Oxígeno
+B: Dióxido de carbono
+C: Nitrógeno
+D: Argón
+
+Topic: earth-spheres
+Question: A volcano blasts ash into the air. Which spheres interact first?
+A: Biosphere and hydrosphere
+B: Geosphere and atmosphere
+C: Cryosphere and biosphere
+D: Hydrosphere and cryosphere
+Answer: B
+Pregunta: Un volcán lanza ceniza al aire. ¿Qué esferas interactúan primero?
+A: Biosfera e hidrosfera
+B: Geosfera y atmósfera
+C: Criosfera y biosfera
+D: Hidrosfera y criosfera
+
+Topic: earth-spheres
+Question: The temperature of beach sand decides whether baby sea turtles hatch as males or females. Which spheres does this connect?
+A: Geosphere and biosphere
+B: Atmosphere and cryosphere
+C: Hydrosphere and cryosphere
+D: Atmosphere and hydrosphere
+Answer: A
+Pregunta: La temperatura de la arena de la playa decide si las tortugas marinas nacen machos o hembras. ¿Qué esferas conecta esto?
+A: Geosfera y biosfera
+B: Atmósfera y criosfera
+C: Hidrosfera y criosfera
+D: Atmósfera e hidrosfera
+
+Topic: sun-energy
+Question: Which kind of energy transfer can travel through empty space?
+A: Conduction
+B: Convection
+C: Radiation
+D: Runoff
+Answer: C
+Pregunta: ¿Qué tipo de transferencia de energía puede viajar por el espacio vacío?
+A: Conducción
+B: Convección
+C: Radiación
+D: Escorrentía
+
+Topic: sun-energy
+Question: Hot sand warms the thin layer of air touching it. What kind of heat transfer is this?
+A: Radiation
+B: Conduction
+C: Convection
+D: Reflection
+Answer: B
+Pregunta: La arena caliente calienta la capa delgada de aire que la toca. ¿Qué tipo de transferencia de calor es esta?
+A: Radiación
+B: Conducción
+C: Convección
+D: Reflexión
+
+Topic: sun-energy
+Question: Warm air rises and cool air sinks to replace it, forming a loop. What is this loop called?
+A: A convection current
+B: A radiation wave
+C: An albedo cycle
+D: A conduction chain
+Answer: A
+Pregunta: El aire cálido sube y el aire frío baja para reemplazarlo, formando un ciclo. ¿Cómo se llama este ciclo?
+A: Corriente de convección
+B: Onda de radiación
+C: Ciclo de albedo
+D: Cadena de conducción
+
+Topic: sun-energy
+Question: Why do oceans heat up and cool down more slowly than land?
+A: Water has a low albedo
+B: Oceans get less sunlight than land
+C: Water has a high specific heat
+D: Salt blocks radiation
+Answer: C
+Pregunta: ¿Por qué los océanos se calientan y se enfrían más despacio que la tierra?
+A: El agua tiene un albedo bajo
+B: Los océanos reciben menos luz solar que la tierra
+C: El agua tiene un calor específico alto
+D: La sal bloquea la radiación
+
+Topic: sun-energy
+Question: Which surface has the HIGHEST albedo (reflects the most sunlight)?
+A: Dark ocean
+B: Fresh snow
+C: Asphalt road
+D: Green forest
+Answer: B
+Pregunta: ¿Qué superficie tiene el albedo MÁS ALTO (refleja más luz solar)?
+A: El océano oscuro
+B: La nieve fresca
+C: Una carretera de asfalto
+D: Un bosque verde
+
+Topic: proxy-indicators
+Question: What is a proxy indicator?
+A: A thermometer reading from last year
+B: A weather forecast for next week
+C: A satellite photo of clouds
+D: A natural record used in place of direct measurements of past climate
+Answer: D
+Pregunta: ¿Qué es un indicador indirecto (proxy)?
+A: Una lectura de termómetro del año pasado
+B: Un pronóstico del tiempo para la próxima semana
+C: Una foto satelital de las nubes
+D: Un registro natural que se usa en lugar de mediciones directas del clima del pasado
+
+Topic: proxy-indicators
+Question: Air bubbles in which proxy are samples of ancient atmosphere?
+A: Ice cores
+B: Tree rings
+C: Pollen
+D: Corals
+Answer: A
+Pregunta: ¿En qué indicador las burbujas de aire son muestras de la atmósfera antigua?
+A: Núcleos de hielo
+B: Anillos de los árboles
+C: Polen
+D: Corales
+
+Topic: proxy-indicators
+Question: A tree has several very narrow rings in a row. What do they most likely show?
+A: Years of great growing weather
+B: Drought or cold years
+C: The tree was cut down
+D: The tree was moved
+Answer: B
+Pregunta: Un árbol tiene varios anillos muy angostos seguidos. ¿Qué es lo más probable que muestren?
+A: Años de muy buen clima para crecer
+B: Años de sequía o frío
+C: Que cortaron el árbol
+D: Que movieron el árbol
+
+Topic: proxy-indicators
+Question: About how far back in time do ice cores reach?
+A: About 150 years
+B: About 2,000 years
+C: About 800,000 years
+D: About 4 billion years
+Answer: C
+Pregunta: ¿Hasta cuánto tiempo atrás llegan, más o menos, los núcleos de hielo?
+A: Unos 150 años
+B: Unos 2,000 años
+C: Unos 800,000 años
+D: Unos 4 mil millones de años
+
+Topic: proxy-indicators
+Question: Why do scientists compare several different proxies?
+A: When they all point to the same change, scientists can be confident it really happened
+B: Each proxy only works in Florida
+C: One proxy is always wrong
+D: Proxies are cheaper than thermometers
+Answer: A
+Pregunta: ¿Por qué los científicos comparan varios indicadores distintos?
+A: Cuando todos señalan el mismo cambio, pueden confiar en que de verdad ocurrió
+B: Cada indicador solo funciona en Florida
+C: Un indicador siempre está equivocado
+D: Los indicadores son más baratos que los termómetros
+
+Topic: ice-ages
+Question: What do we call a warmer stretch of time when ice sheets melt back?
+A: A glacial period
+B: An interglacial period
+C: A Milankovitch cycle
+D: A proxy period
+Answer: B
+Pregunta: ¿Cómo se llama un periodo más cálido en el que las capas de hielo se derriten y retroceden?
+A: Periodo glacial
+B: Periodo interglacial
+C: Ciclo de Milankovitch
+D: Periodo indirecto
+
+Topic: ice-ages
+Question: What are Milankovitch cycles?
+A: Slow, repeating changes in Earth's orbit that change how sunlight reaches Earth
+B: Seasons that repeat every year
+C: Changes in the Sun's color
+D: Storms that form over ice sheets
+Answer: A
+Pregunta: ¿Qué son los ciclos de Milankovitch?
+A: Cambios lentos y repetidos en la órbita de la Tierra que cambian cómo llega la luz solar
+B: Estaciones que se repiten cada año
+C: Cambios en el color del Sol
+D: Tormentas que se forman sobre las capas de hielo
+
+Topic: ice-ages
+Question: About 20,000 years ago, sea level was about 120 m lower. What did that do to Florida?
+A: Florida was completely underwater
+B: Florida was covered by an ice sheet
+C: Florida's peninsula was roughly twice as wide
+D: Florida split into islands
+Answer: C
+Pregunta: Hace unos 20,000 años, el nivel del mar estaba unos 120 m más bajo. ¿Qué le pasó a Florida?
+A: Florida quedó completamente bajo el agua
+B: Florida quedó cubierta por una capa de hielo
+C: La península de Florida era casi el doble de ancha
+D: Florida se dividió en islas
+
+Topic: ice-ages
+Question: Bright ice reflects sunlight back to space, cooling Earth even more. This is an example of a...
+A: proxy
+B: feedback
+C: front
+D: source region
+Answer: B
+Pregunta: El hielo brillante refleja la luz solar al espacio y enfría todavía más la Tierra. Esto es un ejemplo de...
+A: un indicador
+B: una retroalimentación
+C: un frente
+D: una región de origen
+
+Topic: ice-ages
+Question: What is the name of the warm interglacial we live in today?
+A: The Pleistocene
+B: The Jurassic
+C: The Ice Age
+D: The Holocene
+Answer: D
+Pregunta: ¿Cómo se llama el periodo interglacial cálido en el que vivimos hoy?
+A: El Pleistoceno
+B: El Jurásico
+C: La Edad de Hielo
+D: El Holoceno
+
+Topic: climate-vs-weather
+Question: What is the main difference between weather and climate?
+A: Weather is measured with instruments; climate is not
+B: Time: weather is now or a few days; climate is the average over 30 years or more
+C: Weather only happens in summer
+D: Climate only describes rain
+Answer: B
+Pregunta: ¿Cuál es la diferencia principal entre el tiempo y el clima?
+A: El tiempo se mide con instrumentos y el clima no
+B: La duración: el tiempo atmosférico es ahora o unos días; el clima es el promedio de 30 años o más
+C: El tiempo solo pasa en verano
+D: El clima solo describe la lluvia
+
+Topic: climate-vs-weather
+Question: "A thunderstorm rolls in at 3 p.m. today." Is this weather or climate?
+A: Weather
+B: Climate
+C: Both
+D: Neither
+Answer: A
+Pregunta: "Llega una tormenta eléctrica hoy a las 3 p.m." ¿Es tiempo o clima?
+A: Tiempo
+B: Clima
+C: Ambos
+D: Ninguno
+
+Topic: climate-vs-weather
+Question: "Florida has a wet season from about May to October." Is this weather or climate?
+A: Weather
+B: Neither
+C: Climate
+D: A forecast
+Answer: C
+Pregunta: "Florida tiene una temporada de lluvias de mayo a octubre, más o menos." ¿Es tiempo o clima?
+A: Tiempo
+B: Ninguno
+C: Clima
+D: Un pronóstico
+
+Topic: climate-vs-weather
+Question: Why do coastal places usually have milder climates than places far inland?
+A: Coasts are always at higher elevation
+B: Oceans heat and cool slowly
+C: Coasts get less sunlight
+D: There is no wind at the coast
+Answer: B
+Pregunta: ¿Por qué los lugares de la costa suelen tener un clima más templado que los lugares tierra adentro?
+A: Las costas siempre están a mayor altura
+B: Los océanos se calientan y se enfrían despacio
+C: Las costas reciben menos luz solar
+D: En la costa no hay viento
+
+Topic: climate-vs-weather
+Question: One very cold week happens in January. What does it tell you about the climate?
+A: The climate is cooling
+B: The climate is warming
+C: The climate changed this year
+D: Not much: climate shows up in long-term averages
+Answer: D
+Pregunta: Hay una semana muy fría en enero. ¿Qué te dice eso sobre el clima?
+A: El clima se está enfriando
+B: El clima se está calentando
+C: El clima cambió este año
+D: No mucho: el clima se ve en los promedios a largo plazo
+`;
 
 /* =========================================================
    VIEWS + ROUTING   #  |  #q1  |  #q1/water-cycle
@@ -1150,6 +2416,9 @@ function $(s){ return document.querySelector(s); }
 const views = { title: $("#title"), toc: $("#toc"), card: $("#cardView") };
 function show(name){ for (const k in views) views[k].classList.toggle("on", k === name); window.scrollTo(0, 0); }
 function go(hash){ if (location.hash.replace(/^#/,"") === hash) route(); else location.hash = hash ? "#" + hash : ""; if (!hash) route(); }
+/* a card in the current language: Spanish cards keep their text in card.es */
+function cardL(id){ const c = CARDS[id]; return LANG === "es" && c.es ? c.es : c; }
+function cardTitle(id){ return cardL(id).title; }
 function hasTopics(q){ return (TEACHER_ORDER[q] || []).some(id => CARDS[id]); }
 
 function route(){
@@ -1165,16 +2434,16 @@ let currentQ = null;
 function openToc(q){
   currentQ = q;
   const order = getOrder(q);
-  $("#tocCrumb").textContent = QUARTER_NAMES[q];
-  $("#tocTitle").textContent = QUARTER_NAMES[q] + " contents";
+  $("#tocCrumb").textContent = qName(q);
+  $("#tocTitle").textContent = T(qName(q) + " contents", "Contenido del " + qName(q).toLowerCase());
   const list = $("#tocList");
   list.dataset.q = q;
   list.innerHTML = order.map(id => {
     const c = CARDS[id], done = isDone(q + "." + id);
-    return `<li data-id="${id}"><button data-card="${id}">${c.icon}<span><h3>${c.title}</h3><p>${c.blurb}</p></span><span class="status ${done?'done':''}">${done?'✓ Done':'New'}</span></button></li>`;
+    return `<li data-id="${id}"><button data-card="${id}">${c.icon}<span><h3>${cardTitle(id)}</h3><p>${cardL(id).blurb}</p></span><span class="status ${done?'done':''}">${done ? T("✓ Done", "✓ Listo") : T("New", "Nuevo")}</span></button></li>`;
   }).join("");
   const n = order.filter(id => isDone(q + "." + id)).length;
-  $("#tocProgress").textContent = n ? `${n} of ${order.length} topics explored` : "Pick a topic to start.";
+  $("#tocProgress").textContent = n ? T(`${n} of ${order.length} topics explored`, `${n} de ${order.length} temas explorados`) : T("Pick a topic to start.", "Elige un tema para empezar.");
   $("#meterFill").style.width = (n / order.length * 100) + "%";
   $("#resetOrder").hidden = !Array.isArray(save.order[q]);
   show("toc");
@@ -1183,9 +2452,9 @@ function openToc(q){
 let currentCard = null;
 function openCard(q, id){
   currentQ = q; currentCard = id;
-  $("#cardCrumb").textContent = QUARTER_NAMES[q];
+  $("#cardCrumb").textContent = qName(q);
   $("#cardBack").dataset.go = q;
-  $("#cardBody").innerHTML = CARDS[id].body();
+  $("#cardBody").innerHTML = cardL(id).body();
   show("card");
 }
 
@@ -1271,21 +2540,350 @@ $("#resetOrder").addEventListener("click", () => {
 /* =========================================================
    SHEET, SAVE CHECK, WIRING
    ========================================================= */
-function openSheet(html){ $("#sheet").innerHTML = html; $("#scrim").classList.add("on"); const b = $("#sheet").querySelector("button"); if (b) b.focus(); }
-function closeSheet(){ $("#scrim").classList.remove("on"); }
-$("#scrim").addEventListener("click", e => { if (e.target.id === "scrim" || e.target.dataset.close !== undefined) closeSheet(); });
-document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheet(); });
+/* o.tall: scrolls when taller than the screen; o.locked: can't be closed by tapping outside (first-time sign in) */
+let sheetLocked = false;
+function openSheet(html, o = {}){
+  sheetLocked = !!o.locked;
+  const sh = $("#sheet");
+  sh.className = "sheet" + (o.tall ? " tall" : "");
+  sh.innerHTML = html; sh.scrollTop = 0;
+  $("#scrim").classList.add("on");
+  const b = sh.querySelector("button"); if (b) b.focus({ preventScroll: true });
+}
+function closeSheet(){ $("#scrim").classList.remove("on"); sheetLocked = false; }
+$("#scrim").addEventListener("click", e => { if ((e.target.id === "scrim" && !sheetLocked) || e.target.dataset.close !== undefined) closeSheet(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !sheetLocked) closeSheet(); });
 
 function comingSoon(label){
-  openSheet(`<h3 id="sheetTitle">${label}</h3><p><b style="color:var(--amber)">Coming soon!</b> New chapters will show up here when they’re ready, and your saved progress will carry over.</p><div class="row"><button class="btn" data-close>OK</button></div>`);
+  openSheet(`<h3 id="sheetTitle">${label}</h3><p>${T(`<b style="color:var(--amber)">Coming soon!</b> New chapters will show up here when they’re ready, and your saved progress will carry over.`, `<b style="color:var(--amber)">¡Muy pronto!</b> Los nuevos capítulos aparecerán aquí cuando estén listos, y tu progreso guardado se mantendrá.`)}</p><div class="row"><button class="btn" data-close>OK</button></div>`);
 }
 function saveCheck(){
-  openSheet(`<h3 id="sheetTitle">Save check</h3>
-    <p>This number is stored on this device. Tap it a few times, then open a newer version of the notebook from the same link. If the number is still here, saving works.</p>
+  openSheet(`<h3 id="sheetTitle">${T("Save check", "Prueba de guardado")}</h3>
+    <p>${T("This number is stored on this device. Tap it a few times, then open a newer version of the notebook from the same link. If the number is still here, saving works.", "Este número se guarda en este aparato. Tócalo varias veces y luego abre una versión más nueva del cuaderno con el mismo enlace. Si el número sigue aquí, el guardado funciona.")}</p>
     <div class="count" id="countNum">${save.saveTest}</div>
-    <p class="small">${storageOK ? "Saving is on." : "Saving isn’t available in this browser. Try opening the link in Safari or Chrome."} App version ${APP_VERSION}</p>
-    <div class="row"><button class="btn" id="tapCount">Tap +1</button><button class="btn ghost" data-close>Close</button></div>`);
+    <p class="small">${storageOK ? T("Saving is on.", "El guardado está activado.") : T("Saving isn’t available in this browser. Try opening the link in Safari or Chrome.", "No se puede guardar en este navegador. Abre el enlace en Safari o Chrome.")} ${T("App version", "Versión")} ${APP_VERSION}</p>
+    <div class="row"><button class="btn" id="tapCount">${T("Tap +1", "Toca +1")}</button><button class="btn ghost" data-close>${T("Close", "Cerrar")}</button></div>`);
   $("#tapCount").addEventListener("click", () => { save.saveTest++; writeSave(); $("#countNum").textContent = save.saveTest; });
+}
+
+/* =========================================================
+   STUDENT SIGN IN  (language, name, period; asked on first open)
+   ========================================================= */
+function fullName(p){ return p ? (p.first + " " + p.last).trim() : ""; }
+function renderMeLine(){
+  const p = save.profile;
+  $("#meLine").innerHTML = p ? `${esc(fullName(p))}${p.per ? ` · ${T("Period", "Período")} ${esc(p.per)}` : ""}` : "";
+}
+function profileSheet(firstTime){
+  const p = save.profile || {};
+  let lang = p.lang || LANG;
+  const vals = { first: p.first || "", last: p.last || "", per: p.per || "" };
+  const draw = () => {
+    const t = (en, es) => lang === "es" ? es : en;
+    openSheet(`<h3 id="sheetTitle">${firstTime ? t("Welcome!", "¡Hola!") : t("Your info", "Tus datos")}</h3>
+      <p>${t("This shows on your review game score cards. It saves on this device.", "Esto aparece en tus tarjetas de puntaje de los juegos de repaso. Se guarda en este aparato.")}</p>
+      <div class="seg" id="pLang"><button type="button" data-v="en" aria-pressed="${lang === "en"}">English</button><button type="button" data-v="es" aria-pressed="${lang === "es"}">Español</button></div>
+      <label class="field" for="pFirst">${t("First name", "Nombre")}</label>
+      <input class="inp" id="pFirst" maxlength="30" autocomplete="given-name" value="${esc(vals.first)}">
+      <label class="field" for="pLast">${t("Last name", "Apellido")}</label>
+      <input class="inp" id="pLast" maxlength="30" autocomplete="family-name" value="${esc(vals.last)}">
+      <label class="field" for="pPer">${t("Class period", "Período de clase")}</label>
+      <input class="inp num" id="pPer" maxlength="12" inputmode="numeric" autocomplete="off" value="${esc(vals.per)}">
+      <p class="msg warn" id="pMsg"></p>
+      <div class="row"><button class="btn" id="pGo">${firstTime ? t("Start", "Empezar") : t("Save", "Guardar")}</button>${firstTime ? "" : `<button class="btn ghost" data-close>${t("Cancel", "Cancelar")}</button>`}</div>`,
+      { locked: firstTime, tall: true });
+    const keep = () => { vals.first = $("#pFirst").value; vals.last = $("#pLast").value; vals.per = $("#pPer").value; };
+    $("#pLang").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; keep(); lang = b.dataset.v; draw(); });
+    $("#pGo").addEventListener("click", () => {
+      keep();
+      const first = vals.first.trim(), last = vals.last.trim(), per = vals.per.trim();
+      if (!first || !last){ $("#pMsg").textContent = t("Type your first and last name.", "Escribe tu nombre y apellido."); return; }
+      if (!per){ $("#pMsg").textContent = t("Type your class period.", "Escribe tu período de clase."); return; }
+      save.profile = { lang, first, last, per }; writeSave();
+      if (lang !== LANG) return location.reload();
+      closeSheet(); renderMeLine();
+    });
+  };
+  draw();
+}
+
+/* =========================================================
+   REVIEW QUESTIONS
+   Built-in starter questions (STARTER_TEXT, below the cards) plus any
+   pasted in through the cog. Both use the same labeled format:
+     Topic: fronts
+     Question: ...   A: ...  B: ...  C: ...  D: ...   Answer: B
+     Pregunta: ...   A: ...  B: ...  C: ...  D: ...   (same order)
+   ========================================================= */
+const LAUNCH_KEY = "essNotebook.launch";
+function normKey(s){ return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, ""); }
+function findTopic(label){
+  const tries = [label, label.split("(")[0], label.split(/\s[-–—]\s/)[0], label.split(":")[0]];
+  for (const tr of tries){
+    const k = normKey(tr); if (!k) continue;
+    for (const id in CARDS){
+      const c = CARDS[id];
+      if (normKey(id) === k || normKey(c.title) === k || (c.es && normKey(c.es.title) === k)) return id;
+    }
+  }
+  return null;
+}
+/* one language's part of a question: text, then A: B: C: D: choices, then an optional Answer: letter */
+function parseSection(body){
+  const ans = body.match(/(?:^|[\s,;])(?:correct\s+)?(?:answer|respuesta(?:\s+correcta)?)\s*[:.\-]?\s*\(?([A-E])\b/i);
+  let a = -1;
+  if (ans){ a = ans[1].toUpperCase().charCodeAt(0) - 65; body = body.slice(0, ans.index); }
+  const re = /(^|[\s,;])([A-E])\s*[:.)]\s+/g, marks = [];
+  let m;
+  while ((m = re.exec(body))) if (m[2].charCodeAt(0) - 65 === marks.length) marks.push({ at: m.index + m[1].length, textAt: re.lastIndex });
+  const tidy = x => x.replace(/\s+/g, " ").replace(/[\s,;]+$/, "").trim();
+  const q = tidy(marks.length ? body.slice(0, marks[0].at) : body);
+  const c = marks.map((mk, i) => tidy(body.slice(mk.textAt, i + 1 < marks.length ? marks[i + 1].at : body.length)));
+  return { q, c, a };
+}
+function parseBank(text){
+  const out = [], problems = [], unknown = [];
+  let tp = null, label = "", cur = null;
+  const finish = () => {
+    if (!cur) return;
+    const en = parseSection(cur.en), short = cur.en.trim().split("\n")[0].slice(0, 70);
+    if (!cur.tp){ if (!cur.label) problems.push(short + T(" (no Topic: line)", " (falta la línea Topic:)")); }
+    else if (!en.q || en.c.length < 2 || en.c.some(x => !x) || en.a < 0 || en.a >= en.c.length) problems.push(short);
+    else {
+      const q = { tp: cur.tp, q: en.q, c: en.c, a: en.a };
+      if (cur.es != null){ const es = parseSection(cur.es); if (es.q && es.c.length === en.c.length && es.c.every(x => x)) q.es = { q: es.q, c: es.c }; }
+      out.push(q);
+    }
+    cur = null;
+  };
+  const lines = String(text || "").replace(/\r/g, "").split("\n");
+  for (let line of lines){
+    line = line.replace(/\*\*|__/g, "").replace(/\\([*_`#\[\]()\-.!>+~|?:])/g, "$1").replace(/^\s*(?:#+|>|[-*•])\s*/, "").replace(/^\s*\d+\s*[.)]\s+(?=(?:topic|tema|question|pregunta)\b)/i, "");
+    let m;
+    if ((m = line.match(/^\s*(?:topic|tema)\s*[:.\-]\s*(.+)$/i))){
+      finish(); label = m[1].trim(); tp = findTopic(label);
+      if (!tp && !unknown.includes(label)) unknown.push(label);
+    } else if ((m = line.match(/^\s*(?:question|q)\s*\d*\s*[:.)\-]\s*(.*)$/i))){
+      finish(); cur = { tp, label: tp ? "" : label, en: m[1], es: null };
+    } else if ((m = line.match(/^\s*pregunta\s*\d*\s*[:.)\-]\s*(.*)$/i))){
+      if (cur && cur.es == null) cur.es = m[1];
+    } else if (cur){
+      if (cur.es != null) cur.es += "\n" + line; else cur.en += "\n" + line;
+    }
+  }
+  finish();
+  return { questions: out, problems, unknown };
+}
+const qKey = q => q.tp + "|" + normKey(q.q);
+let STARTER_Q = [];
+function allQuestions(){ return STARTER_Q.concat(save.addedQ); }
+function countsBy(list){ const n = {}; list.forEach(q => { n[q.tp] = (n[q.tp] || 0) + 1; }); return n; }
+
+/* topic buttons, grouped by quarter; the student taps to highlight */
+function topicPicker(selected, counts, opt){
+  return ["q1", "q2", "q3", "q4"].map(q => {
+    const ids = hasTopics(q) ? getOrder(q) : [];
+    const chips = ids.length ? ids.map(id => {
+      const n = counts[id] || 0, off = opt.needQ && !n;
+      return `<button type="button" class="tchip" data-tp="${id}" aria-pressed="${selected.has(id)}"${off ? " disabled" : ""}>${esc(cardTitle(id))}${opt.showCount ? `<small>${n}</small>` : ""}</button>`;
+    }).join("") : `<p class="small" style="margin:0">${T("No topics yet.", "Todavía no hay temas.")}</p>`;
+    return `<div class="qgroup" data-q="${q}"><div class="qgroup-head"><b>${qName(q)}</b>${ids.length ? `<button type="button" class="linkish" data-allq="${q}"></button>` : ""}</div><div class="tchips">${chips}</div></div>`;
+  }).join("");
+}
+function bindPicker(root, selected, onChange){
+  const refresh = () => {
+    root.querySelectorAll("[data-allq]").forEach(b => {
+      const chips = [...root.querySelectorAll(`.qgroup[data-q="${b.dataset.allq}"] .tchip:not(:disabled)`)];
+      b.textContent = chips.length && chips.every(x => selected.has(x.dataset.tp)) ? T("Clear", "Quitar") : T("Select all", "Elegir todos");
+      b.hidden = !chips.length;
+    });
+    onChange();
+  };
+  root.addEventListener("click", e => {
+    const c = e.target.closest(".tchip");
+    if (c && !c.disabled){
+      const id = c.dataset.tp;
+      if (selected.has(id)) selected.delete(id); else selected.add(id);
+      c.setAttribute("aria-pressed", selected.has(id));
+      return refresh();
+    }
+    const a = e.target.closest("[data-allq]");
+    if (a){
+      const chips = [...root.querySelectorAll(`.qgroup[data-q="${a.dataset.allq}"] .tchip:not(:disabled)`)];
+      const allOn = chips.every(x => selected.has(x.dataset.tp));
+      chips.forEach(x => { if (allOn) selected.delete(x.dataset.tp); else selected.add(x.dataset.tp); x.setAttribute("aria-pressed", !allOn); });
+      refresh();
+    }
+  });
+  refresh();
+}
+function topicsInOrder(selected){ return ["q1", "q2", "q3", "q4"].flatMap(q => hasTopics(q) ? getOrder(q) : []).filter(id => selected.has(id)); }
+
+/* =========================================================
+   REVIEW GAMES  (the games live in games.html)
+   ========================================================= */
+function gameSheet(sport){
+  const counts = countsBy(allQuestions()), last = save.game || {};
+  const selected = new Set((last.topics || []).filter(id => counts[id]));
+  openSheet(`<h3 id="sheetTitle">${sport === "derby" ? T("Home Run Derby", "Derby de jonrones") : T("Basketball", "Baloncesto")}</h3>
+    <p>${sport === "derby" ? T("Answer 3 questions right to step up to bat. When time runs out, you get a score card.", "Contesta 3 preguntas bien para pasar al bate. Cuando se acabe el tiempo, verás tu tarjeta de puntaje.")
+      : T("Answer 3 questions right to earn 3 balls. When time runs out, you get a score card.", "Contesta 3 preguntas bien para ganar 3 balones. Cuando se acabe el tiempo, verás tu tarjeta de puntaje.")}</p>
+    <label class="field" for="gMins">${T("How many minutes do you want to play?", "¿Cuántos minutos quieres jugar?")}</label>
+    <input class="inp num" id="gMins" type="number" inputmode="numeric" min="1" max="60" value="${last.mins || 5}">
+    <span class="field">${T("Which topics do you want to review?", "¿Qué temas quieres repasar?")}</span>
+    <div id="gPick">${topicPicker(selected, counts, { needQ: true, showCount: false })}</div>
+    <p class="msg" id="gMsg"></p>
+    <div class="row"><button class="btn" id="gGo">${T("Play", "Jugar")}</button><button class="btn ghost" data-close>${T("Cancel", "Cancelar")}</button></div>`, { tall: true });
+  bindPicker($("#gPick"), selected, () => {
+    const n = [...selected].reduce((a, id) => a + (counts[id] || 0), 0);
+    $("#gGo").disabled = !n;
+    $("#gMsg").className = "msg" + (n ? "" : " warn");
+    $("#gMsg").textContent = n ? T(`${selected.size} ${selected.size === 1 ? "topic" : "topics"}, ${n} questions`, `${selected.size} ${selected.size === 1 ? "tema" : "temas"}, ${n} preguntas`)
+      : T("Tap the topics you want to review.", "Toca los temas que quieres repasar.");
+  });
+  $("#gGo").addEventListener("click", () => {
+    const mins = Math.min(60, Math.max(1, parseInt($("#gMins").value, 10) || 5));
+    const ids = topicsInOrder(selected);
+    save.game = Object.assign(save.game || {}, { mins, topics: ids }); writeSave();
+    const p = save.profile || {};
+    const data = {
+      v: 1, s: sport, m: mins, lang: LANG, name: fullName(p), first: p.first || "", per: p.per || "",
+      topics: ids.map(id => ({ id, name: cardTitle(id) })),
+      q: allQuestions().filter(q => ids.includes(q.tp))
+    };
+    try { localStorage.setItem(LAUNCH_KEY, JSON.stringify(data)); }
+    catch(e){ $("#gMsg").className = "msg warn"; $("#gMsg").textContent = T("This browser won’t let the game start. Try Safari or Chrome.", "Este navegador no deja empezar el juego. Prueba Safari o Chrome."); return; }
+    location.href = "games.html#ess";
+  });
+}
+
+/* =========================================================
+   COG: add AI-written review questions (saved on this device)
+   ========================================================= */
+/* a topic's notes as plain text, for the AI prompt */
+function cardText(id){
+  const box = document.createElement("textarea");
+  box.innerHTML = CARDS[id].body()
+    .replace(/<figure[\s\S]*?<\/figure>/g, "").replace(/<svg[\s\S]*?<\/svg>/g, "")
+    .replace(/<\/(td|th)>/g, " | ").replace(/<\/(p|div|h2|h3|h4|li|tr|figcaption|span)>/g, "\n")
+    .replace(/<[^>]+>/g, "");
+  return box.value.split("\n").map(l => l.replace(/\s+/g, " ").trim()).filter(Boolean).join("\n");
+}
+function aiPrompt(ids, per){
+  return `You are writing multiple-choice review questions for a high school Earth Space Science class in Florida. The students' notes for each topic are at the end of this message. Base every question on those notes.
+
+Write ${per} questions for EACH of these ${ids.length} topics (${per * ids.length} questions in all):
+${ids.map(id => `- ${id}: ${CARDS[id].title}`).join("\n")}
+
+Rules:
+- Start every question with a Topic line that uses the exact topic label from the list above (the part before the colon).
+- Each question has exactly 4 answer choices (A, B, C, D) and exactly one correct answer.
+- Mix easy, medium, and hard questions. Include some that ask students to apply an idea, not just remember a word.
+- Spread the correct answers evenly across A, B, C, and D.
+- No "all of the above" or "none of the above".
+- Keep questions and choices short enough to read on a phone.
+- After each English question, write the same question in Spanish, with the choices in the SAME order.
+- Use plain text only: no bold, no numbering, no bullet points, no headings, and no extra comments. Put a blank line between questions.
+
+Example of the format (use it for every question):
+
+Topic: water-cycle
+Question: Which process turns liquid water into water vapor?
+A: Condensation
+B: Evaporation
+C: Precipitation
+D: Infiltration
+Answer: B
+Pregunta: ¿Qué proceso convierte el agua líquida en vapor de agua?
+A: Condensación
+B: Evaporación
+C: Precipitación
+D: Infiltración
+
+If you run out of room, stop after a complete question. I will type "continue" and you keep going from where you stopped, in the same format.
+
+STUDENT NOTES
+${ids.map(id => `=== ${id}: ${CARDS[id].title} ===\n${cardText(id)}`).join("\n\n")}`;
+}
+function cogSheet(){
+  const all = [...Object.keys(CARDS)].filter(id => Object.values(TEACHER_ORDER).some(l => l.includes(id)));
+  const selected = new Set(all);
+  openSheet(`<h3 id="sheetTitle">${T("Review questions", "Preguntas de repaso")}</h3>
+    <p>${T("Add review questions written by AI. They are saved on this device only.", "Agrega preguntas de repaso escritas con IA. Se guardan solo en este aparato.")}</p>
+    <ol class="steps">
+      <li>${T("Pick the topics and how many questions you want for each.", "Elige los temas y cuántas preguntas quieres para cada uno.")}</li>
+      <li>${T("Tap <b>Copy AI prompt</b> and paste it into an AI chat like ChatGPT, Gemini, or Claude.", "Toca <b>Copiar instrucciones</b> y pégalas en un chat de IA como ChatGPT, Gemini o Claude.")}</li>
+      <li>${T("Copy everything the AI writes, paste it in the box below, and tap <b>Add questions</b>. If the AI stops partway, type “continue” in the chat and paste the next answer in the box too.", "Copia todo lo que escriba la IA, pégalo en el cuadro de abajo y toca <b>Agregar preguntas</b>. Si la IA se detiene, escribe “continue” en el chat y pega también la siguiente respuesta en el cuadro.")}</li>
+    </ol>
+    <span class="field">${T("Topics (the number is how many questions each has now)", "Temas (el número es cuántas preguntas tiene cada uno ahora)")}</span>
+    <div id="cPick"></div>
+    <label class="field" for="cPer">${T("Questions per topic", "Preguntas por tema")}</label>
+    <input class="inp num" id="cPer" type="number" inputmode="numeric" min="1" max="50" value="${(save.game && save.game.perTopic) || 20}">
+    <div class="row"><button class="btn" id="cCopy">${T("Copy AI prompt", "Copiar instrucciones")}</button></div>
+    <p class="msg" id="cCopyMsg"></p>
+    <textarea class="inp" id="cPromptBox" readonly hidden></textarea>
+    <hr>
+    <label class="field" for="cPaste">${T("Paste the AI’s questions here", "Pega aquí las preguntas de la IA")}</label>
+    <textarea class="inp" id="cPaste" spellcheck="false" placeholder="Topic: water-cycle&#10;Question: …&#10;A: …&#10;B: …&#10;C: …&#10;D: …&#10;Answer: B&#10;Pregunta: …&#10;A: …"></textarea>
+    <div class="row"><button class="btn" id="cAdd">${T("Add questions", "Agregar preguntas")}</button></div>
+    <div class="msg" id="cAddMsg"></div>
+    <hr>
+    <p class="small" id="cTotal"></p>
+    <div class="row"><button class="btn ghost" id="cClear">${T("Clear my added questions", "Borrar mis preguntas agregadas")}</button><button class="btn ghost" data-close>${T("Close", "Cerrar")}</button></div>`, { tall: true });
+  const drawPick = () => {
+    const box = $("#cPick"), fresh = box.cloneNode(false);
+    box.replaceWith(fresh);
+    fresh.innerHTML = topicPicker(selected, countsBy(allQuestions()), { needQ: false, showCount: true });
+    bindPicker(fresh, selected, () => { $("#cCopy").disabled = !selected.size; });
+    const added = save.addedQ.length;
+    $("#cTotal").textContent = T(`${STARTER_Q.length} built-in questions + ${added} added on this device.`, `${STARTER_Q.length} preguntas incluidas + ${added} agregadas en este aparato.`);
+    $("#cClear").disabled = !added;
+  };
+  drawPick();
+  $("#cCopy").addEventListener("click", () => {
+    const per = Math.min(50, Math.max(1, parseInt($("#cPer").value, 10) || 20));
+    save.game = Object.assign(save.game || {}, { perTopic: per }); writeSave();
+    const text = aiPrompt(topicsInOrder(selected), per), msg = $("#cCopyMsg"), box = $("#cPromptBox");
+    const fallback = () => {
+      box.value = text; box.hidden = false; box.focus(); box.select();
+      msg.className = "msg warn"; msg.textContent = T("Couldn’t copy automatically. The prompt is selected in the box below: copy it yourself.", "No se pudo copiar solo. Las instrucciones están seleccionadas en el cuadro de abajo: cópialas tú.");
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(() => { box.hidden = true; msg.className = "msg"; msg.textContent = T("Copied! Paste it into an AI chat.", "¡Copiado! Pégalo en un chat de IA."); }, fallback);
+    } else fallback();
+  });
+  $("#cAdd").addEventListener("click", () => {
+    const r = parseBank($("#cPaste").value), seen = new Set(allQuestions().map(qKey)), fresh = [];
+    let dup = 0;
+    r.questions.forEach(q => { const k = qKey(q); if (seen.has(k)) dup++; else { seen.add(k); fresh.push(q); } });
+    const noEs = fresh.filter(q => !q.es).length;
+    save.addedQ = save.addedQ.concat(fresh); writeSave();
+    const per = countsBy(fresh), msg = $("#cAddMsg");
+    let html = fresh.length ? `<b>${T(`Added ${fresh.length} questions.`, `Se agregaron ${fresh.length} preguntas.`)}</b><ul>${topicsInOrder(new Set(Object.keys(per))).map(id => `<li>${esc(cardTitle(id))}: +${per[id]}</li>`).join("")}</ul>` : `<b>${T("No new questions were added.", "No se agregaron preguntas nuevas.")}</b>`;
+    const warn = [];
+    if (dup) warn.push(T(`${dup} skipped because they were already saved.`, `${dup} omitidas porque ya estaban guardadas.`));
+    if (noEs) warn.push(T(`${noEs} have no Spanish version, so they show in English for everyone.`, `${noEs} no tienen versión en español, así que salen en inglés.`));
+    if (r.unknown.length) warn.push(T("These Topic labels don’t match a notebook topic, so their questions were skipped: ", "Estas etiquetas de Topic no coinciden con ningún tema, así que se omitieron sus preguntas: ") + r.unknown.map(esc).join(", "));
+    if (r.problems.length) warn.push(T(`${r.problems.length} couldn’t be read (each needs a question, A–D choices, and an Answer: letter):`, `${r.problems.length} no se pudieron leer (cada una necesita la pregunta, opciones A–D y una línea Answer:):`) + `<ul>${r.problems.slice(0, 5).map(x => `<li>${esc(x)}</li>`).join("")}</ul>`);
+    if (warn.length) html += `<div class="msg warn">${warn.map(w => `<p style="margin:0 0 6px">${w}</p>`).join("")}</div>`;
+    msg.className = "msg" + (fresh.length ? "" : " warn"); msg.innerHTML = html;
+    if (fresh.length && !r.problems.length && !r.unknown.length) $("#cPaste").value = "";
+    drawPick();
+  });
+  let clearArmed = null;
+  $("#cClear").addEventListener("click", () => {
+    const b = $("#cClear");
+    if (!clearArmed){
+      b.textContent = T(`Tap again to delete ${save.addedQ.length} questions`, `Toca otra vez para borrar ${save.addedQ.length} preguntas`);
+      clearArmed = setTimeout(() => { clearArmed = null; b.textContent = T("Clear my added questions", "Borrar mis preguntas agregadas"); }, 4000);
+      return;
+    }
+    clearTimeout(clearArmed); clearArmed = null;
+    save.addedQ = []; writeSave();
+    b.textContent = T("Clear my added questions", "Borrar mis preguntas agregadas");
+    $("#cAddMsg").className = "msg"; $("#cAddMsg").textContent = T("Your added questions were deleted. The built-in questions are still here.", "Se borraron tus preguntas agregadas. Las preguntas incluidas siguen aquí.");
+    drawPick();
+  });
 }
 
 const sel = $("#quarter"), openBtn = $("#openQ");
@@ -1294,9 +2892,14 @@ sel.addEventListener("change", () => { openBtn.disabled = !sel.value; });
 openBtn.addEventListener("click", () => {
   const q = sel.value; if (!q) return;
   save.lastQuarter = q; writeSave();
-  if (hasTopics(q)) go(q); else comingSoon(QUARTER_NAMES[q]);
+  if (hasTopics(q)) go(q); else comingSoon(qName(q));
 });
 $("#saveCheckBtn").addEventListener("click", saveCheck);
+$("#profileBtn").addEventListener("click", () => profileSheet(false));
+$("#cogBtn").addEventListener("click", cogSheet);
+const gameSel = $("#game"), playBtn = $("#playG");
+gameSel.addEventListener("change", () => { playBtn.disabled = !gameSel.value; if (gameSel.value) gameSheet(gameSel.value); });
+playBtn.addEventListener("click", () => { if (gameSel.value) gameSheet(gameSel.value); });
 document.addEventListener("click", e => {
   const card = e.target.closest("[data-card]");
   if (card) return go(currentQ + "/" + card.dataset.card);
@@ -1314,7 +2917,11 @@ window.addEventListener("hashchange", route);
   $("#stars").innerHTML = html;
 })();
 
+STARTER_Q = parseBank(STARTER_TEXT).questions;
+applyUI();
+renderMeLine();
 route();
+if (!save.profile) profileSheet(true);
 </script>
 </body>
 </html>
