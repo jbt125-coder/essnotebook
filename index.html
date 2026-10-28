@@ -211,6 +211,7 @@ textarea.inp{min-height:150px;font-size:14px;line-height:1.4;resize:vertical;fon
           <option value="paint" data-i18n="paint">Restore the Masters (painting)</option>
           <option value="snake" data-i18n="snake">Snake</option>
           <option value="blasteroids" data-i18n="blasteroids">Blasteroids</option>
+          <option value="zombie" data-i18n="zombie">Zombie Horde</option>
         </select>
       </div>
       <button class="btn" id="playG" disabled data-i18n="play">Play</button>
@@ -336,6 +337,7 @@ const UI = {
   paint: ["Restore the Masters (painting)", "Restaura las obras maestras (pintura)"],
   snake: ["Snake", "La serpiente"],
   blasteroids: ["Blasteroids", "Blasteroids"],
+  zombie: ["Zombie Horde", "La horda zombi"],
   changeMe: ["Change name, period, or language", "Cambiar nombre, período o idioma"],
   saveCheck: ["Save check", "Prueba de guardado"],
   cogLabel: ["Review questions", "Preguntas de repaso"],
@@ -2731,11 +2733,12 @@ function topicsInOrder(selected){ return ["q1", "q2", "q3", "q4"].flatMap(q => h
 function gameSheet(sport){
   const counts = countsBy(allQuestions()), last = save.game || {};
   const selected = new Set((last.topics || []).filter(id => counts[id]));
-  openSheet(`<h3 id="sheetTitle">${sport === "derby" ? T("Home Run Derby", "Derby de jonrones") : sport === "paint" ? T("Restore the Masters", "Restaura las obras maestras") : sport === "snake" ? T("Snake", "La serpiente") : sport === "blasteroids" ? T("Blasteroids", "Blasteroids") : T("Basketball", "Baloncesto")}</h3>
+  openSheet(`<h3 id="sheetTitle">${sport === "derby" ? T("Home Run Derby", "Derby de jonrones") : sport === "paint" ? T("Restore the Masters", "Restaura las obras maestras") : sport === "snake" ? T("Snake", "La serpiente") : sport === "blasteroids" ? T("Blasteroids", "Blasteroids") : sport === "zombie" ? T("Zombie Horde", "La horda zombi") : T("Basketball", "Baloncesto")}</h3>
     <p>${sport === "derby" ? T("Answer 3 questions right to step up to bat. When time runs out, you get a score card.", "Contesta 3 preguntas bien para pasar al bate. Cuando se acabe el tiempo, verás tu tarjeta de puntaje.")
       : sport === "paint" ? T("Every right answer earns 2 brush strokes. Answer at least 3 right to start painting, or keep going to save up more. When time runs out, you get a score card.", "Cada respuesta correcta gana 2 pinceladas. Contesta por lo menos 3 bien para empezar a pintar, o sigue para juntar más. Cuando se acabe el tiempo, verás tu tarjeta de puntaje.")
       : sport === "snake" ? T("Answer 3 questions right to start, then 3 more after every 2 levels and every time you crash. Beat all 6 levels and the evil snake comes out to race you. When time runs out, you get a score card.", "Contesta 3 preguntas bien para empezar, y 3 más cada 2 niveles y cada vez que choques. Pasa los 6 niveles y sale la serpiente malvada a echarte una carrera. Cuando se acabe el tiempo, verás tu tarjeta de puntaje.")
       : sport === "blasteroids" ? T("Answer 3 questions right before every wave as you fly through all 4 modes. Lose a ship? Answer 3 right to launch the next one. You get 3 ships, then it's back to wave 1. When time runs out, you get a score card.", "Contesta 3 preguntas bien antes de cada oleada mientras vuelas por los 4 modos. ¿Perdiste una nave? Contesta 3 bien para lanzar la siguiente. Tienes 3 naves, y después vuelves a la oleada 1. Cuando se acabe el tiempo, verás tu tarjeta de puntaje.")
+      : sport === "zombie" ? T("Answer 3 questions right to send 3 men into wave 1. After every bonus round, answer up to 10 questions: each right answer is 1 man for the next wave. Lose your squad? Answer more to try the wave again. Stay above 40% correct or the zombies take over. When time runs out, you get a score card.", "Contesta 3 preguntas bien para mandar 3 soldados a la oleada 1. Después de cada ronda de bonificación, contesta hasta 10 preguntas: cada respuesta correcta es 1 soldado para la siguiente oleada. ¿Perdiste tu escuadrón? Contesta más para intentar la oleada otra vez. Mantente arriba del 40% correcto o los zombis se apoderan del mundo. Cuando se acabe el tiempo, verás tu tarjeta de puntaje.")
       : T("Answer 3 questions right to earn 3 balls. When time runs out, you get a score card.", "Contesta 3 preguntas bien para ganar 3 balones. Cuando se acabe el tiempo, verás tu tarjeta de puntaje.")}</p>
     <label class="field" for="gMins">${T("How many minutes do you want to play?", "¿Cuántos minutos quieres jugar?")}</label>
     <input class="inp num" id="gMins" type="number" inputmode="numeric" min="1" max="60" value="${last.mins || 5}">
@@ -2762,7 +2765,7 @@ function gameSheet(sport){
     };
     try { localStorage.setItem(LAUNCH_KEY, JSON.stringify(data)); }
     catch(e){ $("#gMsg").className = "msg warn"; $("#gMsg").textContent = T("This browser won’t let the game start. Try Safari or Chrome.", "Este navegador no deja empezar el juego. Prueba Safari o Chrome."); return; }
-    location.href = sport === "paint" ? "paint.html#ess" : sport === "snake" ? "snake.html#ess" : sport === "blasteroids" ? "blasteroids.html#ess" : "games.html#ess";
+    location.href = sport === "paint" ? "paint.html#ess" : sport === "snake" ? "snake.html#ess" : sport === "blasteroids" ? "blasteroids.html#ess" : sport === "zombie" ? "zombie.html#ess" : "games.html#ess";
   });
 }
 
