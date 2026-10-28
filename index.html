@@ -208,6 +208,7 @@ textarea.inp{min-height:150px;font-size:14px;line-height:1.4;resize:vertical;fon
           <option value="" data-i18n="choose">Choose…</option>
           <option value="hoops" data-i18n="hoops">Basketball</option>
           <option value="derby" data-i18n="derby">Home Run Derby</option>
+          <option value="paint" data-i18n="paint">Restore the Masters (painting)</option>
         </select>
       </div>
       <button class="btn" id="playG" disabled data-i18n="play">Play</button>
@@ -330,6 +331,7 @@ const UI = {
   open: ["Open", "Abrir"], play: ["Play", "Jugar"],
   playGame: ["Play a review game", "Juega un juego de repaso"],
   hoops: ["Basketball", "Baloncesto"], derby: ["Home Run Derby", "Derby de jonrones"],
+  paint: ["Restore the Masters (painting)", "Restaura las obras maestras (pintura)"],
   changeMe: ["Change name, period, or language", "Cambiar nombre, período o idioma"],
   saveCheck: ["Save check", "Prueba de guardado"],
   cogLabel: ["Review questions", "Preguntas de repaso"],
@@ -2725,8 +2727,9 @@ function topicsInOrder(selected){ return ["q1", "q2", "q3", "q4"].flatMap(q => h
 function gameSheet(sport){
   const counts = countsBy(allQuestions()), last = save.game || {};
   const selected = new Set((last.topics || []).filter(id => counts[id]));
-  openSheet(`<h3 id="sheetTitle">${sport === "derby" ? T("Home Run Derby", "Derby de jonrones") : T("Basketball", "Baloncesto")}</h3>
+  openSheet(`<h3 id="sheetTitle">${sport === "derby" ? T("Home Run Derby", "Derby de jonrones") : sport === "paint" ? T("Restore the Masters", "Restaura las obras maestras") : T("Basketball", "Baloncesto")}</h3>
     <p>${sport === "derby" ? T("Answer 3 questions right to step up to bat. When time runs out, you get a score card.", "Contesta 3 preguntas bien para pasar al bate. Cuando se acabe el tiempo, verás tu tarjeta de puntaje.")
+      : sport === "paint" ? T("Every right answer earns 2 brush strokes. Answer at least 3 right to start painting, or keep going to save up more. When time runs out, you get a score card.", "Cada respuesta correcta gana 2 pinceladas. Contesta por lo menos 3 bien para empezar a pintar, o sigue para juntar más. Cuando se acabe el tiempo, verás tu tarjeta de puntaje.")
       : T("Answer 3 questions right to earn 3 balls. When time runs out, you get a score card.", "Contesta 3 preguntas bien para ganar 3 balones. Cuando se acabe el tiempo, verás tu tarjeta de puntaje.")}</p>
     <label class="field" for="gMins">${T("How many minutes do you want to play?", "¿Cuántos minutos quieres jugar?")}</label>
     <input class="inp num" id="gMins" type="number" inputmode="numeric" min="1" max="60" value="${last.mins || 5}">
@@ -2753,7 +2756,7 @@ function gameSheet(sport){
     };
     try { localStorage.setItem(LAUNCH_KEY, JSON.stringify(data)); }
     catch(e){ $("#gMsg").className = "msg warn"; $("#gMsg").textContent = T("This browser won’t let the game start. Try Safari or Chrome.", "Este navegador no deja empezar el juego. Prueba Safari o Chrome."); return; }
-    location.href = "games.html#ess";
+    location.href = sport === "paint" ? "paint.html#ess" : "games.html#ess";
   });
 }
 
