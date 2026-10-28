@@ -209,6 +209,7 @@ textarea.inp{min-height:150px;font-size:14px;line-height:1.4;resize:vertical;fon
           <option value="hoops" data-i18n="hoops">Basketball</option>
           <option value="derby" data-i18n="derby">Home Run Derby</option>
           <option value="paint" data-i18n="paint">Restore the Masters (painting)</option>
+          <option value="snake" data-i18n="snake">Snake</option>
         </select>
       </div>
       <button class="btn" id="playG" disabled data-i18n="play">Play</button>
@@ -332,6 +333,7 @@ const UI = {
   playGame: ["Play a review game", "Juega un juego de repaso"],
   hoops: ["Basketball", "Baloncesto"], derby: ["Home Run Derby", "Derby de jonrones"],
   paint: ["Restore the Masters (painting)", "Restaura las obras maestras (pintura)"],
+  snake: ["Snake", "La serpiente"],
   changeMe: ["Change name, period, or language", "Cambiar nombre, período o idioma"],
   saveCheck: ["Save check", "Prueba de guardado"],
   cogLabel: ["Review questions", "Preguntas de repaso"],
@@ -2727,12 +2729,13 @@ function topicsInOrder(selected){ return ["q1", "q2", "q3", "q4"].flatMap(q => h
 function gameSheet(sport){
   const counts = countsBy(allQuestions()), last = save.game || {};
   const selected = new Set((last.topics || []).filter(id => counts[id]));
-  openSheet(`<h3 id="sheetTitle">${sport === "derby" ? T("Home Run Derby", "Derby de jonrones") : sport === "paint" ? T("Restore the Masters", "Restaura las obras maestras") : T("Basketball", "Baloncesto")}</h3>
+  openSheet(`<h3 id="sheetTitle">${sport === "derby" ? T("Home Run Derby", "Derby de jonrones") : sport === "paint" ? T("Restore the Masters", "Restaura las obras maestras") : sport === "snake" ? T("Snake", "La serpiente") : T("Basketball", "Baloncesto")}</h3>
     <p>${sport === "derby" ? T("Answer 3 questions right to step up to bat. When time runs out, you get a score card.", "Contesta 3 preguntas bien para pasar al bate. Cuando se acabe el tiempo, verás tu tarjeta de puntaje.")
       : sport === "paint" ? T("Every right answer earns 2 brush strokes. Answer at least 3 right to start painting, or keep going to save up more. When time runs out, you get a score card.", "Cada respuesta correcta gana 2 pinceladas. Contesta por lo menos 3 bien para empezar a pintar, o sigue para juntar más. Cuando se acabe el tiempo, verás tu tarjeta de puntaje.")
+      : sport === "snake" ? T("Answer 3 questions right to start, then 3 more after every 2 levels and every time you crash. Beat all 6 levels and the evil snake comes out to race you.", "Contesta 3 preguntas bien para empezar, y 3 más cada 2 niveles y cada vez que choques. Pasa los 6 niveles y sale la serpiente malvada a echarte una carrera.")
       : T("Answer 3 questions right to earn 3 balls. When time runs out, you get a score card.", "Contesta 3 preguntas bien para ganar 3 balones. Cuando se acabe el tiempo, verás tu tarjeta de puntaje.")}</p>
-    <label class="field" for="gMins">${T("How many minutes do you want to play?", "¿Cuántos minutos quieres jugar?")}</label>
-    <input class="inp num" id="gMins" type="number" inputmode="numeric" min="1" max="60" value="${last.mins || 5}">
+    ${sport === "snake" ? "" : `<label class="field" for="gMins">${T("How many minutes do you want to play?", "¿Cuántos minutos quieres jugar?")}</label>
+    <input class="inp num" id="gMins" type="number" inputmode="numeric" min="1" max="60" value="${last.mins || 5}">`}
     <span class="field">${T("Which topics do you want to review?", "¿Qué temas quieres repasar?")}</span>
     <div id="gPick">${topicPicker(selected, counts, { needQ: true, showCount: false })}</div>
     <p class="msg" id="gMsg"></p>
@@ -2745,7 +2748,7 @@ function gameSheet(sport){
       : T("Tap the topics you want to review.", "Toca los temas que quieres repasar.");
   });
   $("#gGo").addEventListener("click", () => {
-    const mins = Math.min(60, Math.max(1, parseInt($("#gMins").value, 10) || 5));
+    const mins = $("#gMins") ? Math.min(60, Math.max(1, parseInt($("#gMins").value, 10) || 5)) : (last.mins || 5);
     const ids = topicsInOrder(selected);
     save.game = Object.assign(save.game || {}, { mins, topics: ids }); writeSave();
     const p = save.profile || {};
@@ -2756,7 +2759,7 @@ function gameSheet(sport){
     };
     try { localStorage.setItem(LAUNCH_KEY, JSON.stringify(data)); }
     catch(e){ $("#gMsg").className = "msg warn"; $("#gMsg").textContent = T("This browser won’t let the game start. Try Safari or Chrome.", "Este navegador no deja empezar el juego. Prueba Safari o Chrome."); return; }
-    location.href = sport === "paint" ? "paint.html#ess" : "games.html#ess";
+    location.href = sport === "paint" ? "paint.html#ess" : sport === "snake" ? "snake.html#ess" : "games.html#ess";
   });
 }
 
