@@ -164,6 +164,7 @@ body.land #pStage { flex: 1; }
 #hTimer.low { color: #ff6060; }
 #hJoinMini { flex: 1; text-align: right; font-size: 12px; color: #c9b8ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #hJoinMini b { color: #f87800; }
+.essQuit { border-color: #d82800; color: #ffb0a0; background: transparent; padding: 6px 7px; }
 .tinyBtn { font-family: "Press Start 2P", monospace; font-size: 8px; padding: 8px; border-radius: 7px; border: 2px solid #4a3696; background: #2a1c60; color: #e6dcff; white-space: nowrap; }
 .tinyBtn.warn { background: #d82800; border-color: #000; color: #fff; }
 #hBox { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; position: relative; }
@@ -299,7 +300,7 @@ body.dby .ballDot.on { background: #fcfcfc; box-shadow: inset -4px -4px 0 #c8c0b
 <!-- ================= STUDENT: questions ================= -->
 <div class="scr" id="scrQuiz">
   <div class="wrap">
-    <div class="qTop"><span class="connTag" id="qConn">Connected</span><span id="qScore" class="pix"></span><span id="qTime" class="pix"></span></div>
+    <div class="qTop"><span class="connTag" id="qConn">Connected</span><button type="button" id="qQuit" class="tinyBtn essQuit" style="display:none" data-l>← NOTEBOOK</button><span id="qScore" class="pix"></span><span id="qTime" class="pix"></span></div>
     <div class="qHead pix" id="qHead">Answer 3 right<br>to earn 3 balls</div>
     <div class="dots" id="qDots"></div>
     <div class="qBox" id="qText"></div>
@@ -311,7 +312,7 @@ body.dby .ballDot.on { background: #fcfcfc; box-shadow: inset -4px -4px 0 #c8c0b
 
 <!-- ================= STUDENT: shooting ================= -->
 <div class="scr" id="scrPlay" data-disp="flex">
-  <div id="pHud"><span id="pBalls"></span><span id="pHoop" class="pix"></span><span id="pTime" class="pix"></span><span id="pScore" class="pix"></span></div>
+  <div id="pHud"><span id="pBalls"></span><span id="pHoop" class="pix"></span><span id="pTime" class="pix"></span><span id="pScore" class="pix"></span><button type="button" id="pQuit" class="tinyBtn essQuit" style="display:none" data-l>EXIT</button></div>
   <div id="pStage"><canvas id="pCanvas"></canvas></div>
   <div id="pad">
     <div id="dpad"><div class="dpH"></div><div class="dpV"></div>
@@ -674,6 +675,8 @@ var ES = {
   'Go back to the notebook and pick the topics to review.': 'Vuelve al cuaderno y elige los temas para repasar.',
   'TOPIC': 'TEMA', 'TOPICS': 'TEMAS', 'Topic': 'Tema', 'Right': 'Bien', 'Total': 'Total',
   'Take a screenshot of your score card!': '¡Toma una captura de pantalla de tu tarjeta de puntaje!',
+  '← NOTEBOOK': '← CUADERNO', 'EXIT': 'SALIR', 'PLAYED': 'JUGASTE', 'OF': 'DE',
+  'End the game now and see your score card?': '¿Terminar el juego ahora y ver tu tarjeta de puntaje?',
   'BASKETBALL REVIEW': 'REPASO DE BALONCESTO', 'HOME RUN DERBY REVIEW': 'REPASO DE JONRONES', 'Earth Space Science Notebook': 'Cuaderno de Ciencias de la Tierra y el Espacio',
   'SHORT HAIR': 'PELO CORTO', 'CAP': 'GORRA', 'BACKWARDS CAP': 'GORRA AL REVÉS', 'BEANIE': 'GORRO', 'AFRO': 'AFRO', 'SPIKY HAIR': 'PELO PARADO',
   'HEADBAND': 'CINTA', 'CROWN': 'CORONA', 'BOW': 'MOÑO', 'MOHAWK': 'CRESTA', 'LONG HAIR': 'PELO LARGO', 'PONYTAIL': 'COLA DE CABALLO', 'PIGTAILS': 'DOS COLITAS'
@@ -2451,7 +2454,7 @@ function soloResume(){
   leaveHalf();
 }
 function soloOver(){
-  if (ESS){ stu.G.ph = 'over'; showOver({ top: [], sc: stu.solo.sc, rk: 1, n: 1 }); return; }
+  if (ESS){ stu.solo.played = SOLO.m * 60 - timeLeft(); stu.G.ph = 'over'; showOver({ top: [], sc: stu.solo.sc, rk: 1, n: 1 }); return; }
   var S = stu.solo, key = SOLO_BEST + location.hash.length + '_' + location.hash.slice(-24), best = load(key) || 0;
   var newBest = S.sc > best;
   if (newBest) store(key, S.sc);
@@ -2485,6 +2488,14 @@ function essInit(){
   $('jGo').onclick = essStart;
   $('hfGo').onclick = soloResume;
   $('oAgain').onclick = essStart;
+  $('qQuit').style.display = ''; $('pQuit').style.display = '';
+  $('qQuit').onclick = $('pQuit').onclick = essQuit;
+}
+// leaving early still ends with the score card
+function essQuit(){
+  if (stu.mode !== 'quiz' && stu.mode !== 'play') return;
+  if (!window.confirm(L('End the game now and see your score card?'))) return;
+  soloOver();
 }
 function essStart(){
   ac();
@@ -2516,8 +2527,9 @@ function essCard(sc){
     '<div class="ocBig">' + L('SCORE') + ' ' + sc + '</div>' +
     '<div class="ocPct">' + pct(stu.qRight, stu.qTotal) + '%</div>' +
     '<div class="ocLine">' + stu.qRight + '/' + stu.qTotal + ' ' + L('CORRECT') + '</div>' +
+    '<div class="ocLine">' + L('PLAYED') + ' ' + fmt(Math.min(SOLO.m * 60, stu.solo.played || 0)) + ' ' + L('OF') + ' ' + SOLO.m + ' MIN</div>' +
     '<table class="ocTbl"><tr><th>' + L('Topic') + '</th><th class="n">' + L('Right') + '</th><th class="n">%</th></tr>' + rows + '</table>' +
-    '<div class="ocDate">' + L('Earth Space Science Notebook') + ', ' + SOLO.m + ' min, ' + d.toLocaleDateString(es ? 'es' : [], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' +
+    '<div class="ocDate">' + L('Earth Space Science Notebook') + ', ' + d.toLocaleDateString(es ? 'es' : [], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' +
     d.toLocaleTimeString(es ? 'es' : [], { hour: 'numeric', minute: '2-digit' }) + '</div>';
 }
 function buildSwatches(id, cols, field){
