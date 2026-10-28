@@ -57,6 +57,26 @@ a.back { color:#6a8f99; font-size:11px; letter-spacing:2px; margin-top:24px; tex
 .dBtn { border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:28px; cursor:pointer; user-select:none; -webkit-user-select:none; transition:background 0.12s; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.6); }
 .dBtn:active,.dBtn.pressed { background:rgba(255,255,255,0.22); }
 .dCenter { background:transparent!important; border:none!important; }
+#hudTime { font-size:13px; letter-spacing:1px; color:#e8d0ff; text-shadow:0 0 6px rgba(200,140,255,0.6); }
+#hudTime.low,#qTime.low { color:#ff5a6e; text-shadow:0 0 8px #ff2d55; }
+.qtop { display:flex; justify-content:space-between; align-items:center; font-size:12px; letter-spacing:2px; color:#8fb3c0; margin-bottom:6px; }
+#qTime { color:#e8d0ff; }
+.quitB { background:none; border:1px solid rgba(255,90,110,0.55); border-radius:12px; color:#ff8a9a; font-family:'Courier New',monospace; font-size:11px; letter-spacing:1px; padding:5px 10px; cursor:pointer; }
+#dQuit { align-self:center; justify-self:center; }
+#repScreen { background:#111; justify-content:flex-start; overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; padding:24px 16px; }
+#repTitle { font-size:28px; letter-spacing:6px; color:#00ffcc; text-shadow:0 0 16px #00ffcc; margin:auto 0 16px; text-align:center; }
+#repScreen a.back { margin-bottom:auto; }
+.scard { background:#fff; color:#111; border:3px solid #000; border-radius:14px; box-shadow:5px 5px 0 #00ffcc; padding:16px; width:100%; max-width:380px; margin-bottom:14px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; text-align:left; }
+.scard .scName { font-size:1.5rem; font-weight:800; line-height:1.1; }
+.scard .scLine { font-size:.9rem; color:#4a5a5f; margin-top:4px; }
+.scard .scBig { font-size:2.2rem; font-weight:800; line-height:1; margin-top:10px; color:#00a383; }
+.scard table { width:100%; border-collapse:collapse; margin-top:12px; font-size:.88rem; text-align:left; }
+.scard th,.scard td { padding:4px 3px; border-bottom:1px solid #dde5e7; }
+.scard td.n,.scard th.n { text-align:right; white-space:nowrap; }
+.scard td.low { color:#c0392b; font-weight:700; }
+.scard tr.tot td { font-weight:700; border-bottom:none; }
+.scard .scDate { font-size:.78rem; color:#6a7a7f; margin-top:10px; }
+.shot { color:#aaa; font:14px/1.4 system-ui,sans-serif; margin-bottom:18px; text-align:center; }
 #progressBar { position:relative; z-index:10; width:calc(100% - 32px); height:3px; background:rgba(255,255,255,0.08); border-radius:2px; margin:6px 16px 4px; overflow:hidden; flex-shrink:0; }
 #progressFill { height:100%; border-radius:2px; transition:width 0.3s ease, background 0.8s; width:0%; background:#555; }
 </style>
@@ -68,6 +88,7 @@ a.back { color:#6a8f99; font-size:11px; letter-spacing:2px; margin-top:24px; tex
     <span id="hudLevel">LV 1</span>
     <span id="hudStars">★ 0</span>
     <span id="hudEvil">😈 0</span>
+    <span id="hudTime"></span>
     <span id="hudScore">0</span>
   </div>
   <div id="progressBar"><div id="progressFill"></div></div>
@@ -78,7 +99,7 @@ a.back { color:#6a8f99; font-size:11px; letter-spacing:2px; margin-top:24px; tex
   <div id="dpad">
     <div></div><div class="dBtn" id="btnUp">▲</div><div></div>
     <div class="dBtn" id="btnLeft">◀</div><div class="dBtn dCenter"></div><div class="dBtn" id="btnRight">▶</div>
-    <div></div><div class="dBtn" id="btnDown">▼</div><div></div>
+    <button type="button" class="quitB" id="dQuit" data-t="exit">✕ EXIT</button><div class="dBtn" id="btnDown">▼</div><div></div>
   </div>
 </div>
 
@@ -93,6 +114,7 @@ a.back { color:#6a8f99; font-size:11px; letter-spacing:2px; margin-top:24px; tex
     <li data-t="h4">Crash? Answer 3 right to keep your spot</li>
     <li data-t="h5">Beat level 6 and the evil snake shows up 😈</li>
     <li data-t="h6">Swipe, use the arrow keys, or tap the pad to move</li>
+    <li data-t="h7">When time runs out, you get a score card</li>
   </ul>
   <button id="startBtn" class="gBtn" data-t="start">START</button>
   <a class="back" href="index.html" data-t="back">← Back to the notebook</a>
@@ -105,10 +127,11 @@ a.back { color:#6a8f99; font-size:11px; letter-spacing:2px; margin-top:24px; tex
     <button id="contBtn" class="gBtn hot">ANSWER 3 TO CONTINUE</button>
     <button id="msgBtn" class="gBtn" data-t="restart">RESTART FROM LEVEL 1</button>
   </div>
-  <a class="back" href="index.html" data-t="back">← Back to the notebook</a>
+  <button type="button" class="quitB" id="msgQuit" style="margin-top:24px" data-t="endNb">← BACK TO THE NOTEBOOK</button>
 </div>
 <div class="screen hidden" id="quizScreen">
   <div class="qwrap">
+    <div class="qtop"><span id="qScore"></span><button type="button" class="quitB" id="qQuit" data-t="exitNb">← NOTEBOOK</button><span id="qTime"></span></div>
     <div id="qHead"></div>
     <div id="qSnark"></div>
     <div id="qDots"></div>
@@ -121,6 +144,13 @@ a.back { color:#6a8f99; font-size:11px; letter-spacing:2px; margin-top:24px; tex
     </div>
   </div>
 </div>
+<div class="screen hidden" id="repScreen">
+  <div id="repTitle"></div>
+  <div class="scard" id="scard"></div>
+  <p class="shot" data-t="shot">Take a screenshot of your score card!</p>
+  <button id="againBtn" class="gBtn hot" data-t="again">PLAY AGAIN</button>
+  <a class="back" href="index.html" data-t="back">← Back to the notebook</a>
+</div>
 <div id="toast"></div>
 
 <script>
@@ -129,7 +159,8 @@ a.back { color:#6a8f99; font-size:11px; letter-spacing:2px; margin-top:24px; tex
 // ============================================================
 const ESS_LAUNCH='essNotebook.launch', NEED_RIGHT=3;
 let ESS=null, LANG='en';
-let tripRight=0, qRight=0, qTotal=0, deck=[], lastQ=-1, curQ=null, quizDone=null;
+let tripRight=0, qRight=0, qTotal=0, tpStats={}, deck=[], lastQ=-1, curQ=null, quizDone=null;
+let startAt=0, endAt=0, clockInt=null, timeUp=false, runs=0, best=null;
 
 const TX={
   h1:['Answer 3 questions right to start','Contesta 3 preguntas bien para empezar'],
@@ -138,6 +169,12 @@ const TX={
   h4:['Crash? Answer 3 right to keep your spot','¿Chocaste? Contesta 3 bien para seguir donde ibas'],
   h5:['Beat level 6 and the evil snake shows up 😈','Pasa el nivel 6 y aparece la serpiente malvada 😈'],
   h6:['Swipe, use the arrow keys, or tap the pad to move','Desliza, usa las flechas o toca los botones para moverte'],
+  h7:['When time runs out, you get a score card','Cuando se acabe el tiempo, verás tu tarjeta de puntaje'],
+  exit:['✕ EXIT','✕ SALIR'],
+  exitNb:['← NOTEBOOK','← CUADERNO'],
+  endNb:['← BACK TO THE NOTEBOOK','← VOLVER AL CUADERNO'],
+  shot:['Take a screenshot of your score card!','¡Toma una captura de pantalla de tu tarjeta de puntaje!'],
+  again:['PLAY AGAIN','JUGAR OTRA VEZ'],
   start:['START','EMPEZAR'],
   back:['← Back to the notebook','← Volver al cuaderno'],
   restart:['RESTART FROM LEVEL 1','EMPEZAR DE NUEVO EN EL NIVEL 1'],
@@ -242,19 +279,21 @@ function essInit(){
     $('howto').style.display='none'; $('startBtn').style.display='none';
     return;
   }
-  ESS={name:String(d.name||''),per:String(d.per||''),topics:Array.isArray(d.topics)?d.topics:[],q:d.q};
+  ESS={name:String(d.name||''),per:String(d.per||''),m:Math.min(60,Math.max(1,parseInt(d.m,10)||5)),topics:Array.isArray(d.topics)?d.topics:[],q:d.q};
   const n=ESS.topics.length;
   $('essInfo').innerHTML=(ESS.name?'<strong>'+esc(ESS.name)+'</strong>':'')+
     (ESS.per?' · '+T('Period','Período')+' '+esc(ESS.per):'')+(ESS.name||ESS.per?'<br>':'')+
-    n+' '+T(n===1?'topic':'topics',n===1?'tema':'temas')+', '+ESS.q.length+' '+T('questions','preguntas');
+    n+' '+T(n===1?'topic':'topics',n===1?'tema':'temas')+', '+ESS.q.length+' '+T('questions','preguntas')+' · '+ESS.m+' min';
 }
 
 // ---- question checkpoints ----
 function checkpoint(kind,onDone,n){
+  if(timeUp) return;
   killLoop();
   quizDone=onDone; tripRight=0;
   $('qHead').innerHTML=L(HEADS[kind],n);
   $('qSnark').textContent=say(kind,n);
+  $('qScore').textContent=score+' '+T('pts','pts');
   $('quizScreen').classList.remove('hidden');
   showQuestion();
 }
@@ -293,7 +332,7 @@ function showQuestion(){
   $('quizScreen').scrollTop=0;
 }
 function answerQ(k){
-  if(!curQ||curQ.done) return;
+  if(!curQ||curQ.done||timeUp) return;
   curQ.done=true;
   const right=curQ.order[k]===curQ.q.a, btns=$('qChoices').children;
   let rightK=0;
@@ -303,6 +342,7 @@ function answerQ(k){
     else btns[i].className='qch dim';
   }
   qTotal++;
+  if(curQ.q.tp){ const t=tpStats[curQ.q.tp]||(tpStats[curQ.q.tp]={r:0,n:0}); t.n++; if(right) t.r++; }
   const fb=$('qFb');
   if(right){
     qRight++; tripRight++;
@@ -318,8 +358,67 @@ function answerQ(k){
   $('qNext').style.display=ready?'none':'';
 }
 function finishQuiz(){
+  if(timeUp) return;
   $('quizScreen').classList.add('hidden');
   const f=quizDone; quizDone=null; if(f) f();
+}
+
+// ---- game clock (keeps running during questions) ----
+function startClock(){
+  clearInterval(clockInt);
+  startAt=Date.now(); endAt=startAt+ESS.m*60000; tickClock();
+  clockInt=setInterval(tickClock,250);
+}
+function tickClock(){
+  const t=Math.max(0,Math.ceil((endAt-Date.now())/1000)), s=Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
+  ['hudTime','qTime'].forEach(id=>{ const el=$(id); el.textContent='⏱ '+s; el.classList.toggle('low',t<60); });
+  if(t<=0) endGame(false);
+}
+function playedText(){
+  const t=Math.min(ESS.m*60,Math.round((Math.min(Date.now(),endAt)-startAt)/1000));
+  return T('Played','Jugaste')+' '+Math.floor(t/60)+':'+String(t%60).padStart(2,'0')+' '+T('of','de')+' '+ESS.m+' min';
+}
+// a run ends on "restart from level 1" or at the end of the game; the best one goes on the score card
+function endRun(){
+  runs++;
+  if(!best||score>best.score) best={score,level:phase+1,round};
+}
+// leaving early still ends with the score card
+function quitGame(){
+  if(timeUp||!startAt) return;
+  if(!window.confirm(T('End the game now and see your score card?','¿Terminar el juego ahora y ver tu tarjeta de puntaje?'))) return;
+  endGame(true);
+}
+function endGame(quit){
+  if(timeUp) return;
+  timeUp=true; killLoop(); clearInterval(clockInt);
+  endRun();
+  ['startScreen','msgScreen','quizScreen'].forEach(id=>$(id).classList.add('hidden'));
+  $('repTitle').textContent=quit?T('GAME OVER','FIN DEL JUEGO'):T("TIME'S UP!",'¡SE ACABÓ EL TIEMPO!');
+  scoreCard();
+  $('repScreen').classList.remove('hidden');
+  $('repScreen').scrollTop=0;
+}
+function scoreCard(){
+  const d=new Date(), es=LANG==='es', p=(r,n)=>n?Math.round(r*100/n):0;
+  let rows='';
+  // only the topics that came up in this game (all of them if nothing was answered)
+  ESS.topics.forEach(tp=>{
+    const t=tpStats[tp.id]||{r:0,n:0}, tpct=p(t.r,t.n);
+    if(qTotal&&!t.n) return;
+    rows+='<tr><td>'+esc(tp.name)+'</td><td class="n">'+t.r+'/'+t.n+'</td><td class="n'+(t.n&&tpct<70?' low':'')+'">'+(t.n?tpct+'%':'-')+'</td></tr>';
+  });
+  rows+='<tr class="tot"><td>'+T('Total','Total')+'</td><td class="n">'+qRight+'/'+qTotal+'</td><td class="n">'+p(qRight,qTotal)+'%</td></tr>';
+  $('scard').innerHTML=
+    '<div class="scName">'+esc(ESS.name||T('Player','Jugador'))+'</div>'+
+    '<div class="scLine">'+(ESS.per?T('Period','Período')+' '+esc(ESS.per)+' · ':'')+T('Snake Review','Repaso con la serpiente')+'</div>'+
+    '<div class="scBig">'+p(qRight,qTotal)+'% '+T('correct','correctas')+'</div>'+
+    '<div class="scLine">'+qRight+'/'+qTotal+' '+T('questions right','preguntas bien')+' · '+playedText()+'</div>'+
+    '<div class="scLine">'+T('Best run','Mejor partida')+': '+best.score+' '+T('pts','pts')+' · '+T('level','nivel')+' '+best.level+
+      (best.round>1?' ('+T('loop','vuelta')+' '+best.round+')':'')+' · '+runs+' '+T(runs===1?'run':'runs',runs===1?'partida':'partidas')+'</div>'+
+    '<table><tr><th>'+T('Topic','Tema')+'</th><th class="n">'+T('Right','Bien')+'</th><th class="n">%</th></tr>'+rows+'</table>'+
+    '<div class="scDate">'+T('Earth Space Science Notebook','Cuaderno de Ciencias de la Tierra y el Espacio')+', '+
+    d.toLocaleDateString(es?'es':[],{month:'short',day:'numeric',year:'numeric'})+' '+d.toLocaleTimeString(es?'es':[],{hour:'numeric',minute:'2-digit'})+'</div>';
 }
 
 // ============================================================
@@ -388,6 +487,8 @@ function init() {
   $('contBtn').addEventListener('click',continueGame);
   $('qNext').addEventListener('click',showQuestion);
   $('qGo').addEventListener('click',finishQuiz);
+  $('againBtn').addEventListener('click',startGame);
+  ['dQuit','qQuit','msgQuit'].forEach(id=>$(id).addEventListener('click',quitGame));
 
   essInit();
   requestAnimationFrame(bgLoop);
@@ -405,8 +506,12 @@ function resize() {
 // ============================================================
 // GAME FLOW
 // ============================================================
-function startGame()   { $('startScreen').classList.add('hidden'); resetAll(); checkpoint('start',()=>startClassic(true,true)); }
-function restartGame() { $('msgScreen').classList.add('hidden');   resetAll(); startClassic(true,true); }
+function startGame()   {
+  $('startScreen').classList.add('hidden'); $('repScreen').classList.add('hidden');
+  timeUp=false; qRight=0; qTotal=0; tpStats={}; deck=[]; lastQ=-1; runs=0; best=null;
+  resetAll(); startClock(); checkpoint('start',()=>startClassic(true,true));
+}
+function restartGame() { if(timeUp) return; endRun(); $('msgScreen').classList.add('hidden'); resetAll(); startClassic(true,true); }
 function resetAll()    { stars=0; score=0; phase=0; lvStars=0; round=1; snake=null; foods=[]; evil=null; evilFoods=[]; }
 function levelGoal()   { return phase>=5?ARENA_GOAL:STARS_PER_PHASE; }
 
@@ -435,6 +540,7 @@ function die(kind) {
   alive=false; killLoop(); lastDeath=kind;
   if(gameMode==='arena') drawArena(); else drawClassic();
   setTimeout(()=>{
+    if(timeUp) return;
     const col=kind==='race'||kind==='evil'?EVIL_COLOR:phase===5?'#00ffcc':((theme&&theme.snakeHead)||'#fff');
     $('msgTitle').textContent=kind==='race'?T('THE EVIL SNAKE WINS','GANÓ LA SERPIENTE MALVADA'):T('GAME OVER','SE ACABÓ');
     $('msgTitle').style.color=col;

@@ -283,7 +283,7 @@ a.back{position:relative;z-index:2;color:rgba(180,140,255,0.6);font-size:10px;le
 
 #quizScreen{background:rgba(0,4,16,0.97);justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:20px 16px 40px;z-index:90;text-align:left;}
 .qwrap{width:100%;max-width:520px;margin:0 auto;}
-.qtop{display:flex;justify-content:space-between;font-size:12px;letter-spacing:2px;color:rgba(0,212,255,0.7);margin-bottom:6px;}
+.qtop{display:flex;align-items:center;justify-content:space-between;font-size:12px;letter-spacing:2px;color:rgba(0,212,255,0.7);margin-bottom:6px;}
 #qTime{color:#e8b0ff;}
 #qHead{color:#00d4ff;text-shadow:0 0 10px rgba(0,212,255,0.5);font-size:clamp(14px,3.6vw,17px);font-weight:700;letter-spacing:3px;text-transform:uppercase;text-align:center;line-height:1.5;margin:8px 0 10px;}
 #qSnark{color:#ffd27a;font:15px/1.45 system-ui,sans-serif;text-align:center;margin-bottom:14px;}
@@ -315,6 +315,8 @@ a.back{position:relative;z-index:2;color:rgba(180,140,255,0.6);font-size:10px;le
 .scard tr.tot td{font-weight:700;border-bottom:none;}
 .scard .scDate{font-size:.78rem;color:#7a6a8a;margin-top:10px;}
 .shot{font:14px/1.4 system-ui,sans-serif;color:rgba(220,230,255,0.75);margin-bottom:16px;}
+#quitBtn,#qQuit{pointer-events:all;background:transparent;border:1px solid rgba(255,90,90,0.5);border-radius:11px;color:rgba(255,140,140,0.85);font-family:inherit;font-size:9px;letter-spacing:1px;padding:4px 8px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+#quitBtn{margin-top:2px;}
 #toast{position:fixed;left:50%;top:84px;transform:translateX(-50%);z-index:60;background:rgba(0,0,0,0.82);color:#fff;border:1px solid rgba(180,80,255,0.6);padding:8px 16px;border-radius:20px;font:14px system-ui,sans-serif;opacity:0;transition:opacity .3s;pointer-events:none;text-align:center;max-width:90vw;}
 #toast.show{opacity:1;}
 </style>
@@ -371,6 +373,7 @@ a.back{position:relative;z-index:2;color:rgba(180,140,255,0.6);font-size:10px;le
       <button id="cogBtn" title="Settings" style="pointer-events:all;background:transparent;border:1px solid rgba(0,212,255,0.35);border-radius:50%;width:22px;height:22px;font-size:12px;color:rgba(0,212,255,0.65);cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:all 0.15s;">⚙</button>
       <button id="helpBtn">?</button>
     </div>
+    <button id="quitBtn" data-t="exit">✕ EXIT</button>
   </div>
 </div>
 <div id="warpHud"><span id="warpLbl">WARP CORES DELIVERED</span><span id="warpVal">0 / 4</span></div>
@@ -534,7 +537,7 @@ a.back{position:relative;z-index:2;color:rgba(180,140,255,0.6);font-size:10px;le
 <!-- Game over -->
 
 <div class="screen hidden" id="reportScreen">
-  <div class="go-h" data-t="timeUp">TIME'S UP!</div>
+  <div class="go-h" id="repTitle"></div>
   <div class="scard" id="scard"></div>
   <p class="shot" data-t="shot">Take a screenshot of your score card!</p>
   <button class="btn" id="againBtn" data-t="again">PLAY AGAIN</button>
@@ -545,7 +548,7 @@ a.back{position:relative;z-index:2;color:rgba(180,140,255,0.6);font-size:10px;le
 
 <div class="screen hidden" id="quizScreen">
   <div class="qwrap">
-    <div class="qtop"><span id="qShips"></span><span id="qTime"></span></div>
+    <div class="qtop"><span id="qShips"></span><button id="qQuit" data-t="exitNb">← NOTEBOOK</button><span id="qTime"></span></div>
     <div id="qHead"></div>
     <div id="qSnark"></div>
     <div id="qDots"></div>
@@ -569,7 +572,7 @@ a.back{position:relative;z-index:2;color:rgba(180,140,255,0.6);font-size:10px;le
 var ESS_LAUNCH='essNotebook.launch', NEED_RIGHT=3, SHIPS=3;
 var ESS=null, LANG='en';
 var tripRight=0, qRight=0, qTotal=0, tpStats={}, deck=[], lastQ=-1, curQ=null, quizDone=null;
-var endAt=0, clockInt=null, timeUp=false, gameGen=0;
+var startAt=0, endAt=0, clockInt=null, timeUp=false, gameGen=0;
 var runOpen=false, runs=0, bestScore=0, bestWave=0;
 
 var TX={
@@ -584,9 +587,10 @@ var TX={
   back:['← Back to the notebook','← Volver al cuaderno'],
   next:['NEXT QUESTION','SIGUIENTE PREGUNTA'],
   go:['▶ LAUNCH','▶ ¡DESPEGAR!'],
-  timeUp:["TIME'S UP!",'¡SE ACABÓ EL TIEMPO!'],
   shot:['Take a screenshot of your score card!','¡Toma una captura de pantalla de tu tarjeta de puntaje!'],
-  again:['PLAY AGAIN','JUGAR OTRA VEZ']
+  again:['PLAY AGAIN','JUGAR OTRA VEZ'],
+  exit:['✕ EXIT','✕ SALIR'],
+  exitNb:['← NOTEBOOK','← CUADERNO']
 };
 
 // ---- snark (PG, random pick) ----
@@ -751,7 +755,7 @@ function finishQuiz(){
 // ---- game clock (keeps running during questions) ----
 function startClock(){
   clearInterval(clockInt);
-  endAt=Date.now()+ESS.m*60000; tickClock();
+  startAt=Date.now(); endAt=startAt+ESS.m*60000; tickClock();
   clockInt=setInterval(tickClock,250);
 }
 function tickClock(){
@@ -769,8 +773,22 @@ function endRun(){
   $('hiVal').textContent=bestScore;
 }
 
-function endGame(){
+// time actually played, for the score card
+function playedText(){
+  var t=Math.min(ESS.m*60,Math.round((Math.min(Date.now(),endAt)-startAt)/1000));
+  return T('Played','Jugaste')+' '+Math.floor(t/60)+':'+String(t%60).padStart(2,'0')+' '+T('of','de')+' '+ESS.m+' min';
+}
+
+// leaving early still ends with the score card
+function quitGame(){
+  if(timeUp||!startAt) return;
+  if(!window.confirm(T('End the game now and see your score card?','¿Terminar el juego ahora y ver tu tarjeta de puntaje?'))) return;
+  endGame(true);
+}
+
+function endGame(quit){
   if(timeUp) return;
+  $('repTitle').textContent=quit?T('GAME OVER','FIN DEL JUEGO'):T("TIME'S UP!",'¡SE ACABÓ EL TIEMPO!');
   endRun();
   timeUp=true; gameActive=false; gameGen++;
   clearInterval(clockInt);
@@ -798,11 +816,11 @@ function scoreCard(){
     '<div class="scName">'+esc(ESS.name||T('Pilot','Piloto'))+'</div>'+
     '<div class="scLine">'+(ESS.per?T('Period','Período')+' '+esc(ESS.per)+' · ':'')+T('Blasteroids Review','Repaso con Blasteroids')+'</div>'+
     '<div class="scBig">'+p(qRight,qTotal)+'% '+T('correct','correctas')+'</div>'+
-    '<div class="scLine">'+qRight+'/'+qTotal+' '+T('questions right','preguntas bien')+'</div>'+
+    '<div class="scLine">'+qRight+'/'+qTotal+' '+T('questions right','preguntas bien')+' · '+playedText()+'</div>'+
     '<div class="scLine">'+T('Best run','Mejor partida')+': '+bestScore+' '+T('pts','pts')+' · '+T('reached wave','llegó a la oleada')+' '+bestWave+
       ' · '+runs+' '+T(runs===1?'run':'runs',runs===1?'partida':'partidas')+'</div>'+
     '<table><tr><th>'+T('Topic','Tema')+'</th><th class="n">'+T('Right','Bien')+'</th><th class="n">%</th></tr>'+rows+'</table>'+
-    '<div class="scDate">'+T('Earth Space Science Notebook','Cuaderno de Ciencias de la Tierra y el Espacio')+', '+ESS.m+' min, '+
+    '<div class="scDate">'+T('Earth Space Science Notebook','Cuaderno de Ciencias de la Tierra y el Espacio')+', '+
     d.toLocaleDateString(es?'es':[],{month:'short',day:'numeric',year:'numeric'})+' '+d.toLocaleTimeString(es?'es':[],{hour:'numeric',minute:'2-digit'})+'</div>';
 }
 
@@ -1476,6 +1494,8 @@ function loop(now){
 document.getElementById('againBtn').addEventListener('click',startGame);
 document.getElementById('qNext').addEventListener('click',showQuestion);
 document.getElementById('qGo').addEventListener('click',finishQuiz);
+document.getElementById('quitBtn').addEventListener('click',quitGame);
+document.getElementById('qQuit').addEventListener('click',quitGame);
 essInit();
 resize();
 if(isTouchDev){document.getElementById('touchControls').style.display='block';initJoystick();}
