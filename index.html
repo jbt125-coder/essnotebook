@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0D1B2A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ESS Notebook">
+<title>Earth Space Science Notebook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#0D1B2A; --sky2:#12253A; --panel:#172C44; --panel2:#1E3653; --line:#2B4765;
+  --ice:#9AD9EA; --amber:#F4B860; --text:#E8EEF5; --muted:#97A9BF; --done:#86D4A9;
+  --head:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
+  color-scheme:dark; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  background:var(--sky);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100%;background:var(--sky);color:var(--text);font-family:var(--body);font-size:17px;line-height:1.55;-webkit-tap-highlight-color:transparent}
+h1,h2,h3,h4{font-family:var(--head);margin:0;line-height:1.15}
+p{margin:0 0 .8em}
+button,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--amber);outline-offset:3px;border-radius:8px}
+.view{display:none}
+.view.on{display:block}
+
+/* Title */
+#title{position:relative;min-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));min-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow:hidden}
+#title.on{display:flex;flex-direction:column}
+.stars{position:absolute;inset:0;pointer-events:none}
+.star{position:absolute;border-radius:50%;background:#fff}
+.star.tw{animation:tw 4s ease-in-out infinite}
+@keyframes tw{50%{opacity:.15}}
+.earth{position:absolute;left:0;right:0;bottom:0;width:100%;height:30vh;max-height:260px;pointer-events:none;animation:rise 1.6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise{from{transform:translateY(40%);opacity:0}to{transform:none;opacity:1}}
+.title-inner{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;justify-content:center;padding:32px 24px calc(30vh + 24px);max-width:520px;width:100%;margin:0 auto}
+.title-inner h1{font-weight:800;font-size:clamp(2.4rem,11vw,3.8rem);letter-spacing:-.02em;line-height:.98;margin-bottom:14px}
+.title-inner h1 span{display:block;font-weight:600;font-size:.52em;letter-spacing:0;color:var(--ice);margin-top:10px}
+.lede{color:var(--muted);margin-bottom:26px}
+.picker{display:flex;gap:10px}
+.select-wrap{position:relative;flex:1}
+.select-wrap::after{content:"";position:absolute;right:16px;top:50%;width:9px;height:9px;border-right:2px solid var(--ice);border-bottom:2px solid var(--ice);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+select{width:100%;appearance:none;-webkit-appearance:none;background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:14px 40px 14px 16px;font-size:17px}
+.btn{border:0;border-radius:14px;padding:14px 22px;font-weight:700;cursor:pointer;background:var(--amber);color:#1A1306}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.ghost{background:transparent;color:var(--ice);border:1.5px solid var(--line)}
+.btn.wide{width:100%;padding:16px;font-size:18px}
+.linkish{background:none;border:0;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:8px;cursor:pointer;font-size:15px}
+.title-foot{position:relative;z-index:1;text-align:center;padding-bottom:10px}
+
+/* Page chrome */
+.page{max-width:680px;margin:0 auto;padding:12px 20px 40px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0 18px}
+.back{background:none;border:0;color:var(--ice);font-weight:700;padding:8px 4px;cursor:pointer;font-size:16px}
+.back::before{content:"‹ ";font-size:1.2em}
+.crumb{color:var(--muted);font-size:14px}
+
+/* Contents */
+.toc-head h2{font-size:clamp(1.9rem,8vw,2.6rem);font-weight:800;letter-spacing:-.01em}
+.toc-head p{color:var(--muted);margin-top:6px}
+.meter{height:6px;background:var(--panel);border-radius:6px;margin:16px 0 10px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--done);border-radius:6px;transition:width .5s}
+.hint{color:var(--muted);font-size:14px;margin:0 0 16px}
+.toc{list-style:none;margin:0;padding:0;position:relative;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.toc li{margin-bottom:12px;position:relative}
+.toc li.lifted{z-index:5}
+.toc li.lifted button{border-color:var(--amber);background:var(--panel2);box-shadow:0 14px 30px rgba(0,0,0,.45);transform:scale(1.02)}
+.toc button{width:100%;display:grid;grid-template-columns:56px 1fr auto;gap:14px;align-items:center;text-align:left;background:var(--panel);border:1.5px solid var(--line);border-radius:18px;padding:14px;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.toc svg{width:56px;height:56px;display:block}
+.toc h3{font-size:1.15rem;font-weight:600}
+.toc p{color:var(--muted);font-size:15px;margin:2px 0 0;line-height:1.4}
+.status{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap}
+.status.done{color:var(--done)}
+.reset-row{text-align:center;margin-top:6px}
+body.dragging{cursor:grabbing}
+
+/* Cards */
+.card-hero{background:var(--sky2);border:1.5px solid var(--line);border-radius:22px;padding:18px;margin:0 0 22px}
+.card-hero svg{width:100%;height:auto;display:block}
+.card-hero figcaption{color:var(--muted);font-size:14px;margin-top:10px}
+.card h2{font-size:clamp(1.9rem,8vw,2.5rem);font-weight:800;letter-spacing:-.01em;margin-bottom:12px}
+.card h3{font-size:1.3rem;font-weight:600;margin:30px 0 10px;color:var(--ice)}
+.card .intro{font-size:1.1rem}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.tile{background:var(--panel);border:1.5px solid var(--line);border-radius:16px;padding:14px}
+.tile svg{width:58px;height:58px;display:block;margin-bottom:8px}
+.tile h4{font-size:1.05rem;font-weight:600;margin-bottom:4px}
+.tile p{font-size:14.5px;line-height:1.45;color:#C9D5E3;margin:0 0 8px}
+.tile p:last-child{margin-bottom:0}
+.chip{display:inline-block;font-size:12.5px;font-weight:700;color:var(--ice);background:rgba(154,217,234,.1);border-radius:999px;padding:3px 10px}
+.callout{background:rgba(244,184,96,.08);border-left:4px solid var(--amber);border-radius:4px 14px 14px 4px;padding:14px 16px;margin:22px 0}
+.callout strong{color:var(--amber)}
+.callout p:last-child{margin:0}
+.callout.big p{font-family:var(--head);font-size:1.35rem;font-weight:600;line-height:1.3}
+.defs{display:grid;gap:10px;margin:12px 0}
+.def{background:var(--panel);border-radius:14px;padding:12px 14px}
+.def b{color:var(--ice)}
+.def ul{margin:6px 0 0;padding-left:20px}
+.def li{margin-bottom:4px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.compare > div{background:var(--panel);border:1.5px solid var(--line);border-radius:16px;padding:14px}
+.compare h4{font-size:1.15rem;margin-bottom:2px}
+.compare .when{color:var(--muted);font-size:14px;margin-bottom:10px;line-height:1.35}
+.compare ul{margin:0;padding-left:18px;font-size:15px;line-height:1.45}
+.compare li{margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips span{background:var(--panel);border:1.5px solid var(--line);border-radius:999px;padding:6px 12px;font-size:15px}
+.tablewrap{overflow-x:auto;border:1.5px solid var(--line);border-radius:14px;margin:12px 0;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--panel2);font-weight:700;color:var(--ice);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.nw{white-space:nowrap}
+.wide-table{min-width:640px}
+.cat{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:baseline}
+.key{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--amber);color:#1A1306;font-weight:700;font-size:12px}
+.chain{display:grid;gap:10px;margin:12px 0}
+.chain > div{background:var(--panel);border-radius:14px;padding:12px 14px}
+.chain b{display:block;margin-bottom:4px}
+.chain p{margin:0;font-size:15px;color:#C9D5E3}
+.next-row{margin-top:34px}
+.next-note{text-align:center;color:var(--muted);font-size:14px;margin-top:10px}
+.source{font-size:13px;color:var(--muted);margin-top:6px}
+
+/* Sheet */
+.scrim{position:fixed;inset:0;background:rgba(4,10,18,.65);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.scrim.on{display:flex}
+.sheet{background:var(--panel);border:1.5px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:26px 22px calc(22px + env(safe-area-inset-bottom,0px));animation:up .3s cubic-bezier(.2,.7,.2,1)}
+@keyframes up{from{transform:translateY(100%)}}
+.sheet h3{font-size:1.6rem;font-weight:800;margin-bottom:8px}
+.sheet p{color:#C9D5E3}
+.sheet .row{display:flex;gap:10px;margin-top:18px}
+.sheet .row .btn{flex:1}
+.count{font-family:var(--head);font-size:3rem;font-weight:800;color:var(--amber);line-height:1;margin:6px 0 4px}
+.small{font-size:13px;color:var(--muted)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+@media (min-width:700px){.earth{height:34vh}}
+@media (max-width:360px){.compare{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<section id="title" class="view" aria-labelledby="app-title">
+  <div class="stars" id="stars" aria-hidden="true"></div>
+  <div class="title-inner">
+    <h1 id="app-title">Earth Space Science <span>Notebook</span></h1>
+    <p class="lede">Notes, review games, and activities for each quarter. Your progress saves on this device.</p>
+    <label for="quarter" class="small" style="display:block;margin-bottom:6px">Open a quarter</label>
+    <div class="picker">
+      <div class="select-wrap">
+        <select id="quarter">
+          <option value="">Choose…</option>
+          <option value="q1">Quarter 1</option>
+          <option value="q2">Quarter 2</option>
+          <option value="q3">Quarter 3</option>
+          <option value="q4">Quarter 4</option>
+        </select>
+      </div>
+      <button class="btn" id="openQ" disabled>Open</button>
+    </div>
+  </div>
+  <div class="title-foot"><button class="linkish" id="saveCheckBtn">Save check</button></div>
+  <svg class="earth" viewBox="0 0 400 120" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs>
+      <radialGradient id="ocean" cx="50%" cy="15%" r="60%"><stop offset="0" stop-color="#2F7FB0"/><stop offset=".6" stop-color="#174B73"/><stop offset="1" stop-color="#0D2A45"/></radialGradient>
+      <filter id="glow" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="3"/></filter>
+    </defs>
+    <circle cx="200" cy="560" r="530" fill="none" stroke="#9AD9EA" stroke-width="7" opacity=".45" filter="url(#glow)"/>
+    <circle cx="200" cy="560" r="530" fill="url(#ocean)"/>
+    <path d="M60 70 C110 52 150 60 180 48 C215 36 250 52 300 44" stroke="#fff" stroke-opacity=".22" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M120 92 C170 80 230 88 280 74" stroke="#fff" stroke-opacity=".14" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <path d="M150 40 C175 33 200 38 214 44 C222 56 205 66 186 70 C168 66 156 56 150 40Z" fill="#3E7D5A" opacity=".55"/>
+    <circle cx="200" cy="560" r="530" fill="none" stroke="#CFF1FA" stroke-width="1.5" opacity=".8"/>
+  </svg>
+</section>
+
+<section id="toc" class="view">
+  <div class="page">
+    <div class="topbar">
+      <button class="back" data-go="">Quarters</button>
+      <span class="crumb" id="tocCrumb"></span>
+    </div>
+    <div class="toc-head">
+      <h2 id="tocTitle"></h2>
+      <p id="tocProgress"></p>
+    </div>
+    <div class="meter" aria-hidden="true"><i id="meterFill" style="width:0"></i></div>
+    <p class="hint">Press and hold a topic, then drag to move it.</p>
+    <ul class="toc" id="tocList"></ul>
+    <div class="reset-row"><button class="linkish" id="resetOrder" hidden>Reset to Mr. T’s order</button></div>
+  </div>
+</section>
+
+<section id="cardView" class="view">
+  <div class="page">
+    <div class="topbar">
+      <button class="back" id="cardBack">Contents</button>
+      <span class="crumb" id="cardCrumb"></span>
+    </div>
+    <article class="card" id="cardBody"></article>
+    <div class="next-row">
+      <button class="btn wide" id="nextBtn">Next</button>
+      <p class="next-note">Activities for this topic are coming soon.</p>
+    </div>
+  </div>
+</section>
+
+<div class="scrim" id="scrim" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><div class="sheet" id="sheet"></div></div>
+
+<script>
+/* =========================================================
+   MR. T'S TOPIC ORDER  (edit this list to change the default)
+   - One line per topic, top to bottom = order on the contents screen.
+   - Students who rearrange keep their own order; new topics you add
+     appear for them in the spot you put them here.
+   - IDs are permanent save keys: never rename one after students use it.
+   ========================================================= */
+const TEACHER_ORDER = {
+  q1: [
+    "water-cycle",
+    "weather-instruments",
+    "station-models",
+    "fronts",
+    "air-masses",
+    "hurricanes",
+    "karst-florida",
+    "earth-spheres",
+    "sun-energy"
+  ],
+  q2: [
+    "proxy-indicators",
+    "ice-ages",
+    "climate-vs-weather"
+  ],
+  q3: [],
+  q4: []
+};
+const QUARTER_NAMES = { q1: "Quarter 1", q2: "Quarter 2", q3: "Quarter 3", q4: "Quarter 4" };
+
+/* =========================================================
+   SAVE SYSTEM
+   ========================================================= */
+const APP_VERSION = "0.2";
+const SAVE_KEY = "essNotebook.save";
+const SAVE_VERSION = 2;
+let storageOK = true;
+
+function blankSave(){ return { v: SAVE_VERSION, items: {}, order: {}, lastQuarter: "", saveTest: 0 }; }
+function migrate(d){
+  if (!d || typeof d !== "object") return blankSave();
+  if (!d.v || d.v < 2) { d.order = d.order || {}; }   // v1 -> v2: adds custom topic order
+  d.items = d.items || {}; d.order = d.order || {};
+  d.lastQuarter = d.lastQuarter || ""; d.saveTest = d.saveTest || 0;
+  d.v = SAVE_VERSION;
+  return d;
+}
+function loadSave(){ try { return migrate(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch(e){ storageOK = false; return blankSave(); } }
+function writeSave(){ try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); storageOK = true; } catch(e){ storageOK = false; } }
+let save = loadSave();
+writeSave();
+
+function markDone(key){ save.items[key] = Object.assign(save.items[key] || {}, { viewed: true, at: Date.now() }); writeSave(); }
+function isDone(key){ return !!(save.items[key] && save.items[key].viewed); }
+
+/* Order: student's order if they made one, with any new teacher topics
+   inserted right after the teacher's previous topic. */
+function getOrder(q){
+  const teacher = (TEACHER_ORDER[q] || []).filter(id => CARDS[id]);
+  const mine = save.order[q];
+  if (!Array.isArray(mine)) return teacher;
+  const result = mine.filter(id => teacher.includes(id));
+  teacher.forEach((id, i) => {
+    if (result.includes(id)) return;
+    let pos = 0;
+    for (let j = i - 1; j >= 0; j--) { const k = result.indexOf(teacher[j]); if (k >= 0) { pos = k + 1; break; } }
+    result.splice(pos, 0, id);
+  });
+  return result;
+}
+
+/* =========================================================
+   DRAWING HELPERS
+   ========================================================= */
+const F = 'font-family="Atkinson Hyperlegible, sans-serif"';
+function txt(x, y, s, o = {}){
+  return `<text x="${x}" y="${y}" ${F} font-size="${o.size||10.5}" fill="${o.fill||'#97A9BF'}"${o.anchor?` text-anchor="${o.anchor}"`:''}${o.weight?` font-weight="${o.weight}"`:''}>${s}</text>`;
+}
+function arrowDef(id, color){ return `<marker id="${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="${color}"/></marker>`; }
+
+const FRONT_COLORS = { cold: "#5AA9FF", warm: "#FF6B6B", occl: "#C58BFF" };
+/* Weather-map front: pts = [[x,y],...]; markers point to the left of travel direction (s=1) or right (s=-1) */
+function front(pts, type, s = 1, k = 1){
+  const sp = 22 * k, segs = []; let L = 0;
+  for (let i = 0; i < pts.length - 1; i++){
+    const [x1,y1] = pts[i], [x2,y2] = pts[i+1], l = Math.hypot(x2-x1, y2-y1);
+    segs.push({x1,y1,x2,y2,l,start:L}); L += l;
+  }
+  const P = pts.map(p => p.join(",")).join(" ");
+  let out = "";
+  if (type === "stat"){
+    out += `<polyline points="${P}" fill="none" stroke="${FRONT_COLORS.warm}" stroke-width="${3*k}"/>`;
+    out += `<polyline points="${P}" fill="none" stroke="${FRONT_COLORS.cold}" stroke-width="${3*k}" stroke-dasharray="${sp} ${sp}"/>`;
+  } else {
+    out += `<polyline points="${P}" fill="none" stroke="${FRONT_COLORS[type]}" stroke-width="${3*k}" stroke-linejoin="round"/>`;
+  }
+  const tri = `M${-5*k} 0 L${5*k} 0 L0 ${-7.5*k} Z`, semi = `M${-5.5*k} 0 A${5.5*k} ${5.5*k} 0 0 1 ${5.5*k} 0 Z`;
+  for (let i = 0, d = sp/2; d < L - 3*k; i++, d += sp){
+    const g = segs.find(sg => d >= sg.start && d <= sg.start + sg.l) || segs[segs.length-1];
+    const t = (d - g.start) / g.l, x = g.x1 + (g.x2-g.x1)*t, y = g.y1 + (g.y2-g.y1)*t;
+    const a = Math.atan2(g.y2-g.y1, g.x2-g.x1) * 180 / Math.PI;
+    let shape, color, side = s;
+    if (type === "cold"){ shape = tri; color = FRONT_COLORS.cold; }
+    else if (type === "warm"){ shape = semi; color = FRONT_COLORS.warm; }
+    else if (type === "occl"){ shape = i % 2 ? semi : tri; color = FRONT_COLORS.occl; }
+    else { if (i % 2){ shape = semi; color = FRONT_COLORS.warm; side = -s; } else { shape = tri; color = FRONT_COLORS.cold; } }
+    out += `<path d="${shape}" fill="${color}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${a.toFixed(1)}) scale(1 ${side})"/>`;
+  }
+  return out;
+}
+
+/* Hurricane spiral (counterclockwise spin, Northern Hemisphere) */
+function spiral(cx, cy, R, w = 7){
+  let out = "";
+  for (let arm = 0; arm < 3; arm++){
+    const phi = arm * 2 * Math.PI / 3; let d = "";
+    for (let t = 0; t <= 1.0001; t += 0.04){
+      const th = t * 1.5 * Math.PI, r = R*0.22 + t * R*0.78, ang = phi + th;
+      d += (t === 0 ? "M" : "L") + (cx + r*Math.cos(ang)).toFixed(1) + " " + (cy + r*Math.sin(ang)).toFixed(1) + " ";
+    }
+    out += `<path d="${d}" fill="none" stroke="#C9D5E3" stroke-width="${w}" stroke-linecap="round" opacity=".55"/>`;
+  }
+  out += `<circle cx="${cx}" cy="${cy}" r="${R*0.17}" fill="none" stroke="#fff" stroke-width="${w*1.15}"/>`;
+  out += `<circle cx="${cx}" cy="${cy}" r="${R*0.09}" fill="#0D1B2A"/>`;
+  return out;
+}
+
+function waveRay(x, y, deg, n, color = "#F4B860"){
+  let d = "M0 0 "; for (let i = 0; i < n; i++) d += i === 0 ? "q8 -6 16 0 " : "t16 0 ";
+  return `<path d="${d}" transform="translate(${x} ${y}) rotate(${deg})" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round"/>`;
+}
+
+function badge(code, fill, ink = "#0D1B2A"){
+  return `<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="32" fill="${fill}"/><text x="40" y="49" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="26" fill="${ink}">${code}</text></svg>`;
+}
+
+/* =========================================================
+   SMALL ILLUSTRATIONS
+   ========================================================= */
+const ART = {
+  iceCore:`<svg viewBox="0 0 80 80" aria-hidden="true"><rect x="27" y="5" width="26" height="70" rx="6" fill="#DDF3FA" stroke="#9AD9EA" stroke-width="1.5"/><g stroke="#A8D3E2" stroke-width="1.2"><line x1="28" y1="15" x2="52" y2="15"/><line x1="28" y1="22" x2="52" y2="22"/><line x1="28" y1="27" x2="52" y2="27"/><line x1="28" y1="38" x2="52" y2="38" stroke-width="2.4"/><line x1="28" y1="46" x2="52" y2="46"/><line x1="28" y1="51" x2="52" y2="51"/><line x1="28" y1="61" x2="52" y2="61" stroke-width="2.4"/><line x1="28" y1="68" x2="52" y2="68"/></g><g fill="#fff" stroke="#86BFD3" stroke-width=".8"><circle cx="34" cy="18" r="1.6"/><circle cx="45" cy="31" r="2"/><circle cx="38" cy="42" r="1.4"/><circle cx="47" cy="55" r="1.7"/><circle cx="33" cy="64" r="1.5"/></g></svg>`,
+  treeRings:`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="33" fill="#5E4129"/><circle cx="40" cy="40" r="29" fill="#EBCB93"/><g fill="none" stroke="#B5844D" stroke-width="1.3"><circle cx="40" cy="40" r="26"/><circle cx="40" cy="40" r="22.5"/><circle cx="40" cy="40" r="21" stroke-width="1.8"/><circle cx="40" cy="40" r="17"/><circle cx="40" cy="40" r="13"/><circle cx="40" cy="40" r="11.5" stroke-width="1.8"/><circle cx="40" cy="40" r="8"/><circle cx="40" cy="40" r="4.5"/></g><circle cx="40" cy="40" r="1.6" fill="#8A5E33"/><path d="M40 11 L42 22 L39 30" stroke="#5E4129" stroke-width="1.4" fill="none"/></svg>`,
+  sediment:`<svg viewBox="0 0 80 80" aria-hidden="true"><rect x="27" y="5" width="26" height="70" rx="6" fill="#5B6B78"/><rect x="27" y="5" width="26" height="12" rx="6" fill="#7A8C99"/><rect x="27" y="17" width="26" height="9" fill="#8A7356"/><rect x="27" y="26" width="26" height="6" fill="#C8B48A"/><rect x="27" y="32" width="26" height="13" fill="#6D5A45"/><rect x="27" y="45" width="26" height="7" fill="#A59A8A"/><rect x="27" y="52" width="26" height="12" fill="#4E5A63"/><g fill="#F3EEE2"><circle cx="33" cy="22" r="1.3"/><circle cx="46" cy="37" r="1.5"/><circle cx="38" cy="48" r="1.2"/><circle cx="44" cy="58" r="1.4"/><circle cx="35" cy="69" r="1.2"/></g><rect x="27" y="5" width="26" height="70" rx="6" fill="none" stroke="#97A9BF" stroke-width="1.5"/></svg>`,
+  soil:`<svg viewBox="0 0 80 80" aria-hidden="true"><g stroke="#6FBF7A" stroke-width="2" stroke-linecap="round"><line x1="31" y1="12" x2="29" y2="5"/><line x1="37" y1="12" x2="37" y2="4"/><line x1="44" y1="12" x2="46" y2="5"/><line x1="49" y1="12" x2="51" y2="7"/></g><rect x="27" y="12" width="26" height="63" rx="4" fill="#A7653A"/><rect x="27" y="12" width="26" height="14" fill="#3B2A1D"/><rect x="27" y="26" width="26" height="14" fill="#6E4A2C"/><rect x="27" y="56" width="26" height="19" rx="4" fill="#C99A5A"/><path d="M34 26 C33 32 36 36 33 42 M45 26 C47 31 44 37 46 44" stroke="#D7B98C" stroke-width="1" fill="none"/><rect x="27" y="12" width="26" height="63" rx="4" fill="none" stroke="#97A9BF" stroke-width="1.5"/></svg>`,
+  coral:`<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M8 68 Q8 12 40 12 Q72 12 72 68 Z" fill="#F2D7C9"/><g fill="none" stroke="#D29C86" stroke-width="1.6"><path d="M14 68 Q14 19 40 19 Q66 19 66 68"/><path d="M20 68 Q20 27 40 27 Q60 27 60 68"/><path d="M25 68 Q25 34 40 34 Q55 34 55 68"/><path d="M30 68 Q30 42 40 42 Q50 42 50 68"/><path d="M35 68 Q35 51 40 51 Q45 51 45 68"/></g><rect x="4" y="68" width="72" height="6" rx="3" fill="#C8B48A"/></svg>`,
+  pollen:`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="30" cy="32" r="12" fill="#F4B860"/><circle cx="30" cy="32" r="15" fill="none" stroke="#F4B860" stroke-width="4" stroke-dasharray="1.6 3.2"/><circle cx="30" cy="32" r="5" fill="#D8963F"/><circle cx="56" cy="50" r="9" fill="#E9A7B8"/><circle cx="56" cy="50" r="11.5" fill="none" stroke="#E9A7B8" stroke-width="3.5" stroke-dasharray="1.4 2.8"/><circle cx="25" cy="62" r="6" fill="#C7E39A"/><circle cx="25" cy="62" r="8" fill="none" stroke="#C7E39A" stroke-width="3" stroke-dasharray="1.2 2.4"/></svg>`,
+  cave:`<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M0 4 H80 V12 H70 L66 28 L62 12 H48 L45 21 L42 12 H20 L16 32 L12 12 H0 Z" fill="#7D8796"/><rect x="0" y="70" width="80" height="10" fill="#7D8796"/><path d="M26 70 L40 28 L54 70 Z" fill="#CBB99B"/><g fill="none" stroke="#A58F6F" stroke-width="1.4"><path d="M30 70 L40 38 L50 70"/><path d="M33.5 70 L40 49 L46.5 70"/><path d="M37 70 L40 60 L43 70"/></g><circle cx="40" cy="22" r="1.8" fill="#9AD9EA"/></svg>`,
+  records:`<svg viewBox="0 0 80 80" aria-hidden="true"><rect x="14" y="10" width="48" height="60" rx="4" fill="#EFE3C8"/><g stroke="#B9A47E" stroke-width="1.6" stroke-linecap="round"><line x1="22" y1="34" x2="54" y2="34"/><line x1="22" y1="41" x2="50" y2="41"/><line x1="22" y1="48" x2="54" y2="48"/><line x1="22" y1="55" x2="44" y2="55"/></g><text x="22" y="26" font-family="Georgia,serif" font-size="11" font-style="italic" fill="#8A6D43">1816</text><path d="M58 8 L70 56 L66 58 Z" fill="#DDE6EF"/><line x1="62" y1="22" x2="68" y2="56" stroke="#97A9BF" stroke-width="1"/></svg>`,
+  snow:`<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M8 58 L26 30 L36 42 L50 20 L72 58 Z" fill="#DDF3FA"/><path d="M8 58 L26 30 L30 35 L20 58 Z" fill="#B8E1EE"/><path d="M50 20 L58 34 L54 36 L50 28 Z" fill="#fff"/><rect x="6" y="58" width="68" height="10" rx="3" fill="#2F6E99"/><g stroke="#9AD9EA" stroke-width="1.6" stroke-linecap="round"><line x1="62" y1="6" x2="62" y2="18"/><line x1="56" y1="12" x2="68" y2="12"/><line x1="58" y1="8" x2="66" y2="16"/><line x1="66" y1="8" x2="58" y2="16"/></g></svg>`,
+  sky:`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="50" cy="28" r="14" fill="#F4B860"/><g stroke="#F4B860" stroke-width="2.4" stroke-linecap="round"><line x1="50" y1="6" x2="50" y2="10"/><line x1="70" y1="28" x2="74" y2="28"/><line x1="64" y1="13" x2="67" y2="10"/><line x1="36" y1="13" x2="33" y2="10"/></g><path d="M16 58 C8 58 8 46 17 46 C17 36 32 34 35 43 C40 37 52 40 51 49 C59 49 59 58 51 58 Z" fill="#8DA2BD"/><g stroke="#9AD9EA" stroke-width="2" stroke-linecap="round"><line x1="22" y1="63" x2="19" y2="70"/><line x1="32" y1="63" x2="29" y2="70"/><line x1="42" y1="63" x2="39" y2="70"/></g></svg>`,
+  orbit:`<svg viewBox="0 0 80 80" aria-hidden="true"><ellipse cx="40" cy="40" rx="32" ry="20" fill="none" stroke="#9AD9EA" stroke-width="1.6" stroke-dasharray="3 3"/><circle cx="32" cy="40" r="7" fill="#F4B860"/><circle cx="72" cy="40" r="4" fill="#2F7FB0" stroke="#9AD9EA"/></svg>`,
+  tilt:`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="42" r="20" fill="#2F7FB0"/><path d="M26 34 C34 30 44 36 52 31" stroke="#3E7D5A" stroke-width="5" fill="none" stroke-linecap="round"/><line x1="31" y1="12" x2="49" y2="72" stroke="#E8EEF5" stroke-width="2"/><line x1="40" y1="10" x2="40" y2="74" stroke="#97A9BF" stroke-width="1.2" stroke-dasharray="3 3"/></svg>`,
+  wobble:`<svg viewBox="0 0 80 80" aria-hidden="true"><ellipse cx="40" cy="14" rx="14" ry="4.5" fill="none" stroke="#F4B860" stroke-width="1.6" stroke-dasharray="3 2"/><circle cx="40" cy="48" r="18" fill="#2F7FB0"/><line x1="40" y1="74" x2="50" y2="14" stroke="#E8EEF5" stroke-width="2"/><path d="M52 10 l4 4 -5 2" fill="none" stroke="#F4B860" stroke-width="1.6"/></svg>`,
+
+  /* Quarter 1 */
+  drop:`<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 10 C40 10 20 36 20 50 A20 20 0 0 0 60 50 C60 36 40 10 40 10Z" fill="#2F7FB0"/><path d="M30 50 A10 10 0 0 0 40 60" fill="none" stroke="#9AD9EA" stroke-width="3" stroke-linecap="round"/><path d="M66 22 A30 30 0 0 1 70 46" fill="none" stroke="#F4B860" stroke-width="2.4" stroke-linecap="round"/><path d="M14 58 A30 30 0 0 1 10 34" fill="none" stroke="#F4B860" stroke-width="2.4" stroke-linecap="round"/><path d="M70 46 l-5 -3 m5 3 l3 -5 M10 34 l5 3 m-5 -3 l-3 5" stroke="#F4B860" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+  thermo:`<svg viewBox="0 0 80 80" aria-hidden="true"><rect x="34" y="6" width="12" height="56" rx="6" fill="#E8EEF5"/><rect x="38" y="24" width="4" height="40" fill="#FF6B6B"/><circle cx="40" cy="64" r="10" fill="#FF6B6B"/><g stroke="#97A9BF" stroke-width="1.5"><line x1="48" y1="14" x2="53" y2="14"/><line x1="48" y1="22" x2="53" y2="22"/><line x1="48" y1="30" x2="53" y2="30"/><line x1="48" y1="38" x2="53" y2="38"/><line x1="48" y1="46" x2="53" y2="46"/></g></svg>`,
+  baro:`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="31" fill="#E8EEF5" stroke="#97A9BF" stroke-width="3"/><g stroke="#4A6585" stroke-width="1.6"><line x1="40" y1="13" x2="40" y2="18"/><line x1="17" y1="34" x2="21" y2="35"/><line x1="63" y1="34" x2="59" y2="35"/><line x1="23" y1="58" x2="27" y2="55"/><line x1="57" y1="58" x2="53" y2="55"/></g><line x1="40" y1="40" x2="56" y2="26" stroke="#E8584A" stroke-width="2.6" stroke-linecap="round"/><circle cx="40" cy="40" r="3.5" fill="#172C44"/><text x="40" y="60" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#4A6585">mb</text></svg>`,
+  anemo:`<svg viewBox="0 0 80 80" aria-hidden="true"><line x1="40" y1="76" x2="40" y2="30" stroke="#97A9BF" stroke-width="3"/><g stroke="#E8EEF5" stroke-width="2.4"><line x1="40" y1="30" x2="14" y2="30"/><line x1="40" y1="30" x2="66" y2="30"/><line x1="40" y1="30" x2="40" y2="12"/></g><g fill="#9AD9EA"><path d="M8 30 A6 6 0 0 1 20 30Z"/><path d="M60 30 A6 6 0 0 0 72 30Z" transform="rotate(180 66 30)"/><circle cx="40" cy="12" r="6"/></g><circle cx="40" cy="30" r="3.5" fill="#F4B860"/></svg>`,
+  vane:`<svg viewBox="0 0 80 80" aria-hidden="true"><line x1="40" y1="76" x2="40" y2="26" stroke="#97A9BF" stroke-width="3"/><line x1="16" y1="26" x2="62" y2="26" stroke="#E8EEF5" stroke-width="3"/><path d="M8 26 L20 19 L20 33 Z" fill="#F4B860"/><path d="M58 26 L72 14 L72 38 Z" fill="#E8EEF5"/><g stroke="#4A6585" stroke-width="2"><line x1="26" y1="52" x2="54" y2="52"/></g>${''}<text x="58" y="56" font-family="sans-serif" font-size="10" fill="#97A9BF">E</text><text x="16" y="56" font-family="sans-serif" font-size="10" fill="#97A9BF">W</text></svg>`,
+  hygro:`<svg viewBox="0 0 80 80" aria-hidden="true"><rect x="20" y="8" width="11" height="50" rx="5.5" fill="#E8EEF5"/><rect x="23.5" y="26" width="4" height="34" fill="#FF6B6B"/><circle cx="25.5" cy="62" r="8" fill="#FF6B6B"/><rect x="49" y="8" width="11" height="50" rx="5.5" fill="#E8EEF5"/><rect x="52.5" y="34" width="4" height="26" fill="#FF6B6B"/><circle cx="54.5" cy="62" r="8" fill="#FF6B6B"/><rect x="45" y="56" width="19" height="16" rx="5" fill="#9AD9EA" opacity=".85"/><text x="25" y="78" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#97A9BF">dry</text><text x="55" y="80" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#97A9BF">wet</text></svg>`,
+  rain:`<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M22 12 H58 L47 22 H33 Z" fill="#97A9BF"/><rect x="29" y="22" width="22" height="52" rx="3" fill="none" stroke="#E8EEF5" stroke-width="2"/><rect x="31" y="48" width="18" height="24" rx="2" fill="#9AD9EA" opacity=".8"/><g stroke="#E8EEF5" stroke-width="1.2"><line x1="51" y1="32" x2="56" y2="32"/><line x1="51" y1="42" x2="56" y2="42"/><line x1="51" y1="52" x2="56" y2="52"/><line x1="51" y1="62" x2="56" y2="62"/></g><g stroke="#9AD9EA" stroke-width="2" stroke-linecap="round"><line x1="30" y1="2" x2="28" y2="7"/><line x1="40" y1="0" x2="38" y2="6"/><line x1="50" y1="2" x2="48" y2="7"/></g></svg>`,
+  balloon:`<svg viewBox="0 0 80 80" aria-hidden="true"><ellipse cx="40" cy="26" rx="19" ry="21" fill="#E8EEF5"/><path d="M36 46 L44 46 L40 50 Z" fill="#E8EEF5"/><line x1="40" y1="50" x2="40" y2="64" stroke="#97A9BF" stroke-width="1.4"/><rect x="34" y="64" width="12" height="10" rx="2" fill="#F4B860"/></svg>`,
+  radar:`<svg viewBox="0 0 80 80" aria-hidden="true"><rect x="34" y="52" width="12" height="24" fill="#97A9BF"/><path d="M18 54 A22 22 0 0 1 62 54 Z" fill="#E8EEF5"/><g fill="none" stroke="#9AD9EA" stroke-width="2" stroke-linecap="round"><path d="M58 22 A14 14 0 0 1 66 34"/><path d="M60 12 A24 24 0 0 1 75 32"/></g></svg>`,
+  sat:`<svg viewBox="0 0 80 80" aria-hidden="true"><rect x="8" y="34" width="22" height="12" fill="#5AA9FF"/><rect x="50" y="34" width="22" height="12" fill="#5AA9FF"/><g stroke="#0D1B2A" stroke-width="1"><line x1="15" y1="34" x2="15" y2="46"/><line x1="22" y1="34" x2="22" y2="46"/><line x1="57" y1="34" x2="57" y2="46"/><line x1="64" y1="34" x2="64" y2="46"/></g><rect x="31" y="30" width="18" height="20" rx="2" fill="#F4B860"/><line x1="40" y1="50" x2="40" y2="60" stroke="#E8EEF5" stroke-width="2"/><path d="M32 66 A8 5 0 0 0 48 66 Z" fill="#E8EEF5"/></svg>`,
+  station:`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="11" fill="none" stroke="#E8EEF5" stroke-width="2.4"/><path d="M40 40 L40 29 A11 11 0 1 1 29 40 Z" fill="#E8EEF5"/><line x1="48" y1="48" x2="70" y2="70" stroke="#E8EEF5" stroke-width="2.4"/><line x1="70" y1="70" x2="61" y2="78" stroke="#E8EEF5" stroke-width="2.4"/><line x1="65" y1="65" x2="60" y2="70" stroke="#E8EEF5" stroke-width="2.4"/><text x="16" y="30" font-family="sans-serif" font-size="11" fill="#FF6B6B" text-anchor="middle">84</text><text x="16" y="60" font-family="sans-serif" font-size="11" fill="#86D4A9" text-anchor="middle">75</text><text x="62" y="30" font-family="sans-serif" font-size="11" fill="#F4B860" text-anchor="middle">096</text></svg>`,
+  frontIcon:`<svg viewBox="0 0 80 80" aria-hidden="true">${front([[6,30],[74,30]],"cold",1,1)}${front([[6,58],[74,58]],"warm",1,1)}</svg>`,
+  airIcon:`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="28" cy="34" r="20" fill="#5AA9FF"/><circle cx="54" cy="48" r="20" fill="#F28C4E" opacity=".9"/><text x="24" y="38" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="12" fill="#0D1B2A">cP</text><text x="58" y="53" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="12" fill="#0D1B2A">mT</text></svg>`,
+  hurricaneIcon:`<svg viewBox="0 0 80 80" aria-hidden="true">${spiral(40,40,34,6)}</svg>`,
+  sinkIcon:`<svg viewBox="0 0 80 80" aria-hidden="true"><rect x="0" y="40" width="80" height="40" fill="#8C8577"/><path d="M0 26 H24 C30 26 32 44 40 44 C48 44 50 26 56 26 H80 V40 H0 Z" fill="#C9A66B"/><path d="M27 30 C32 30 34 42 40 42 C46 42 48 30 53 30 Z" fill="#2F7FB0"/><ellipse cx="40" cy="60" rx="20" ry="8" fill="#2F7FB0"/><line x1="0" y1="26" x2="24" y2="26" stroke="#6FBF7A" stroke-width="3"/><line x1="56" y1="26" x2="80" y2="26" stroke="#6FBF7A" stroke-width="3"/></svg>`,
+  spheresIcon:`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="24" r="16" fill="#5AA9FF" opacity=".85"/><circle cx="24" cy="44" r="16" fill="#2F7FB0" opacity=".85"/><circle cx="56" cy="44" r="16" fill="#3E9A62" opacity=".85"/><circle cx="40" cy="60" r="16" fill="#A07A4E" opacity=".85"/></svg>`,
+  sunIcon:`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="24" cy="24" r="14" fill="#F4B860"/>${waveRay(38,36,40,3)}<rect x="6" y="64" width="68" height="12" rx="3" fill="#C9A66B"/><path d="M58 60 C54 52 62 46 58 38" fill="none" stroke="#FF6B6B" stroke-width="2.4" stroke-linecap="round"/><path d="M58 38 l-4 4 m4 -4 l4 4" stroke="#FF6B6B" stroke-width="2.4" stroke-linecap="round"/></svg>`
+};
+
+/* =========================================================
+   BIG FIGURES
+   ========================================================= */
+const HERO = {};
+
+HERO.proxy = () => `<figure class="card-hero">
+  <div style="display:flex;justify-content:space-around;align-items:end">
+    <div style="text-align:center;width:30%">${ART.treeRings}<div class="small">Tree rings</div></div>
+    <div style="text-align:center;width:30%">${ART.iceCore}<div class="small">Ice core</div></div>
+    <div style="text-align:center;width:30%">${ART.sediment}<div class="small">Sediment core</div></div>
+  </div>
+  <svg viewBox="0 0 320 74" role="img" aria-label="Thermometer records cover about 150 years, a tiny speck compared with ice cores that reach back about 800,000 years" style="margin-top:14px">
+    ${txt(0,13,"Thermometer records ≈ 150 years",{size:11})}
+    <rect x="0" y="19" width="2" height="12" fill="#F4B860"/>
+    ${txt(8,29,"← barely a speck at this scale",{size:10,fill:"#F4B860"})}
+    ${txt(0,51,"Ice cores ≈ 800,000 years",{size:11})}
+    <rect x="0" y="57" width="320" height="12" rx="6" fill="#9AD9EA"/>
+  </svg>
+  <figcaption>Proxies let scientists see far beyond the age of thermometers.</figcaption>
+</figure>`;
+
+HERO.ice = () => `<figure class="card-hero">
+  <svg viewBox="0 0 350 172" role="img" aria-label="Graph of Earth's temperature over 400,000 years showing a sawtooth pattern of long cold glacial periods and short warm interglacial periods">
+    <rect x="20" y="40" width="312" height="22" fill="#F4B860" opacity=".07"/>
+    <line x1="20" y1="60" x2="332" y2="60" stroke="#97A9BF" stroke-width="1" stroke-dasharray="4 4"/>
+    <path d="M20 52 L35.6 84 L51.2 100 L62.9 124 L74.6 52 L98 92 L121.4 108 L133.1 124 L144.8 52 L176 92 L207.2 108 L222.8 132 L232.2 44 L254 84 L277.4 100 L300.8 108 L316.4 132 L323.4 60 L332 56 L332 150 L20 150 Z" fill="#9AD9EA" opacity=".12"/>
+    <path d="M20 52 L35.6 84 L51.2 100 L62.9 124 L74.6 52 L98 92 L121.4 108 L133.1 124 L144.8 52 L176 92 L207.2 108 L222.8 132 L232.2 44 L254 84 L277.4 100 L300.8 108 L316.4 132 L323.4 60 L332 56" fill="none" stroke="#9AD9EA" stroke-width="2.4" stroke-linejoin="round"/>
+    <circle cx="316.4" cy="132" r="4" fill="#F4B860"/><circle cx="332" cy="56" r="4" fill="#E8EEF5"/>
+    ${txt(22,34,"Warmer (interglacial)",{fill:"#F4B860"})}${txt(22,146,"Colder (glacial)")}
+    ${txt(20,166,"400,000 years ago")}${txt(332,166,"Today",{anchor:"end"})}
+    ${txt(306,124,"~20,000 yrs ago",{anchor:"end",fill:"#F4B860"})}
+  </svg>
+  <figcaption>Earth has swung between long cold glacial periods and short warm interglacials about every 100,000 years. Dashed line ≈ today’s temperature.</figcaption>
+</figure>`;
+
+HERO.climate = () => {
+  const rain = [2.5,2.7,3,2.1,3,6.8,7.5,8,6.3,2.6,1.9,2.4];
+  const bars = rain.map((r,i) => { const h = r*11, x = 157 + i*14.6, wet = i >= 5 && i <= 8;
+    return `<rect x="${x}" y="${136-h}" width="9" height="${h}" rx="2" fill="${wet?'#9AD9EA':'#4A6585'}"/>${txt(x+4.5,150,"JFMAMJJASOND"[i],{anchor:"middle",size:9.5})}`; }).join("");
+  return `<figure class="card-hero">
+  <svg viewBox="0 0 340 160" role="img" aria-label="Left: a thunderstorm today, which is weather. Right: Florida average monthly rainfall over decades, showing a wet season from June to September, which is climate">
+    ${txt(10,14,"Weather",{size:12,weight:700,fill:"#F4B860"})}${txt(10,28,"This afternoon")}
+    <path d="M30 92 C14 92 14 70 32 70 C32 52 62 48 68 64 C78 54 100 60 98 76 C114 76 114 92 98 92 Z" fill="#8DA2BD"/>
+    <path d="M62 92 L52 112 L62 112 L54 134 L76 104 L65 104 L72 92 Z" fill="#F4B860"/>
+    <g stroke="#9AD9EA" stroke-width="2" stroke-linecap="round"><line x1="34" y1="98" x2="29" y2="110"/><line x1="44" y1="100" x2="39" y2="112"/><line x1="86" y1="98" x2="81" y2="110"/><line x1="96" y1="100" x2="91" y2="112"/></g>
+    <line x1="140" y1="10" x2="140" y2="150" stroke="#2B4765" stroke-width="1.5"/>
+    ${txt(156,14,"Climate",{size:12,weight:700,fill:"#9AD9EA"})}${txt(156,28,"Avg. monthly rain, 30+ years")}
+    ${bars}
+  </svg>
+  <figcaption>One storm is weather. Florida’s summer wet season showing up in decades of averages is climate. (Rain values are approximate.)</figcaption>
+</figure>`;
+};
+
+HERO.water = () => `<figure class="card-hero">
+  <svg viewBox="0 0 360 240" role="img" aria-label="Water cycle diagram showing evaporation from the ocean, transpiration from a tree, condensation into clouds, precipitation on a mountain, runoff in a river, infiltration into the ground, and groundwater flowing through an aquifer back to the sea">
+    <defs>${arrowDef("wcA","#F4B860")}${arrowDef("wcB","#9AD9EA")}</defs>
+    <circle cx="30" cy="28" r="15" fill="#F4B860"/>
+    <rect x="0" y="150" width="122" height="90" fill="#1F6A98"/>
+    <path d="M0 150 q8 -4 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t10 0" fill="none" stroke="#9AD9EA" stroke-width="1.5"/>
+    <rect x="120" y="222" width="240" height="18" fill="#3B4250"/>
+    <rect x="120" y="176" width="240" height="46" fill="#2F5E7E"/>
+    <g fill="#9AD9EA" opacity=".5"><circle cx="140" cy="190" r="1.5"/><circle cx="170" cy="210" r="1.5"/><circle cx="200" cy="186" r="1.5"/><circle cx="235" cy="214" r="1.5"/><circle cx="270" cy="192" r="1.5"/><circle cx="310" cy="206" r="1.5"/><circle cx="340" cy="186" r="1.5"/></g>
+    <rect x="120" y="150" width="240" height="26" fill="#5B4330"/>
+    <path d="M200 152 L300 66 L360 112 L360 152 Z" fill="#3B5368"/>
+    <path d="M286 78 L300 66 L314 77 L306 76 L300 82 L293 76 Z" fill="#fff"/>
+    <line x1="120" y1="176" x2="360" y2="176" stroke="#9AD9EA" stroke-width="1.2" stroke-dasharray="4 3"/>
+    <rect x="157" y="128" width="6" height="24" fill="#6E4A2C"/><circle cx="160" cy="120" r="15" fill="#3E9A62"/>
+    <g fill="#C9D5E3"><circle cx="140" cy="44" r="11"/><circle cx="154" cy="37" r="14"/><circle cx="170" cy="44" r="11"/><rect x="140" y="44" width="30" height="11" rx="5"/></g>
+    <g fill="#A8B8CC"><circle cx="250" cy="34" r="12"/><circle cx="266" cy="27" r="15"/><circle cx="283" cy="34" r="12"/><rect x="250" y="34" width="33" height="12" rx="6"/></g>
+    <g stroke="#9AD9EA" stroke-width="2" stroke-linecap="round"><line x1="256" y1="52" x2="252" y2="64"/><line x1="266" y1="52" x2="262" y2="64"/><line x1="276" y1="52" x2="272" y2="64"/><line x1="286" y1="52" x2="282" y2="64"/></g>
+    <path d="M236 146 C200 146 170 152 124 151" fill="none" stroke="#5BB8E0" stroke-width="3" marker-end="url(#wcB)"/>
+    <path d="M64 142 C56 120 72 100 62 74" fill="none" stroke="#F4B860" stroke-width="2.2" stroke-dasharray="4 3" marker-end="url(#wcA)"/>
+    <path d="M168 104 C174 88 162 76 168 62" fill="none" stroke="#F4B860" stroke-width="2.2" stroke-dasharray="4 3" marker-end="url(#wcA)"/>
+    <line x1="232" y1="154" x2="232" y2="182" stroke="#9AD9EA" stroke-width="2.2" marker-end="url(#wcB)"/>
+    <path d="M330 200 L136 204" fill="none" stroke="#9AD9EA" stroke-width="2.2" marker-end="url(#wcB)"/>
+    ${txt(6,104,"Evaporation",{fill:"#F4B860"})}
+    ${txt(176,96,"Transpiration",{fill:"#F4B860"})}
+    ${txt(120,16,"Condensation",{fill:"#E8EEF5"})}
+    ${txt(248,78,"Precipitation",{anchor:"end",fill:"#E8EEF5"})}
+    ${txt(192,140,"Runoff",{fill:"#E8EEF5"})}
+    ${txt(238,166,"Infiltration",{fill:"#E8EEF5",size:10})}
+    ${txt(238,190,"Recharge",{fill:"#E8EEF5",size:10})}
+    ${txt(302,173,"Water table",{size:9.5})}
+    ${txt(150,216,"Aquifer: groundwater flows to the sea",{fill:"#E8EEF5",size:10})}
+    ${txt(8,190,"Collection",{fill:"#E8EEF5"})}
+  </svg>
+  <figcaption>The Sun powers evaporation; gravity pulls water back down and downhill.</figcaption>
+</figure>`;
+
+HERO.instruments = () => `<figure class="card-hero">
+  <div style="display:flex;justify-content:space-around;align-items:end;gap:6px">
+    ${[["thermo","Thermometer"],["baro","Barometer"],["anemo","Anemometer"],["rain","Rain gauge"]].map(([a,l]) => `<div style="text-align:center;width:24%">${ART[a]}<div class="small">${l}</div></div>`).join("")}
+  </div>
+  <figcaption>Each instrument measures one part of the weather. Together they describe the atmosphere at one place and time.</figcaption>
+</figure>`;
+
+HERO.station = () => `<figure class="card-hero">
+  <svg viewBox="0 0 340 190" role="img" aria-label="Station model: temperature 84, dew point 75, pressure code 096, pressure rising 1.2 millibars, cloud cover 75 percent, rain falling, wind from the south at 15 knots">
+    <circle cx="170" cy="95" r="14" fill="none" stroke="#E8EEF5" stroke-width="2.2"/>
+    <path d="M170 95 L170 81 A14 14 0 1 1 156 95 Z" fill="#E8EEF5"/>
+    <line x1="170" y1="109" x2="170" y2="166" stroke="#E8EEF5" stroke-width="2.2"/>
+    <line x1="170" y1="166" x2="152" y2="172" stroke="#E8EEF5" stroke-width="2.2"/>
+    <line x1="170" y1="158" x2="161" y2="161" stroke="#E8EEF5" stroke-width="2.2"/>
+    ${txt(146,82,"84",{size:16,anchor:"end",fill:"#FF6B6B",weight:700})}
+    ${txt(146,121,"75",{size:16,anchor:"end",fill:"#86D4A9",weight:700})}
+    <circle cx="138" cy="96" r="2.4" fill="#9AD9EA"/><circle cx="146" cy="96" r="2.4" fill="#9AD9EA"/>
+    ${txt(192,82,"096",{size:16,fill:"#F4B860",weight:700})}
+    ${txt(192,121,"+12/",{size:16,fill:"#C58BFF",weight:700})}
+    <g stroke="#4A6585" stroke-width="1"><line x1="96" y1="58" x2="128" y2="74"/><line x1="96" y1="96" x2="132" y2="96"/><line x1="96" y1="138" x2="128" y2="118"/><line x1="170" y1="40" x2="170" y2="79"/><line x1="244" y1="58" x2="226" y2="74"/><line x1="244" y1="132" x2="232" y2="118"/><line x1="226" y1="164" x2="176" y2="164"/></g>
+    ${txt(4,54,"Temperature",{fill:"#FF6B6B"})}${txt(4,66,"84°F")}
+    ${txt(4,92,"Weather now",{fill:"#9AD9EA"})}${txt(4,104,"rain")}
+    ${txt(4,140,"Dew point",{fill:"#86D4A9"})}${txt(4,152,"75°F")}
+    ${txt(170,22,"Cloud cover",{anchor:"middle",fill:"#E8EEF5"})}${txt(170,34,"75% (¾ shaded)",{anchor:"middle"})}
+    ${txt(248,54,"Air pressure",{fill:"#F4B860"})}${txt(248,66,"1009.6 mb")}
+    ${txt(248,128,"Pressure change",{fill:"#C58BFF"})}${txt(248,140,"+1.2 mb, rising")}
+    ${txt(230,162,"Wind: from the",{fill:"#E8EEF5"})}${txt(230,174,"south at 15 knots")}
+  </svg>
+  <figcaption>One station model packs a whole weather report into a tiny symbol on a map.</figcaption>
+</figure>`;
+
+HERO.spaghetti = () => `<figure class="card-hero">
+  <svg viewBox="0 0 340 170" role="img" aria-label="Several computer model forecast tracks fanning out from a storm toward a coastline, inside a widening cone of uncertainty">
+    <path d="M300 0 C292 40 300 70 288 100 C280 125 292 150 284 170 L340 170 L340 0 Z" fill="#2A4058"/>
+    ${txt(316,90,"Coast",{anchor:"middle",size:10})}
+    <path d="M40 140 L300 30 L300 150 Z" fill="#E8EEF5" opacity=".1"/>
+    <path d="M40 140 L300 30 M40 140 L300 150" stroke="#E8EEF5" stroke-width="1" opacity=".35"/>
+    <g fill="none" stroke-width="1.8" stroke-linecap="round">
+      <path d="M40 140 C120 110 200 80 292 48" stroke="#5AA9FF"/>
+      <path d="M40 140 C130 115 210 95 290 78" stroke="#F4B860"/>
+      <path d="M40 140 C120 120 200 105 288 98" stroke="#86D4A9"/>
+      <path d="M40 140 C140 125 220 120 286 122" stroke="#FF6B6B"/>
+      <path d="M40 140 C110 118 190 90 290 70" stroke="#C58BFF"/>
+      <path d="M40 140 C150 132 220 138 300 144" stroke="#E9A7B8"/>
+      <path d="M40 140 C120 116 200 92 290 86" stroke="#fff" stroke-width="3"/>
+    </g>
+    ${spiral(40,140,16,3)}
+    ${txt(70,24,"Each colored line = one model’s forecast track",{size:10})}
+    ${txt(140,160,"White = consensus (average of models)",{size:10,fill:"#E8EEF5"})}
+  </svg>
+  <figcaption>A “spaghetti plot.” The shaded cone shows where the storm’s center will probably go, but its winds, rain, and surge can reach far outside the cone.</figcaption>
+</figure>`;
+
+HERO.fronts = () => `<figure class="card-hero">
+  <svg viewBox="0 0 340 210" role="img" aria-label="Weather map with a low pressure center, a warm front extending east, a cold front extending southwest, high pressure behind the cold front, cold dry air to the west and warm humid air between the fronts">
+    <defs>${arrowDef("frA","#97A9BF")}</defs>
+    <rect x="0" y="0" width="340" height="210" fill="#12253A"/>
+    ${front([[166,62],[214,70],[258,82],[304,98]],"warm",1,1)}
+    ${front([[150,78],[136,112],[114,148],[86,190]],"cold",1,1)}
+    <text x="148" y="70" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="30" fill="#FF6B6B">L</text>
+    <text x="40" y="70" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="30" fill="#5AA9FF">H</text>
+    <path d="M120 40 A36 30 0 0 0 120 92" fill="none" stroke="#97A9BF" stroke-width="1.6" marker-end="url(#frA)"/>
+    <path d="M184 92 A36 30 0 0 0 184 40" fill="none" stroke="#97A9BF" stroke-width="1.6" marker-end="url(#frA)"/>
+    ${txt(14,140,"Cold, dry air",{fill:"#9AD9EA",size:11})}
+    ${txt(188,156,"Warm, humid air",{fill:"#FF9B9B",size:11})}
+    ${txt(232,64,"Warm front",{fill:"#FF6B6B"})}
+    ${txt(52,196,"Cold front",{fill:"#5AA9FF"})}
+    ${txt(214,22,"Low: air rises, spins",{size:10})}${txt(214,34,"counterclockwise",{size:10})}
+  </svg>
+  <figcaption>Fronts stretch out from a low-pressure center. In the U.S., the whole system usually travels west to east.</figcaption>
+</figure>`;
+
+HERO.air = () => {
+  const b = (x,y,c,f,lab) => `<circle cx="${x}" cy="${y}" r="20" fill="${f}"/><text x="${x}" y="${y+6}" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="15" fill="#0D1B2A">${c}</text>${txt(x,y+33,lab,{anchor:"middle",size:9.5})}`;
+  return `<figure class="card-hero">
+  <svg viewBox="0 0 340 236" role="img" aria-label="Simplified diagram of where air masses affecting the United States come from: continental arctic and continental polar from the north, maritime polar from the North Pacific and North Atlantic, continental tropical from the southwestern deserts, and maritime tropical from the Gulf, Caribbean and tropical Atlantic">
+    <defs>${arrowDef("amA","#97A9BF")}</defs>
+    <rect x="96" y="92" width="150" height="74" rx="14" fill="#1E3653" stroke="#2B4765" stroke-width="1.5"/>
+    ${txt(171,124,"United States",{anchor:"middle",size:12,fill:"#E8EEF5",weight:700})}
+    <circle cx="226" cy="152" r="5" fill="#F4B860"/>${txt(214,156,"FL",{anchor:"end",size:10,fill:"#F4B860"})}
+    <g stroke="#97A9BF" stroke-width="1.5" fill="none">
+      <path d="M134 50 L150 90" marker-end="url(#amA)"/><path d="M210 50 L196 90" marker-end="url(#amA)"/>
+      <path d="M58 92 L94 112" marker-end="url(#amA)"/><path d="M286 92 L248 112" marker-end="url(#amA)"/>
+      <path d="M68 180 L100 160" marker-end="url(#amA)"/><path d="M190 196 L200 168" marker-end="url(#amA)"/><path d="M288 176 L248 156" marker-end="url(#amA)"/>
+    </g>
+    ${b(126,26,"cA","#C9E6FF","Arctic")}${b(214,26,"cP","#5AA9FF","Canada")}
+    ${b(40,72,"mP","#7FC4D8","N. Pacific")}${b(300,72,"mP","#7FC4D8","N. Atlantic")}
+    ${b(50,190,"cT","#E8B26A","SW deserts")}${b(186,204,"mT","#F28C4E","Gulf & Caribbean")}${b(302,184,"mT","#F28C4E","Atlantic")}
+  </svg>
+  <figcaption>Simplified, not to scale. Each air mass takes on the temperature and moisture of the place it formed.</figcaption>
+</figure>`;
+};
+
+HERO.hurricane = () => `<figure class="card-hero">
+  <svg viewBox="0 0 340 220" role="img" aria-label="Top view of a hurricane with spiral rain bands, a ring-shaped eyewall, and a calm eye in the center">
+    ${spiral(150,112,96,10)}
+    <g stroke="#97A9BF" stroke-width="1"><line x1="150" y1="112" x2="268" y2="40"/><line x1="166" y1="112" x2="268" y2="106"/><line x1="214" y1="160" x2="268" y2="176"/></g>
+    ${txt(272,36,"Eye",{fill:"#E8EEF5",weight:700,size:11})}${txt(272,48,"calm, lowest",{size:9.5})}${txt(272,59,"pressure",{size:9.5})}
+    ${txt(272,104,"Eyewall",{fill:"#E8EEF5",weight:700,size:11})}${txt(272,116,"strongest",{size:9.5})}${txt(272,127,"winds",{size:9.5})}
+    ${txt(272,174,"Rain bands",{fill:"#E8EEF5",weight:700,size:11})}${txt(272,186,"heavy rain,",{size:9.5})}${txt(272,197,"tornadoes",{size:9.5})}
+    ${txt(8,212,"Spins counterclockwise (Northern Hemisphere)",{size:10})}
+  </svg>
+  <figcaption>View from above. Air spirals inward along the surface, rises in the eyewall, and spreads out at the top.</figcaption>
+</figure>`;
+
+/* Hurricane Ian track map (simplified coastlines) */
+const IAN_TRACK = [[12.3,-66.3,30],[12.9,-67.2,30],[13.7,-68.1,30],[14.2,-69.3,30],[14.6,-70.6,30],[14.7,-71.7,35],[14.7,-72.9,35],[14.5,-74.4,40],[14.4,-75.8,40],[14.6,-77.2,40],[14.6,-78.3,40],[15.0,-79.4,40],[15.8,-80.1,40],[16.8,-80.9,50],[17.7,-81.7,65],[18.7,-82.4,70],[19.7,-83.0,80],[20.8,-83.3,85],[21.8,-83.6,100],[22.2,-83.7,110],[22.6,-83.6,100],[23.5,-83.3,105],[24.4,-83.0,105],[24.6,-82.9,110],[25.2,-82.9,120],[26.0,-82.7,140],[26.6,-82.4,135],[26.7,-82.2,130],[26.8,-82.0,125],[27.2,-81.7,100],[27.7,-81.1,65],[28.4,-80.6,60],[28.9,-80.1,65],[29.6,-79.4,70],[30.3,-79.1,75],[31.5,-79.0,75],[33.3,-79.2,70],[34.4,-79.3,50],[35.3,-79.7,30]];
+const IAN_EVENTS = [
+  {k:"A",t:"Sep 23, 2 a.m.",lat:13.7,lon:-68.1,mb:1006,mph:35,stage:"Tropical depression",note:"Forms northeast of Aruba from a tropical wave that left Africa about a week earlier"},
+  {k:"B",t:"Sep 23, 8 p.m.",lat:14.7,lon:-71.7,mb:1005,mph:40,stage:"Tropical storm",note:"Named Ian, southeast of Jamaica"},
+  {k:"C",t:"Sep 25, 2 p.m.",lat:15.8,lon:-80.1,mb:1003,mph:45,stage:"Tropical storm",note:"Rapid strengthening begins over very warm water (30°C / 86°F and up)"},
+  {k:"D",t:"Sep 26, 2 a.m.",lat:17.7,lon:-81.7,mb:985,mph:75,stage:"Category 1",note:"Becomes a hurricane south-southwest of Grand Cayman"},
+  {k:"E",t:"Sep 27, 2 a.m.",lat:21.8,lon:-83.6,mb:956,mph:115,stage:"Category 3",note:"Becomes a major hurricane"},
+  {k:"F",t:"Sep 27, 4:30 a.m.",lat:22.2,lon:-83.7,mb:947,mph:125,stage:"Category 3",note:"Landfall in western Cuba near La Coloma"},
+  {k:"G",t:"Sep 27, 10 p.m.",lat:24.6,lon:-82.9,mb:952,mph:125,stage:"Category 3",note:"Eye passes over the Dry Tortugas, Florida"},
+  {k:"H",t:"Sep 28, 8 a.m.",lat:26.0,lon:-82.7,mb:937,mph:160,stage:"Category 5",note:"Peak strength over the Gulf; lowest pressure"},
+  {k:"I",t:"Sep 28, 3:05 p.m.",lat:26.7,lon:-82.2,mb:941,mph:150,stage:"Category 4",note:"Landfall on Cayo Costa, Florida"},
+  {k:"J",t:"Sep 28, 4:35 p.m.",lat:26.8,lon:-82.0,mb:945,mph:145,stage:"Category 4",note:"Landfall near Punta Gorda"},
+  {k:"K",t:"Sep 29, 8 a.m.",lat:28.4,lon:-80.6,mb:987,mph:70,stage:"Tropical storm",note:"Weakens over land, exits into the Atlantic near Cape Canaveral"},
+  {k:"L",t:"Sep 29, 2 p.m.",lat:28.9,lon:-80.1,mb:986,mph:75,stage:"Category 1",note:"Re-strengthens over warm Atlantic water"},
+  {k:"M",t:"Sep 30, 2:05 p.m.",lat:33.3,lon:-79.2,mb:978,mph:80,stage:"Category 1",note:"Final landfall near Georgetown, South Carolina"},
+  {k:"N",t:"Sep 30, 8 p.m.",lat:34.4,lon:-79.3,mb:990,mph:60,stage:"Post-tropical",note:"Merges with a front over North Carolina"}
+];
+const CAT_COLORS = { td:"#8DA2BD", ts:"#9AD9EA", c1:"#F7E08A", c2:"#F4B860", c3:"#F28C4E", c4:"#E8584A", c5:"#D24DCF", pt:"#97A9BF" };
+function ktClass(kt){ return kt < 34 ? "td" : kt < 64 ? "ts" : kt < 83 ? "c1" : kt < 96 ? "c2" : kt < 113 ? "c3" : kt < 137 ? "c4" : "c5"; }
+function stageClass(s){ return s.startsWith("Category") ? "c" + s.slice(-1) : s === "Tropical storm" ? "ts" : s === "Tropical depression" ? "td" : "pt"; }
+
+HERO.ianMap = () => {
+  const P = (lat, lon) => [10 + (lon + 88) * 12, 10 + (36 - lat) * 12.6];
+  const poly = (pts, fill) => `<polygon points="${pts.map(([lo,la]) => P(la,lo).map(n=>n.toFixed(1)).join(",")).join(" ")}" fill="${fill}" stroke="#4A6585" stroke-width="1"/>`;
+  const land = "#2A4058";
+  const us = [[-88,30.4],[-87.5,30.3],[-86.5,30.4],[-85.4,29.7],[-84.3,30.0],[-83.6,29.9],[-83.0,29.2],[-82.7,28.5],[-82.8,27.9],[-82.6,27.4],[-82.2,26.7],[-81.8,26.1],[-81.3,25.5],[-80.9,25.15],[-80.4,25.2],[-80.1,25.8],[-80.0,26.7],[-80.2,27.4],[-80.5,28.1],[-80.6,28.6],[-81.0,29.3],[-81.3,30.0],[-81.4,30.7],[-81.2,31.5],[-80.9,32.0],[-79.9,32.8],[-79.2,33.3],[-78.5,33.9],[-77.9,34.0],[-76.5,34.7],[-75.5,35.3],[-75.8,36.0],[-75.9,36.6],[-88,36.6]];
+  const cuba = [[-84.95,21.86],[-84.0,22.6],[-83.0,22.9],[-82.0,23.15],[-81.0,23.1],[-80.0,22.95],[-79.0,22.5],[-78.0,22.3],[-77.0,21.6],[-76.0,21.15],[-75.0,20.7],[-74.15,20.25],[-74.5,20.05],[-75.5,19.9],[-77.0,19.85],[-77.7,20.4],[-78.5,21.5],[-79.5,21.6],[-80.5,22.0],[-81.5,22.2],[-82.2,22.4],[-83.0,22.1],[-84.0,21.9]];
+  const hisp = [[-74.4,18.4],[-73.5,19.7],[-72.8,19.9],[-71.0,19.9],[-69.5,19.4],[-68.4,18.6],[-69.0,18.3],[-70.5,18.2],[-71.4,17.6],[-72.0,18.1],[-73.5,18.2]];
+  const pr = [[-67.25,18.5],[-65.6,18.4],[-65.6,17.95],[-67.2,17.95]];
+  const jam = [[-78.4,18.4],[-77.6,18.5],[-76.4,18.2],[-76.2,17.9],[-77.2,17.75],[-78.3,18.2]];
+  const sa = [[-77.6,10],[-76.0,10.1],[-75.5,10.6],[-74.2,11.3],[-72.2,11.9],[-71.6,11.0],[-71.1,11.6],[-70.2,12.1],[-69.8,11.4],[-68.4,10.9],[-66.0,10.6],[-64.0,10.6],[-64,10],[-77.6,10]];
+  const yuc = [[-88,21.6],[-86.8,21.5],[-87.4,20.2],[-87.8,18.4],[-88,18.4]];
+  let segs = "";
+  for (let i = 0; i < IAN_TRACK.length - 1; i++){
+    const [la1,lo1,kt] = IAN_TRACK[i], [la2,lo2] = IAN_TRACK[i+1], a = P(la1,lo1), b = P(la2,lo2);
+    const c = i >= IAN_TRACK.length - 3 ? CAT_COLORS.pt : CAT_COLORS[ktClass(kt)];
+    segs += `<line x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}" stroke="${c}" stroke-width="3.2" stroke-linecap="round"/>`;
+  }
+  const side = { A:[0.2,1.1],B:[0,-1.1],C:[1,0.4],D:[1,-0.2],E:[1,0],F:[-1,0],G:[-1.1,0.7],H:[-1.1,0],I:[-1.1,-1],J:[1.1,0.5],K:[-1.1,0.4],L:[1.1,-0.2],M:[1,0.3],N:[1,-0.3] };
+  const marks = IAN_EVENTS.map(e => { const [x,y] = P(e.lat,e.lon), [dx,dy] = side[e.k], lx = x + dx*13, ly = y + dy*13;
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.4" fill="#fff"/><circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="7.5" fill="#F4B860"/><text x="${lx.toFixed(1)}" y="${(ly+3.5).toFixed(1)}" text-anchor="middle" ${F} font-weight="700" font-size="9.5" fill="#1A1306">${e.k}</text>`; }).join("");
+  const legend = [["td","TD"],["ts","TS"],["c1","Cat 1"],["c2","Cat 2"],["c3","Cat 3"],["c4","Cat 4"],["c5","Cat 5"]]
+    .map(([c,l],i) => `<rect x="${12 + i*42}" y="350" width="10" height="10" rx="2" fill="${CAT_COLORS[c]}"/>${txt(25 + i*42,359,l,{size:8.5})}`).join("");
+  return `<figure class="card-hero">
+  <svg viewBox="0 0 308 366" role="img" aria-label="Map of Hurricane Ian's track from near Aruba northwest across the Caribbean, over western Cuba, north through the Gulf to southwest Florida, across the Florida peninsula, and north to South Carolina, colored by strength">
+    <rect x="0" y="0" width="308" height="344" fill="#12304A"/>
+    ${poly(us,land)}${poly(cuba,land)}${poly(hisp,land)}${poly(pr,land)}${poly(jam,land)}${poly(sa,land)}${poly(yuc,land)}
+    ${txt(24,30,"UNITED STATES",{size:9})}${txt(150,300,"Caribbean Sea",{size:9.5,fill:"#7FA7C9"})}${txt(30,140,"Gulf",{size:9.5,fill:"#7FA7C9"})}${txt(230,120,"Atlantic",{size:9.5,fill:"#7FA7C9"})}${txt(118,150,"FL",{size:9.5})}${txt(122,190,"CUBA",{size:8.5})}
+    ${segs}${marks}
+    ${legend}
+  </svg>
+  <figcaption>Simplified map. Letters match the table below; line colors show strength along the track (TD = tropical depression, TS = tropical storm).</figcaption>
+</figure>`;
+};
+
+HERO.karst = () => `<figure class="card-hero">
+  <svg viewBox="0 0 360 232" role="img" aria-label="Cross-section of Florida karst: rain soaks through sand into limestone with water-filled caves, a sinkhole lake at the surface, a pumping well creating a cone of depression in the water table, and a spring flowing into a river">
+    <defs>${arrowDef("kaA","#F4B860")}${arrowDef("kaB","#9AD9EA")}</defs>
+    <rect x="0" y="96" width="360" height="136" fill="#8C8577"/>
+    <path d="M0 60 L70 60 C80 60 86 90 105 90 C124 90 130 60 140 60 L296 60 L304 72 L360 72 L360 102 L0 102 Z" fill="#C9A66B"/>
+    <path d="M300 66 L360 66 L360 80 L306 80 Z" fill="#2F7FB0"/>
+    <path d="M74 66 C82 66 86 88 105 88 C124 88 128 66 136 66 Z" fill="#2F7FB0"/>
+    <path d="M96 88 L100 106 L110 106 L114 88 Z" fill="#2F7FB0" opacity=".85"/>
+    <path d="M0 60 L70 60 M140 60 L296 60" stroke="#6FBF7A" stroke-width="3"/>
+    <ellipse cx="60" cy="152" rx="32" ry="12" fill="#2F7FB0"/>
+    <ellipse cx="160" cy="186" rx="42" ry="11" fill="#2F7FB0"/>
+    <path d="M100 106 C104 130 90 140 80 146" fill="none" stroke="#2F7FB0" stroke-width="7"/>
+    <path d="M198 186 C262 190 300 150 326 82" fill="none" stroke="#2F7FB0" stroke-width="9"/>
+    <path d="M0 112 L190 102 C214 100 232 142 248 142 C264 142 280 96 300 90 L360 84" fill="none" stroke="#E8EEF5" stroke-width="1.4" stroke-dasharray="5 4"/>
+    <rect x="243" y="44" width="12" height="16" rx="2" fill="#F4B860"/>
+    <line x1="249" y1="60" x2="249" y2="168" stroke="#E8EEF5" stroke-width="3"/>
+    <g stroke="#9AD9EA" stroke-width="2" stroke-linecap="round"><line x1="22" y1="14" x2="18" y2="26"/><line x1="36" y1="10" x2="32" y2="22"/><line x1="50" y1="14" x2="46" y2="26"/><line x1="64" y1="10" x2="60" y2="22"/></g>
+    <line x1="30" y1="64" x2="30" y2="96" stroke="#F4B860" stroke-width="2" marker-end="url(#kaA)"/>
+    <line x1="52" y1="64" x2="52" y2="96" stroke="#F4B860" stroke-width="2" marker-end="url(#kaA)"/>
+    <line x1="326" y1="96" x2="326" y2="56" stroke="#9AD9EA" stroke-width="2.4" marker-end="url(#kaB)"/>
+    ${txt(74,22,"Rain recharges the aquifer",{fill:"#E8EEF5"})}
+    ${txt(105,52,"Sinkhole lake",{anchor:"middle",fill:"#E8EEF5"})}
+    ${txt(156,84,"Sand & clay",{fill:"#3B2A1D"})}
+    ${txt(130,118,"Water table",{fill:"#E8EEF5",size:10})}
+    ${txt(262,40,"Pumping well",{fill:"#F4B860"})}
+    ${txt(258,160,"Cone of",{fill:"#E8EEF5",size:10})}${txt(258,171,"depression",{fill:"#E8EEF5",size:10})}
+    ${txt(310,46,"Spring",{fill:"#9AD9EA",weight:700})}
+    ${txt(8,216,"Limestone (Floridan aquifer)",{fill:"#2B2318",weight:700})}
+    ${txt(118,214,"Water-filled caves",{fill:"#E8EEF5",size:10})}
+  </svg>
+  <figcaption>Slightly acidic water dissolves limestone into caves and conduits. Pumping lowers the water table around a well.</figcaption>
+</figure>`;
+
+HERO.spheres = () => {
+  const node = (x,y,r,f,l,ink="#0D1B2A") => `<circle cx="${x}" cy="${y}" r="${r}" fill="${f}"/><text x="${x}" y="${y+4}" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="700" font-size="${r>30?12:10}" fill="${ink}">${l}</text>`;
+  return `<figure class="card-hero">
+  <svg viewBox="0 0 340 236" role="img" aria-label="Diagram of Earth's spheres: atmosphere, hydrosphere with cryosphere, biosphere, and geosphere, each connected to every other">
+    <g stroke="#4A6585" stroke-width="2"><line x1="170" y1="36" x2="62" y2="118"/><line x1="170" y1="36" x2="278" y2="118"/><line x1="170" y1="36" x2="170" y2="200"/><line x1="62" y1="118" x2="278" y2="118"/><line x1="62" y1="118" x2="170" y2="200"/><line x1="278" y1="118" x2="170" y2="200"/><line x1="62" y1="118" x2="36" y2="196"/></g>
+    ${node(170,36,34,"#5AA9FF","Atmosphere")}${node(62,118,34,"#2F7FB0","Hydrosphere","#E8EEF5")}${node(278,118,34,"#3E9A62","Biosphere","#E8EEF5")}${node(170,200,34,"#A07A4E","Geosphere","#E8EEF5")}${node(36,198,24,"#DDF3FA","Cryosphere")}
+  </svg>
+  <figcaption>Every sphere connects to every other. The cryosphere, Earth’s frozen water, is often counted as part of the hydrosphere.</figcaption>
+</figure>`;
+};
+
+HERO.sun = () => `<figure class="card-hero">
+  <svg viewBox="0 0 360 222" role="img" aria-label="Sun radiating energy to the ocean and land; hot sand warming the air above it by conduction; warm air rising by convection to form a cloud; a sea breeze blowing from the ocean onto land">
+    <defs>${arrowDef("suA","#FF6B6B")}${arrowDef("suB","#9AD9EA")}</defs>
+    <circle cx="40" cy="36" r="22" fill="#F4B860"/>
+    ${waveRay(64,52,30,10)}${waveRay(62,58,42,9)}${waveRay(54,62,58,7)}
+    <rect x="0" y="162" width="180" height="60" fill="#1F6A98"/>
+    <rect x="180" y="162" width="180" height="60" fill="#C9A66B"/>
+    <rect x="180" y="153" width="180" height="9" fill="#FF6B6B" opacity=".35"/>
+    <g fill="#C9D5E3"><circle cx="262" cy="52" r="13"/><circle cx="279" cy="42" r="17"/><circle cx="298" cy="52" r="13"/><rect x="262" y="52" width="36" height="13" rx="6"/></g>
+    <path d="M238 150 C230 120 250 104 262 72" fill="none" stroke="#FF6B6B" stroke-width="2.4" marker-end="url(#suA)"/>
+    <path d="M312 150 C320 120 300 104 296 72" fill="none" stroke="#FF6B6B" stroke-width="2.4" marker-end="url(#suA)"/>
+    <line x1="70" y1="146" x2="206" y2="146" stroke="#9AD9EA" stroke-width="2.4" marker-end="url(#suB)"/>
+    ${txt(120,92,"Radiation",{fill:"#F4B860",weight:700,size:11})}
+    ${txt(70,138,"Sea breeze (cooler air)",{fill:"#9AD9EA",size:10})}
+    ${txt(270,104,"Convection",{fill:"#FF6B6B",weight:700,size:11,anchor:"middle"})}
+    ${txt(270,116,"warm air rises",{anchor:"middle",size:9.5,fill:"#E8EEF5"})}
+    ${txt(270,186,"Conduction",{anchor:"middle",fill:"#3B2A1D",weight:700,size:11})}
+    ${txt(270,199,"hot sand warms the air",{anchor:"middle",fill:"#3B2A1D",size:9.5})}
+    ${txt(270,210,"touching it",{anchor:"middle",fill:"#3B2A1D",size:9.5})}
+    ${txt(90,196,"Ocean heats slowly",{anchor:"middle",fill:"#E8EEF5",size:10})}
+  </svg>
+  <figcaption>Florida’s summer sea breeze in one picture: all three kinds of energy transfer at work.</figcaption>
+</figure>`;
+
+/* =========================================================
+   TOPIC CARDS
+   ========================================================= */
+const tile = (art, title, text, chip) => `<div class="tile">${art || ""}<h4>${title}</h4><p>${text}</p>${chip ? `<span class="chip">${chip}</span>` : ""}</div>`;
+const def = (term, text) => `<div class="def"><b>${term}:</b> ${text}</div>`;
+
+const CARDS = {
+/* ---------------- QUARTER 1 ---------------- */
+"water-cycle": {
+  title: "The water cycle",
+  blurb: "How water moves between the ocean, sky, land, and underground",
+  icon: ART.drop,
+  body: () => `${HERO.water()}
+    <h2>The water cycle</h2>
+    <p class="intro">Earth’s water is always on the move. The <b>water cycle</b> is the continuous path water takes between the oceans, the air, the land, living things, and underground. Water isn’t used up; it just changes form and location.</p>
+    <h3>Moving up into the air</h3>
+    <div class="defs">
+      ${def("Evaporation","liquid water absorbs heat energy from the Sun and changes into water vapor, a gas. Most evaporation comes from the oceans.")}
+      ${def("Transpiration","plants pull water up from their roots and release water vapor through tiny pores in their leaves.")}
+      ${def("Evapotranspiration","evaporation and transpiration together; the total water returned to the air from land.")}
+      ${def("Sublimation","ice changes directly into water vapor without melting first.")}
+    </div>
+    <h3>In the sky and back down</h3>
+    <div class="defs">
+      ${def("Condensation","water vapor cools and changes back into tiny liquid droplets, forming clouds, fog, and dew.")}
+      ${def("Precipitation","water falls from clouds as rain, snow, sleet, or hail when droplets grow too heavy to stay up.")}
+    </div>
+    <h3>On the ground</h3>
+    <div class="defs">
+      ${def("Runoff","water that flows over the surface into streams, rivers, lakes, and the ocean instead of soaking in. Pavement and saturated soil increase runoff.")}
+      ${def("Collection","water gathers in oceans, lakes, rivers, and wetlands.")}
+      ${def("Infiltration","water soaks into the soil at the surface.")}
+      ${def("Percolation","water keeps moving downward through soil and rock layers.")}
+    </div>
+    <h3>Underground</h3>
+    <div class="defs">
+      ${def("Groundwater","water stored in the spaces between soil particles and cracks in rock below the water table.")}
+      ${def("Water table","the top of the zone where the ground is completely filled (saturated) with water.")}
+      ${def("Aquifer","a layer of rock or sediment that holds groundwater and lets it flow, so it can supply wells and springs.")}
+      ${def("Groundwater recharge","water from the surface that refills an aquifer. Recharge is fastest where soils are sandy and water can soak in easily.")}
+    </div>
+    <div class="callout"><p><strong>Florida connection.</strong> About 90% of Floridians get their drinking water from groundwater, mostly from the Floridan aquifer, one of the most productive aquifers in the world. Every rain that soaks in helps refill it.</p></div>
+    <h3>What powers the cycle?</h3>
+    <p>The <b>Sun</b> provides the energy that evaporates water and drives winds that carry vapor around the planet. <b>Gravity</b> pulls precipitation down, makes runoff flow downhill, and pulls water down into the ground.</p>`
+},
+
+"weather-instruments": {
+  title: "Weather instruments",
+  blurb: "The tools that measure temperature, pressure, wind, humidity, and rain",
+  icon: ART.thermo,
+  body: () => `${HERO.instruments()}
+    <h2>Weather instruments</h2>
+    <p class="intro">Forecasters can’t predict the weather until they measure it. Each instrument below tracks one variable of the atmosphere.</p>
+    <h3>At a weather station</h3>
+    <div class="tiles">
+      ${tile(ART.thermo,"Thermometer","Measures air temperature. Weather stations keep it shaded so sunlight doesn’t heat it directly.","°F or °C")}
+      ${tile(ART.baro,"Barometer","Measures air pressure, the weight of the air above. Falling pressure often means stormy weather is coming; rising pressure usually means clearing.","millibars (mb) or inches of mercury")}
+      ${tile(ART.anemo,"Anemometer","Measures wind speed. Spinning cups turn faster as the wind blows harder.","mph or knots")}
+      ${tile(ART.vane,"Wind vane","Shows wind direction. The arrow points into the wind, toward where the wind is coming from.","N, NE, E…")}
+      ${tile(ART.hygro,"Hygrometer / psychrometer","Measures humidity. A psychrometer compares a dry thermometer to one with a wet cloth; the bigger the gap, the drier the air.","% relative humidity")}
+      ${tile(ART.rain,"Rain gauge","Collects and measures how much precipitation fell.","inches or mm")}
+    </div>
+    <h3>Watching from above</h3>
+    <div class="tiles">
+      ${tile(ART.balloon,"Weather balloon","Carries a radiosonde up through the atmosphere, radioing back temperature, pressure, humidity, and wind. Launched twice a day around the world.","upper air")}
+      ${tile(ART.radar,"Doppler radar","Bounces radio waves off raindrops to show where precipitation is, how heavy it is, and which way it’s moving, including rotation in storms.","precipitation & motion")}
+      ${tile(ART.sat,"Weather satellite","Photographs clouds and measures temperatures from space. GOES satellites watch the Americas nonstop, spotting hurricanes as they form.","clouds & storms")}
+    </div>
+    <h3>Key ideas</h3>
+    <div class="defs">
+      ${def("Relative humidity","how much water vapor the air holds compared with the most it could hold at that temperature.")}
+      ${def("Dew point","the temperature the air must cool to for water vapor to condense. Florida summer dew points in the 70s °F feel sticky.")}
+      ${def("Standard air pressure","about 1013 mb (29.92 inches of mercury) at sea level.")}
+    </div>`
+},
+
+"station-models": {
+  title: "Station models & forecast models",
+  blurb: "Reading weather map symbols and how computer models predict storms",
+  icon: ART.station,
+  body: () => `${HERO.station()}
+    <h2>Station models & forecast models</h2>
+    <p class="intro">A <b>station model</b> is a shorthand symbol that shows the weather measured at one weather station. Meteorologists plot thousands of them on a map to see the big picture.</p>
+    <h3>How to read a station model</h3>
+    <div class="defs">
+      ${def("Center circle","cloud cover. Empty = clear sky, fully shaded = overcast; each quarter shaded is about 25% more cloud.")}
+      ${def("Upper left","air temperature, in °F in the U.S.")}
+      ${def("Lower left","dew point temperature. The closer it is to the temperature, the more humid the air.")}
+      ${def("Between them","present weather symbol, like dots for rain, stars for snow, or ≡ for fog.")}
+      ${def("Upper right","air pressure code. Put a 9 or 10 in front, whichever gives a number closest to 1000, and add a decimal before the last digit: 096 → 1009.6 mb; 872 → 987.2 mb.")}
+      ${def("Lower right","pressure change over the last 3 hours, in tenths of a millibar. +12/ means up 1.2 mb and rising.")}
+      ${def("Wind barb","the line points toward where the wind is coming from. Each full feather = 10 knots, half feather = 5 knots, flag = 50 knots.")}
+    </div>
+    <h3>Computer forecast models</h3>
+    <p>A <b>forecast model</b> is a computer program that uses the laws of physics to predict how the atmosphere will change. It starts with millions of observations from weather stations, balloons, satellites, radar, buoys, ships, and aircraft, then calculates the future step by step on a grid covering the planet.</p>
+    <div class="tiles">
+      ${tile("","Global models","Cover the whole planet and predict days to weeks ahead. Well-known examples: the American GFS, the European ECMWF (the “Euro”), and the UK Met Office model.","worldwide")}
+      ${tile("","Hurricane models","Zoom in on a single storm with much finer detail. NOAA’s HAFS model is built to predict a hurricane’s track, strength, and structure.","one storm")}
+      ${tile("","Ensembles","Run the same model many times with slightly different starting data. If the runs agree, forecasters are more confident.","many runs")}
+      ${tile("","Consensus","Averages several different models. Averaging usually beats any single model for hurricane track forecasts.","best guess")}
+    </div>
+    ${HERO.spaghetti()}
+    <div class="callout"><p><strong>Hurricane Hunters.</strong> Air Force Reserve and NOAA aircraft fly straight into hurricanes, dropping instruments that measure pressure and wind. Their data go right into the models and improve the forecast.</p></div>`
+},
+
+"fronts": {
+  title: "Fronts & forecasting",
+  blurb: "Cold, warm, stationary, and occluded fronts, plus how highs and lows steer them",
+  icon: ART.frontIcon,
+  body: () => `${HERO.fronts()}
+    <h2>Fronts & forecasting</h2>
+    <p class="intro">A <b>front</b> is the boundary where two air masses with different temperatures and humidity meet. Fronts are where much of our changeable weather happens, so forecasters track them closely.</p>
+    <h3>The four types of fronts</h3>
+    <div class="tiles">
+      ${tile(`<svg viewBox="0 0 80 28" style="width:100%;height:auto" aria-hidden="true">${front([[4,18],[76,18]],"cold",1,1.5)}</svg>`,"Cold front","Cold, dense air pushes under warm air and forces it up quickly. Brings a narrow line of strong storms, then cooler, drier air, a wind shift, and rising pressure.","blue triangles")}
+      ${tile(`<svg viewBox="0 0 80 28" style="width:100%;height:auto" aria-hidden="true">${front([[4,18],[76,18]],"warm",1,1.5)}</svg>`,"Warm front","Warm air slides gently up and over retreating cold air. Brings widespread clouds and long, steady rain, then warmer, more humid air.","red half-circles")}
+      ${tile(`<svg viewBox="0 0 80 28" style="width:100%;height:auto" aria-hidden="true">${front([[4,14],[76,14]],"stat",1,1.5)}</svg>`,"Stationary front","Neither air mass is strong enough to push the other, so the front stalls. Can bring cloudy, rainy weather for days.","alternating, opposite sides")}
+      ${tile(`<svg viewBox="0 0 80 28" style="width:100%;height:auto" aria-hidden="true">${front([[4,18],[76,18]],"occl",1,1.5)}</svg>`,"Occluded front","A fast cold front catches up to a warm front and lifts the warm air completely off the ground. Usually forms as a storm system matures.","purple, both shapes")}
+    </div>
+    <p style="margin-top:12px">The symbols point in the direction the front is moving.</p>
+    <h3>How highs and lows steer fronts</h3>
+    <div class="compare">
+      <div>
+        <h4 style="color:#FF6B6B">Low pressure (L)</h4>
+        <p class="when">Air flows in and rises</p>
+        <ul><li>Spins counterclockwise in the Northern Hemisphere</li><li>Rising air cools, forming clouds and storms</li><li>Fronts stretch out from the low and travel with it</li></ul>
+      </div>
+      <div>
+        <h4 style="color:#5AA9FF">High pressure (H)</h4>
+        <p class="when">Air sinks and flows out</p>
+        <ul><li>Spins clockwise in the Northern Hemisphere</li><li>Sinking air warms and dries, so skies clear</li><li>A strong high pushes a cold front forward, or blocks a front so it stalls</li></ul>
+      </div>
+    </div>
+    <h3>A cold front passes Florida</h3>
+    <div class="tablewrap"><table>
+      <tr><th></th><th>Before</th><th>During</th><th>After</th></tr>
+      <tr><td><b>Temperature</b></td><td>Warm</td><td>Dropping</td><td>Cooler</td></tr>
+      <tr><td><b>Humidity</b></td><td>Humid</td><td>—</td><td>Drier</td></tr>
+      <tr><td><b>Wind</b></td><td>S or SW</td><td>Gusty, shifting</td><td>NW or N</td></tr>
+      <tr><td><b>Pressure</b></td><td>Falling</td><td>Lowest</td><td>Rising</td></tr>
+      <tr><td><b>Sky</b></td><td>Clouds build</td><td>Line of storms</td><td>Clearing</td></tr>
+    </table></div>
+    <div class="callout"><p><strong>Forecasting tip.</strong> In the U.S., prevailing westerly winds carry most lows, highs, and fronts from west to east. Check the weather to your west to see what’s coming.</p></div>`
+},
+
+"air-masses": {
+  title: "Air masses",
+  blurb: "Huge bodies of air named for where they form",
+  icon: ART.airIcon,
+  body: () => `${HERO.air()}
+    <h2>Air masses</h2>
+    <p class="intro">An <b>air mass</b> is a huge body of air, often over 1,000 miles across, with about the same temperature and humidity throughout. It gets those properties from the region where it forms, called its <b>source region</b>.</p>
+    <h3>Cracking the code</h3>
+    <div class="tablewrap"><table>
+      <tr><th>Letter</th><th>Means</th><th>Tells you</th></tr>
+      <tr><td><b>c</b></td><td>continental</td><td>formed over land, so it’s dry</td></tr>
+      <tr><td><b>m</b></td><td>maritime</td><td>formed over ocean, so it’s humid</td></tr>
+      <tr><td><b>T</b></td><td>tropical</td><td>formed near the tropics, so it’s warm</td></tr>
+      <tr><td><b>P</b></td><td>polar</td><td>formed at high latitudes, so it’s cold</td></tr>
+      <tr><td><b>A</b></td><td>arctic</td><td>formed over the Arctic, so it’s bitterly cold</td></tr>
+    </table></div>
+    <h3>The five main types</h3>
+    <div class="tiles">
+      ${tile(badge("mT","#F28C4E"),"Maritime tropical","Warm and humid. Forms over the Gulf, Caribbean, and tropical Atlantic. Florida’s everyday summer air, fueling afternoon thunderstorms.")}
+      ${tile(badge("cP","#5AA9FF"),"Continental polar","Cold and dry. Forms over northern Canada. Arrives behind winter cold fronts, giving Florida its crisp, cool days.")}
+      ${tile(badge("cA","#C9E6FF"),"Continental arctic","Bitterly cold and very dry. Forms over the Arctic. Rarely reaches Florida, but can bring damaging freezes to crops when it does.")}
+      ${tile(badge("mP","#7FC4D8"),"Maritime polar","Cool and moist. Forms over the North Pacific and North Atlantic. Brings rain and snow to the Pacific Northwest and New England.")}
+      ${tile(badge("cT","#E8B26A"),"Continental tropical","Hot and dry. Forms over the deserts of Mexico and the southwestern U.S. Brings summer heat waves to the Southwest.")}
+    </div>
+    <div class="callout"><p><strong>Air masses change as they travel.</strong> Cold, dry cP air crossing the warm Great Lakes picks up moisture and dumps “lake-effect” snow downwind. Where two air masses collide, a front forms.</p></div>`
+},
+
+"hurricanes": {
+  title: "Hurricanes",
+  blurb: "How they form, how they’re rated, how to prepare, and Hurricane Ian’s path",
+  icon: ART.hurricaneIcon,
+  body: () => `${HERO.hurricane()}
+    <h2>Hurricanes</h2>
+    <p class="intro">A <b>hurricane</b> is a powerful <b>tropical cyclone</b>: a spinning low-pressure system of organized thunderstorms that forms over warm tropical oceans, with sustained winds of at least 74 mph.</p>
+    <h3>From disturbance to hurricane</h3>
+    <div class="defs">
+      ${def("Tropical disturbance","a cluster of thunderstorms over warm water, often a tropical wave moving west off Africa.")}
+      ${def("Tropical depression","a closed circulation forms; winds up to 38 mph.")}
+      ${def("Tropical storm","winds 39–73 mph. The storm gets a name.")}
+      ${def("Hurricane","winds 74 mph or higher.")}
+    </div>
+    <h3>Ingredients a hurricane needs</h3>
+    <div class="chips">
+      <span>Ocean water at least 80°F (26.5°C), warm to about 150 ft deep</span>
+      <span>Moist air</span>
+      <span>Low wind shear (winds not changing much with height)</span>
+      <span>A starting disturbance</span>
+      <span>At least about 5° from the equator, so Earth’s spin can start the rotation</span>
+    </div>
+    <p style="margin-top:12px">Energy comes from warm ocean water: as water evaporates and later condenses in the storm’s clouds, it releases heat that powers the hurricane. That’s why hurricanes weaken over land or cool water.</p>
+    <h3>Where they form and what they’re called</h3>
+    <div class="tiles">
+      ${tile("","Hurricane","Atlantic Ocean, Caribbean, Gulf, and the eastern and central North Pacific.")}
+      ${tile("","Typhoon","Northwestern Pacific, near Japan, the Philippines, and China.")}
+      ${tile("","Cyclone","Indian Ocean and the South Pacific near Australia.")}
+    </div>
+    <p style="margin-top:12px">The Atlantic hurricane season runs June 1 to November 30, peaking from mid-August through October.</p>
+    <h3>Parts of a hurricane</h3>
+    <div class="defs">
+      ${def("Eye","the calm center, often clear with light winds and the lowest air pressure. Usually 20–40 miles across.")}
+      ${def("Eyewall","a ring of towering thunderstorms around the eye, with the strongest winds and heaviest rain.")}
+      ${def("Rain bands","spiral bands of storms reaching out hundreds of miles. They bring bursts of heavy rain, gusty winds, and sometimes tornadoes.")}
+      ${def("Outflow","air that rose in the storm spreads out at the top, forming a wide shield of high, thin clouds.")}
+      ${def("Right-front side","for a storm moving forward, the side to the right of its path usually has the strongest winds and highest storm surge.")}
+    </div>
+    <h3>The Saffir-Simpson Hurricane Wind Scale</h3>
+    <div class="tablewrap"><table>
+      <tr><th>Category</th><th>Winds</th><th>Damage</th></tr>
+      <tr><td class="nw"><span class="cat" style="background:${CAT_COLORS.c1}"></span><b>1</b></td><td class="nw">74–95 mph</td><td>Very dangerous winds damage roofs, siding, and gutters; power outages likely</td></tr>
+      <tr><td class="nw"><span class="cat" style="background:${CAT_COLORS.c2}"></span><b>2</b></td><td class="nw">96–110 mph</td><td>Extremely dangerous; major roof damage, many trees uprooted, outages for days to weeks</td></tr>
+      <tr><td class="nw"><span class="cat" style="background:${CAT_COLORS.c3}"></span><b>3</b> major</td><td class="nw">111–129 mph</td><td>Devastating; homes can lose roofs, water and power out for days to weeks</td></tr>
+      <tr><td class="nw"><span class="cat" style="background:${CAT_COLORS.c4}"></span><b>4</b> major</td><td class="nw">130–156 mph</td><td>Catastrophic; severe damage to homes, most trees snapped, area may be unlivable for weeks or months</td></tr>
+      <tr><td class="nw"><span class="cat" style="background:${CAT_COLORS.c5}"></span><b>5</b> major</td><td class="nw">157+ mph</td><td>Catastrophic; many homes destroyed, area may be unlivable for weeks or months</td></tr>
+    </table></div>
+    <p class="source">The scale rates wind only. It doesn’t include storm surge or rain flooding, which often cause the most deaths.</p>
+    <h3>Other dangers</h3>
+    <div class="tiles">
+      ${tile("","Storm surge","An abnormal rise of seawater pushed ashore by the storm’s winds. The deadliest hurricane hazard.")}
+      ${tile("","Storm tide","Storm surge plus the normal tide. A surge arriving at high tide floods higher and farther inland.")}
+      ${tile("","Freshwater flooding","Slow-moving storms can drop well over a foot of rain, flooding rivers far inland.")}
+      ${tile("","Waves & rip currents","Large waves batter the coast and dangerous rip currents can form hundreds of miles away.")}
+      ${tile("","Tornadoes","Short-lived tornadoes often spin up in the outer rain bands.")}
+      ${tile("","Wind","Flying debris and falling trees damage buildings and knock out power.")}
+    </div>
+    <h3>How to prepare</h3>
+    <div class="compare">
+      <div><h4 style="color:var(--amber)">Hurricane watch</h4><p class="when" style="margin:0">Hurricane conditions are <b>possible</b>, issued about 48 hours ahead. Finish preparing.</p></div>
+      <div><h4 style="color:#FF6B6B">Hurricane warning</h4><p class="when" style="margin:0">Hurricane conditions are <b>expected</b>, issued about 36 hours ahead. Complete your plan or evacuate if told to.</p></div>
+    </div>
+    <div class="defs" style="margin-top:12px">
+      <div class="def"><b>Before the season:</b><ul><li>Know your evacuation zone and where you would go.</li><li>Make a family plan, including pets.</li><li>Build a supply kit.</li></ul></div>
+      <div class="def"><b>When a storm threatens:</b><ul><li>Bring in outdoor objects and protect windows.</li><li>Fill prescriptions, charge devices, and fill the gas tank.</li><li>Follow evacuation orders. Run from the water, hide from the wind.</li></ul></div>
+      <div class="def"><b>After the storm:</b><ul><li>Stay out of floodwater; it can hide power lines and debris.</li><li>Run generators outside only, far from windows, to avoid carbon monoxide.</li><li>Wait for officials to say it’s safe to return.</li></ul></div>
+    </div>
+    <p style="margin-top:10px"><b>Supply kit:</b></p>
+    <div class="chips"><span>Water: 1 gallon per person per day</span><span>Food that doesn’t need cooking</span><span>Medicines</span><span>Flashlights & batteries</span><span>Battery radio</span><span>First-aid kit</span><span>Phone chargers & power bank</span><span>Documents in a waterproof bag</span><span>Cash</span><span>Pet supplies</span></div>
+    <h3>Case study: Hurricane Ian (2022)</h3>
+    <p>Ian grew from a tropical wave off Africa into the costliest hurricane in Florida’s history. Follow it from birth to landfall.</p>
+    ${HERO.ianMap()}
+    <div class="tablewrap"><table class="wide-table">
+      <tr><th></th><th>Date & time (EDT)</th><th>Location</th><th>Wind</th><th>Pressure</th><th>Strength</th><th>What happened</th></tr>
+      ${IAN_EVENTS.map(e => `<tr><td><span class="key">${e.k}</span></td><td class="nw">${e.t}</td><td class="nw">${e.lat.toFixed(1)}°N, ${Math.abs(e.lon).toFixed(1)}°W</td><td class="nw">${e.mph} mph</td><td class="nw">${e.mb} mb</td><td class="nw"><span class="cat" style="background:${CAT_COLORS[stageClass(e.stage)]}"></span>${e.stage}</td><td style="min-width:200px">${e.note}</td></tr>`).join("")}
+    </table></div>
+    <p class="source">Scroll the table sideways to see every column. Winds rounded to the nearest 5 mph. Data: National Hurricane Center Tropical Cyclone Report, Hurricane Ian.</p>
+    <div class="tiles">
+      ${tile("","Notice the pattern","As pressure dropped from 1006 mb to 937 mb, winds climbed from 35 to 160 mph. Lower pressure means a stronger storm.")}
+      ${tile("","Storm surge","Water rose 10 to 15 feet above the ground on Fort Myers Beach. Surge caused most of the storm’s direct deaths.")}
+      ${tile("","Rain","Up to about 27 inches fell near the landfall area, flooding rivers across central Florida.")}
+      ${tile("","Cost","About $113 billion in U.S. damage, the costliest hurricane in Florida history.")}
+    </div>`
+},
+
+"karst-florida": {
+  title: "Florida’s karst, aquifer & sinkholes",
+  blurb: "How dissolving limestone makes caves, springs, and sinkholes",
+  icon: ART.sinkIcon,
+  body: () => `${HERO.karst()}
+    <h2>Florida’s karst, aquifer & sinkholes</h2>
+    <p class="intro">Much of Florida sits on thick layers of <b>limestone</b>, rock built from the shells and skeletons of sea creatures when Florida was under a shallow sea. Water slowly dissolves this rock, creating a landscape called <b>karst topography</b>.</p>
+    <h3>How limestone dissolves</h3>
+    <p>Rainwater absorbs carbon dioxide from the air and soil, forming weak <b>carbonic acid</b>. As this slightly acidic water seeps through cracks in limestone, it dissolves the rock (chemical weathering), widening cracks into channels, tunnels, and caves over thousands of years.</p>
+    <h3>Karst features</h3>
+    <div class="tiles">
+      ${tile("","Caves & conduits","Underground passages, most of them filled with water in Florida. Florida Caverns State Park has dry caves you can walk through.")}
+      ${tile("","Springs","Places where groundwater flows out to the surface. Florida has more than 1,000 springs, one of the largest concentrations on Earth.")}
+      ${tile("","Sinkholes","Depressions or holes that form when the ground sinks into dissolved spaces in the limestone below.")}
+      ${tile("","Sinkhole lakes","Many of Florida’s round lakes are old sinkholes that filled with water.")}
+      ${tile("","Disappearing rivers","Some rivers flow into a sinkhole and travel underground before resurfacing, like the Santa Fe River.")}
+    </div>
+    <h3>The Floridan aquifer</h3>
+    <p>The limestone is so full of openings that it holds enormous amounts of water. The <b>Floridan aquifer</b> lies under all of Florida and parts of Georgia, Alabama, and South Carolina, and it’s the main drinking water source for most of the state. Rain recharges it fastest where sandy soils let water soak straight in, like the ridges of central Florida.</p>
+    <h3>Three kinds of sinkholes</h3>
+    <div class="defs">
+      ${def("Dissolution","limestone near the surface dissolves gradually, forming a slow, shallow dip that often fills with water.")}
+      ${def("Cover-subsidence","sand slowly trickles down into openings in the limestone, so the ground sags gradually.")}
+      ${def("Cover-collapse","a cavity grows under a layer of clay until the roof suddenly gives way. These can appear in hours and are the most dangerous.")}
+    </div>
+    <h3>How groundwater use affects karst</h3>
+    <p>Groundwater filling underground spaces helps support the rock and sediment above. Heavy pumping lowers the water table, especially right around a well (the <b>cone of depression</b>), which can take away that support.</p>
+    <div class="defs">
+      ${def("More sinkholes","sinkholes often appear after big drops in the water table, or when heavy rain follows a drought.")}
+      ${def("Weaker springs","less groundwater means lower spring flow, harming rivers and wildlife like manatees that depend on warm spring water.")}
+      ${def("Saltwater intrusion","near the coast, over-pumping can let seawater move into the aquifer and spoil wells.")}
+      ${def("Drying wetlands","lakes and wetlands connected to the water table can shrink.")}
+    </div>
+    <div class="callout"><p><strong>Real example: Plant City, 2010.</strong> During a January freeze, strawberry farmers pumped huge amounts of groundwater to spray protective ice on their crops. The water table dropped about 60 feet, and roughly 140 sinkholes opened in the area.</p></div>`
+},
+
+"earth-spheres": {
+  title: "Earth’s spheres",
+  blurb: "Geosphere, hydrosphere, cryosphere, atmosphere, biosphere, and how they interact",
+  icon: ART.spheresIcon,
+  body: () => `${HERO.spheres()}
+    <h2>Earth’s spheres</h2>
+    <p class="intro">Scientists divide the Earth system into parts called <b>spheres</b>. Each one is different, but they constantly trade matter and energy, so a change in one sphere affects the others.</p>
+    <div class="tiles">
+      ${tile(`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="30" fill="#A07A4E"/><circle cx="40" cy="40" r="18" fill="#C86B3C"/><circle cx="40" cy="40" r="8" fill="#F4B860"/></svg>`,"Geosphere","The solid Earth: rocks, minerals, soil, landforms, and the interior layers (crust, mantle, core). Florida’s limestone bedrock is part of it.")}
+      ${tile(ART.drop,"Hydrosphere","All of Earth’s water: oceans, lakes, rivers, groundwater, and water vapor. About 97% of it is salty ocean water.")}
+      ${tile(ART.snow,"Cryosphere","Frozen water: glaciers, ice sheets, sea ice, snow, and permanently frozen ground. Often counted as part of the hydrosphere. Its bright surface reflects sunlight.")}
+      ${tile(`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="50" r="22" fill="#2F7FB0"/><circle cx="40" cy="50" r="30" fill="none" stroke="#5AA9FF" stroke-width="5" opacity=".6"/><circle cx="40" cy="50" r="37" fill="none" stroke="#5AA9FF" stroke-width="3" opacity=".3"/></svg>`,"Atmosphere","The layer of gases around Earth: about 78% nitrogen, 21% oxygen, plus small amounts of argon, carbon dioxide, and water vapor. Weather happens in its lowest layer, the troposphere.")}
+      ${tile(`<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 70 V36" stroke="#6E4A2C" stroke-width="5"/><circle cx="40" cy="28" r="18" fill="#3E9A62"/><circle cx="26" cy="38" r="10" fill="#4FB074"/><circle cx="54" cy="38" r="10" fill="#4FB074"/></svg>`,"Biosphere","All living things, from bacteria to people, plus the places they live. Life exists in the other spheres: soil, water, and air.")}
+    </div>
+    <h3>Spheres in action</h3>
+    <div class="chain">
+      <div><b>A hurricane</b><p>Warm ocean water evaporates into the air (hydrosphere → atmosphere), fueling the storm. Winds and surge erode beaches (atmosphere → geosphere) and damage mangroves and reefs (→ biosphere).</p></div>
+      <div><b>Plants breathing</b><p>Plants take in carbon dioxide and release oxygen and water vapor (biosphere ↔ atmosphere), and their roots pull water from the soil (geosphere, hydrosphere).</p></div>
+      <div><b>Florida’s caves</b><p>Carbon dioxide from the air dissolves in rainwater (atmosphere → hydrosphere), and that acidic water dissolves limestone (→ geosphere).</p></div>
+      <div><b>A volcanic eruption</b><p>Ash and gases blast into the air (geosphere → atmosphere), can block sunlight and cool the climate, and affect crops and animals (→ biosphere).</p></div>
+      <div><b>Melting ice sheets</b><p>Melting ice adds water to the ocean (cryosphere → hydrosphere), raising sea level and reshaping coastlines (→ geosphere).</p></div>
+      <div><b>Sea turtle nests</b><p>The temperature of beach sand (geosphere) decides whether baby sea turtles (biosphere) hatch as males or females: warmer sand produces more females.</p></div>
+    </div>`
+},
+
+"sun-energy": {
+  title: "The Sun’s energy & heat transfer",
+  blurb: "Radiation, conduction, and convection drive weather and Earth’s spheres",
+  icon: ART.sunIcon,
+  body: () => `${HERO.sun()}
+    <h2>The Sun’s energy & heat transfer</h2>
+    <p class="intro">Almost all the energy that drives weather comes from the Sun. That energy moves around the Earth system in three ways: <b>radiation</b>, <b>conduction</b>, and <b>convection</b>.</p>
+    <div class="tiles">
+      ${tile(`<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="20" cy="22" r="13" fill="#F4B860"/>${waveRay(32,30,38,4)}</svg>`,"Radiation","Energy traveling as electromagnetic waves, like sunlight. It needs no matter, so it crosses empty space. Earth’s warmed surface also gives off infrared radiation.","no contact needed")}
+      ${tile(`<svg viewBox="0 0 80 80" aria-hidden="true"><rect x="6" y="50" width="68" height="20" rx="3" fill="#C9A66B"/><rect x="6" y="40" width="68" height="10" fill="#FF6B6B" opacity=".45"/><path d="M20 38 v-10 M40 38 v-10 M60 38 v-10" stroke="#FF6B6B" stroke-width="2.4" stroke-linecap="round"/></svg>`,"Conduction","Heat passing directly between things that touch. Hot sand heats the thin layer of air right above it. Air conducts heat poorly, so this only warms the lowest air.","direct contact")}
+      ${tile(`<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M24 64 C14 44 34 30 24 12" fill="none" stroke="#FF6B6B" stroke-width="3" stroke-linecap="round"/><path d="M56 12 C66 32 46 46 56 64" fill="none" stroke="#5AA9FF" stroke-width="3" stroke-linecap="round"/><path d="M24 12 Q40 2 56 12 M56 64 Q40 74 24 64" fill="none" stroke="#97A9BF" stroke-width="2" stroke-dasharray="3 3"/></svg>`,"Convection","Heat carried by a moving fluid (liquid or gas). Warm air is less dense and rises; cool air sinks to replace it, forming a loop called a convection current.","rising & sinking")}
+    </div>
+    <h3>Uneven heating drives the weather</h3>
+    <p>Sunlight hits the equator almost straight on but strikes the poles at a low angle, spreading the same energy over more area. The tropics gain more energy than they lose, and the poles lose more than they gain. Winds and ocean currents constantly carry heat from the equator toward the poles. That movement is our weather.</p>
+    <h3>Land vs. water</h3>
+    <p>Water has a high <b>specific heat</b>: it takes a lot of energy to warm it up, so oceans heat and cool slowly. Land heats up quickly. On a sunny Florida day the land gets hotter than the ocean, warm air over land rises, and cooler ocean air rushes in as a <b>sea breeze</b>. When the Gulf and Atlantic sea breezes collide over the peninsula, they force air upward and trigger Florida’s afternoon thunderstorms.</p>
+    <h3>Two more key ideas</h3>
+    <div class="defs">
+      ${def("Albedo","how much sunlight a surface reflects. Fresh snow reflects up to about 90%, the dark ocean less than 10%. Earth overall reflects about 30%.")}
+      ${def("Latent heat","energy stored when water evaporates and released when vapor condenses into clouds. This hidden heat powers thunderstorms and hurricanes.")}
+    </div>
+    <h3>How the Sun’s energy reaches every sphere</h3>
+    <div class="chain">
+      <div><b>Atmosphere</b><p>Uneven heating creates pressure differences, winds, fronts, and storms.</p></div>
+      <div><b>Hydrosphere</b><p>Sunlight evaporates water to run the water cycle and warms the ocean surface, driving currents.</p></div>
+      <div><b>Cryosphere</b><p>Absorbed energy melts snow and ice; less ice means more sunlight absorbed.</p></div>
+      <div><b>Biosphere</b><p>Plants capture sunlight through photosynthesis, the energy source for nearly every food chain.</p></div>
+      <div><b>Geosphere</b><p>Heating and cooling, along with water and wind, weather and erode rock. (Plate movement is driven by Earth’s internal heat, not the Sun.)</p></div>
+    </div>`
+},
+
+/* ---------------- QUARTER 2 ---------------- */
+"proxy-indicators": {
+  title: "Proxy indicators",
+  blurb: "How scientists read past climates from ice, trees, mud, and more",
+  icon: ART.treeRings,
+  body: () => `${HERO.proxy()}
+    <h2>Proxy indicators</h2>
+    <p class="intro">A <b>proxy</b> is something that stands in for something else. Nobody can go back in time and read a thermometer, so scientists use natural records that were shaped by past climate. These are called <b>proxy indicators</b>, or climate proxies.</p>
+    <h3>How do they work?</h3>
+    <p>Many proxies build up in layers over time, often one layer per year. Each layer traps clues about the conditions when it formed. Count the layers to find the age, then study each layer to read the climate.</p>
+    <h3>Common proxy indicators</h3>
+    <div class="tiles">
+      ${tile(ART.iceCore,"Ice cores","Air bubbles trapped in the ice are samples of ancient atmosphere. The ice itself records past temperatures.","Up to ~800,000 years")}
+      ${tile(ART.treeRings,"Tree rings","A tree adds one ring per year. Wide rings mean good growing years; narrow rings point to drought or cold.","Thousands of years")}
+      ${tile(ART.sediment,"Sediment cores","Mud piles up on ocean and lake floors, trapping shells of tiny organisms whose chemistry records water temperature.","Millions of years")}
+      ${tile(ART.soil,"Soil cores","Soil layers, colors, and buried plant material show whether an area was wetter or drier in the past.","Thousands of years")}
+      ${tile(ART.coral,"Corals","Corals add a growth band each year. The chemistry of each band records past ocean temperature.","Hundreds of years")}
+      ${tile(ART.pollen,"Pollen","Pollen preserved in lake mud shows which plants grew nearby, and the plants reveal the climate.","Tens of thousands of years")}
+      ${tile(ART.cave,"Cave formations","Stalagmites grow in thin layers from dripping water, recording past rainfall and temperature.","Hundreds of thousands of years")}
+      ${tile(ART.records,"Historical records","Diaries, ship logs, and harvest dates describe weather people saw before thermometers were common.","Hundreds of years")}
+    </div>
+    <div class="callout"><p><strong>Stronger together.</strong> No single proxy tells the whole story. When ice cores, tree rings, and sediments all point to the same change, scientists can be confident it really happened.</p></div>
+    <h3>Words to know</h3>
+    <div class="defs">
+      ${def("Proxy","a natural record used in place of direct measurements.")}
+      ${def("Core sample","a long cylinder drilled out of ice, mud, rock, or soil so its layers can be studied in order.")}
+      ${def("Annual layer","a layer that forms once per year, like a tree ring.")}
+    </div>`
+},
+
+"ice-ages": {
+  title: "Ice ages",
+  blurb: "Why Earth swings between giant ice sheets and warm spells",
+  icon: ART.snow,
+  body: () => `${HERO.ice()}
+    <h2>Ice ages</h2>
+    <p class="intro">An <b>ice age</b> is a long stretch of time when Earth’s climate is cold enough for huge ice sheets to cover large parts of the continents.</p>
+    <div class="defs">
+      ${def("Glacial period","a cold stretch when ice sheets grow and spread.")}
+      ${def("Interglacial period","a warmer stretch when ice sheets melt back.")}
+    </div>
+    <p>Right now we live in a warm interglacial called the <b>Holocene</b>, which began about 11,700 years ago. Ice sheets still cover Greenland and Antarctica.</p>
+    <h3>The last big freeze</h3>
+    <p>About 20,000 years ago, ice up to 3 km (2 miles) thick covered most of Canada and the northern United States. So much water was locked up as ice that sea level was about 120 m (400 ft) lower than today.</p>
+    <div class="callout"><p><strong>Florida during the ice age.</strong> With sea level that low, Florida’s Gulf coast stretched far out onto what is now sea floor, making the peninsula roughly twice as wide as it is today.</p></div>
+    <h3>What causes ice ages?</h3>
+    <p>Slow, repeating changes in Earth’s orbit change how sunlight reaches Earth. These are called <b>Milankovitch cycles</b>.</p>
+    <div class="tiles">
+      ${tile(ART.orbit,"Orbit shape","Earth’s path around the Sun stretches into an oval, then rounds out again. (Eccentricity)","~100,000 years")}
+      ${tile(ART.tilt,"Tilt","The angle of Earth’s axis shifts between about 22° and 24.5°. (Obliquity)","~41,000 years")}
+      ${tile(ART.wobble,"Wobble","Earth’s axis slowly circles like a spinning top. (Precession)","~26,000 years")}
+    </div>
+    <p style="margin-top:14px">Feedbacks make the swings bigger: bright ice reflects sunlight back to space, cooling Earth even more, and changes in carbon dioxide strengthen both warming and cooling.</p>
+    <h3>How do we know?</h3>
+    <p>Proxy indicators! Ice cores and ocean sediment cores record the rhythm of glacial cycles, and landforms like moraines and scratched bedrock show where glaciers once flowed.</p>`
+},
+
+"climate-vs-weather": {
+  title: "Climate vs. weather",
+  blurb: "Same atmosphere, different time scales",
+  icon: ART.sky,
+  body: () => `${HERO.climate()}
+    <h2>Climate vs. weather</h2>
+    <p class="intro">Weather and climate both describe the atmosphere. The difference is <b>time</b>.</p>
+    <div class="compare">
+      <div><h4 style="color:var(--amber)">Weather</h4><p class="when">Conditions right now or over a few days</p>
+        <ul><li>A thunderstorm rolls in at 3 p.m. today</li><li>Tomorrow’s high is 91°F</li><li>A cold front drops it to 48°F one January morning</li></ul></div>
+      <div><h4 style="color:var(--ice)">Climate</h4><p class="when">The average pattern over 30 years or more</p>
+        <ul><li>Florida has a wet season from about May to October</li><li>Summers are hot and humid</li><li>South Florida winters are mild</li></ul></div>
+    </div>
+    <div class="callout big"><p>Climate is what you expect. Weather is what you get.</p></div>
+    <h3>What gets measured</h3>
+    <p>Both use the same ingredients. Weather looks at them today; climate averages them over decades.</p>
+    <div class="chips"><span>Temperature</span><span>Precipitation</span><span>Humidity</span><span>Wind</span><span>Air pressure</span><span>Cloud cover</span></div>
+    <h3>What shapes a place’s climate</h3>
+    <div class="defs">
+      ${def("Latitude","places closer to the equator get more direct sunlight.")}
+      ${def("Nearness to water","oceans heat and cool slowly, keeping coasts milder.")}
+      ${def("Ocean currents","warm currents like the Gulf Stream carry heat along coastlines.")}
+      ${def("Elevation","higher places are usually cooler.")}
+      ${def("Prevailing winds","winds bring moist or dry air from other regions.")}
+    </div>
+    <div class="callout"><p><strong>Watch out.</strong> One cold week doesn’t mean the climate is cooling, and one hot day doesn’t prove it’s warming. Climate shows up in long-term averages.</p></div>`
+}
+};
+
+/* =========================================================
+   VIEWS + ROUTING   #  |  #q1  |  #q1/water-cycle
+   ========================================================= */
+function $(s){ return document.querySelector(s); }
+const views = { title: $("#title"), toc: $("#toc"), card: $("#cardView") };
+function show(name){ for (const k in views) views[k].classList.toggle("on", k === name); window.scrollTo(0, 0); }
+function go(hash){ if (location.hash.replace(/^#/,"") === hash) route(); else location.hash = hash ? "#" + hash : ""; if (!hash) route(); }
+function hasTopics(q){ return (TEACHER_ORDER[q] || []).some(id => CARDS[id]); }
+
+function route(){
+  const [q, id] = location.hash.replace(/^#/, "").split("/");
+  if (TEACHER_ORDER[q] && hasTopics(q)){
+    if (id && CARDS[id] && TEACHER_ORDER[q].includes(id)) return openCard(q, id);
+    return openToc(q);
+  }
+  show("title");
+}
+
+let currentQ = null;
+function openToc(q){
+  currentQ = q;
+  const order = getOrder(q);
+  $("#tocCrumb").textContent = QUARTER_NAMES[q];
+  $("#tocTitle").textContent = QUARTER_NAMES[q] + " contents";
+  const list = $("#tocList");
+  list.dataset.q = q;
+  list.innerHTML = order.map(id => {
+    const c = CARDS[id], done = isDone(q + "." + id);
+    return `<li data-id="${id}"><button data-card="${id}">${c.icon}<span><h3>${c.title}</h3><p>${c.blurb}</p></span><span class="status ${done?'done':''}">${done?'✓ Done':'New'}</span></button></li>`;
+  }).join("");
+  const n = order.filter(id => isDone(q + "." + id)).length;
+  $("#tocProgress").textContent = n ? `${n} of ${order.length} topics explored` : "Pick a topic to start.";
+  $("#meterFill").style.width = (n / order.length * 100) + "%";
+  $("#resetOrder").hidden = !Array.isArray(save.order[q]);
+  show("toc");
+}
+
+let currentCard = null;
+function openCard(q, id){
+  currentQ = q; currentCard = id;
+  $("#cardCrumb").textContent = QUARTER_NAMES[q];
+  $("#cardBack").dataset.go = q;
+  $("#cardBody").innerHTML = CARDS[id].body();
+  show("card");
+}
+
+/* =========================================================
+   DRAG TO REORDER (press and hold, then drag)
+   ========================================================= */
+let drag = null, suppressClick = false;
+const tocList = $("#tocList");
+
+function startPress(li, x, y){
+  cancelPress();
+  drag = { li, x0: x, y0: y, y, active: false };
+  drag.timer = setTimeout(activateDrag, 350);
+}
+function cancelPress(){ if (drag){ clearTimeout(drag.timer); if (!drag.active) drag = null; } }
+function activateDrag(){
+  if (!drag) return;
+  drag.active = true;
+  const r = drag.li.getBoundingClientRect();
+  drag.grab = drag.y - r.top;
+  drag.li.classList.add("lifted");
+  document.body.classList.add("dragging");
+  if (navigator.vibrate) navigator.vibrate(15);
+  positionDrag();
+  requestAnimationFrame(autoScroll);
+}
+function moveDrag(x, y, e){
+  if (!drag) return;
+  drag.y = y;
+  if (!drag.active){ if (Math.hypot(x - drag.x0, y - drag.y0) > 10) cancelPress(); return; }
+  if (e && e.cancelable) e.preventDefault();
+  positionDrag();
+}
+function positionDrag(){
+  const li = drag.li, target = drag.y - drag.grab, mid = drag.y;
+  let before = null;
+  for (const n of tocList.children){
+    if (n === li) continue;
+    const r = n.getBoundingClientRect();
+    if (mid < r.top + r.height / 2){ before = n; break; }
+  }
+  if (before !== li.nextElementSibling) tocList.insertBefore(li, before);
+  const natural = tocList.getBoundingClientRect().top + li.offsetTop;
+  li.style.transform = `translateY(${target - natural}px)`;
+}
+function autoScroll(){
+  if (!drag || !drag.active) return;
+  const edge = 70;
+  if (drag.y < edge) { window.scrollBy(0, -8); positionDrag(); }
+  else if (drag.y > window.innerHeight - edge) { window.scrollBy(0, 8); positionDrag(); }
+  requestAnimationFrame(autoScroll);
+}
+function endPress(){
+  if (!drag) return;
+  clearTimeout(drag.timer);
+  if (drag.active){
+    drag.li.style.transform = "";
+    drag.li.classList.remove("lifted");
+    document.body.classList.remove("dragging");
+    const q = tocList.dataset.q;
+    save.order[q] = [...tocList.children].map(n => n.dataset.id);
+    writeSave();
+    $("#resetOrder").hidden = false;
+    suppressClick = true;
+    setTimeout(() => { suppressClick = false; }, 400);
+  }
+  drag = null;
+}
+tocList.addEventListener("touchstart", e => { const li = e.target.closest("li"); if (li){ const t = e.touches[0]; startPress(li, t.clientX, t.clientY); } }, { passive: true });
+tocList.addEventListener("mousedown", e => { if (e.button !== 0) return; const li = e.target.closest("li"); if (li) startPress(li, e.clientX, e.clientY); });
+tocList.addEventListener("contextmenu", e => e.preventDefault());
+document.addEventListener("touchmove", e => { if (drag){ const t = e.touches[0]; moveDrag(t.clientX, t.clientY, e); } }, { passive: false });
+document.addEventListener("mousemove", e => { if (drag) moveDrag(e.clientX, e.clientY, e); });
+document.addEventListener("touchend", endPress);
+document.addEventListener("touchcancel", endPress);
+document.addEventListener("mouseup", endPress);
+document.addEventListener("click", e => { if (suppressClick){ e.stopPropagation(); e.preventDefault(); suppressClick = false; } }, true);
+
+$("#resetOrder").addEventListener("click", () => {
+  delete save.order[currentQ]; writeSave(); openToc(currentQ);
+});
+
+/* =========================================================
+   SHEET, SAVE CHECK, WIRING
+   ========================================================= */
+function openSheet(html){ $("#sheet").innerHTML = html; $("#scrim").classList.add("on"); const b = $("#sheet").querySelector("button"); if (b) b.focus(); }
+function closeSheet(){ $("#scrim").classList.remove("on"); }
+$("#scrim").addEventListener("click", e => { if (e.target.id === "scrim" || e.target.dataset.close !== undefined) closeSheet(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheet(); });
+
+function comingSoon(label){
+  openSheet(`<h3 id="sheetTitle">${label}</h3><p><b style="color:var(--amber)">Coming soon!</b> New chapters will show up here when they’re ready, and your saved progress will carry over.</p><div class="row"><button class="btn" data-close>OK</button></div>`);
+}
+function saveCheck(){
+  openSheet(`<h3 id="sheetTitle">Save check</h3>
+    <p>This number is stored on this device. Tap it a few times, then open a newer version of the notebook from the same link. If the number is still here, saving works.</p>
+    <div class="count" id="countNum">${save.saveTest}</div>
+    <p class="small">${storageOK ? "Saving is on." : "Saving isn’t available in this browser. Try opening the link in Safari or Chrome."} App version ${APP_VERSION}</p>
+    <div class="row"><button class="btn" id="tapCount">Tap +1</button><button class="btn ghost" data-close>Close</button></div>`);
+  $("#tapCount").addEventListener("click", () => { save.saveTest++; writeSave(); $("#countNum").textContent = save.saveTest; });
+}
+
+const sel = $("#quarter"), openBtn = $("#openQ");
+if (save.lastQuarter){ sel.value = save.lastQuarter; openBtn.disabled = false; }
+sel.addEventListener("change", () => { openBtn.disabled = !sel.value; });
+openBtn.addEventListener("click", () => {
+  const q = sel.value; if (!q) return;
+  save.lastQuarter = q; writeSave();
+  if (hasTopics(q)) go(q); else comingSoon(QUARTER_NAMES[q]);
+});
+$("#saveCheckBtn").addEventListener("click", saveCheck);
+document.addEventListener("click", e => {
+  const card = e.target.closest("[data-card]");
+  if (card) return go(currentQ + "/" + card.dataset.card);
+  const back = e.target.closest("[data-go]");
+  if (back) return go(back.dataset.go);
+});
+$("#nextBtn").addEventListener("click", () => { if (currentCard) markDone(currentQ + "." + currentCard); go(currentQ); });
+window.addEventListener("hashchange", route);
+
+(function stars(){
+  let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  let html = "";
+  for (let i = 0; i < 80; i++){ const s = rnd() < .85 ? 1.5 : 2.5;
+    html += `<span class="star${rnd() < .2 ? ' tw' : ''}" style="left:${rnd()*100}%;top:${rnd()*72}%;width:${s}px;height:${s}px;opacity:${.35 + rnd()*.6};animation-delay:${rnd()*4}s"></span>`; }
+  $("#stars").innerHTML = html;
+})();
+
+route();
+</script>
+</body>
+</html>
