@@ -174,6 +174,13 @@ textarea.inp{min-height:150px;font-size:14px;line-height:1.4;resize:vertical;fon
 .steps{padding-left:20px;margin:6px 0 0;color:#C9D5E3}
 .steps li{margin-bottom:4px}
 .sheet hr{border:0;border-top:1px solid var(--line);margin:22px 0 4px}
+[hidden]{display:none!important}
+.check{display:flex;gap:10px;align-items:flex-start;margin:8px 0;font-size:15px;cursor:pointer}
+.check input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--amber)}
+textarea.inp.link{min-height:0;height:90px;word-break:break-all}
+.classbar{border:1.5px solid var(--amber);border-radius:14px;padding:10px 14px;margin:0 0 18px;font-size:14px;color:var(--text);background:rgba(23,44,68,.8)}
+.classbar b{color:var(--amber)}
+.classbar .linkish{padding:4px 0;font-size:14px}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 @media (min-width:700px){.earth{height:34vh}}
@@ -186,6 +193,7 @@ textarea.inp{min-height:150px;font-size:14px;line-height:1.4;resize:vertical;fon
   <div class="stars" id="stars" aria-hidden="true"></div>
   <button class="cog" id="cogBtn" data-i18n-label="cogLabel" aria-label="Review questions"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#9AD9EA" d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6a.5.5 0 0 0 .1-.6l-2-3.5a.5.5 0 0 0-.6-.2l-2.5 1a7.3 7.3 0 0 0-1.7-1l-.4-2.6a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.4l-.4 2.7a7.6 7.6 0 0 0-1.7 1l-2.5-1a.5.5 0 0 0-.6.2l-2 3.5a.5.5 0 0 0 .1.6L4.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6a.5.5 0 0 0-.1.6l2 3.5a.5.5 0 0 0 .6.2l2.5-1a7.3 7.3 0 0 0 1.7 1l.4 2.6a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.4l.4-2.7a7.6 7.6 0 0 0 1.7-1l2.5 1a.5.5 0 0 0 .6-.2l2-3.5a.5.5 0 0 0-.1-.6ZM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"/></svg></button>
   <div class="title-inner">
+    <div class="classbar" id="classBar" hidden></div>
     <h1 id="app-title" data-i18n="appTitle">Earth Space Science <span>Notebook</span></h1>
     <p class="lede" data-i18n="lede">Notes, review games, and activities for each quarter. Your progress saves on this device.</p>
     <label for="quarter" class="small" style="display:block;margin-bottom:6px" data-i18n="openQuarter">Open a quarter</label>
@@ -359,7 +367,7 @@ function isDone(key){ return !!(save.items[key] && save.items[key].viewed); }
 /* Order: student's order if they made one, with any new teacher topics
    inserted right after the teacher's previous topic. */
 function getOrder(q){
-  const teacher = (TEACHER_ORDER[q] || []).filter(id => CARDS[id]);
+  const teacher = (TEACHER_ORDER[q] || []).filter(id => CARDS[id] && topicOn(id));
   const mine = save.order[q];
   if (!Array.isArray(mine)) return teacher;
   const result = mine.filter(id => teacher.includes(id));
@@ -2427,12 +2435,13 @@ function go(hash){ if (location.hash.replace(/^#/,"") === hash) route(); else lo
 /* a card in the current language: Spanish cards keep their text in card.es */
 function cardL(id){ const c = CARDS[id]; return LANG === "es" && c.es ? c.es : c; }
 function cardTitle(id){ return cardL(id).title; }
-function hasTopics(q){ return (TEACHER_ORDER[q] || []).some(id => CARDS[id]); }
+function hasTopics(q){ return (TEACHER_ORDER[q] || []).some(id => CARDS[id] && topicOn(id)); }
 
 function route(){
+  if (/^#(class=|teacher$)/.test(location.hash)) return location.reload();   // a class link (or #teacher) opened in a tab that already had the notebook
   const [q, id] = location.hash.replace(/^#/, "").split("/");
   if (TEACHER_ORDER[q] && hasTopics(q)){
-    if (id && CARDS[id] && TEACHER_ORDER[q].includes(id)) return openCard(q, id);
+    if (id && CARDS[id] && TEACHER_ORDER[q].includes(id) && topicOn(id)) return openCard(q, id);
     return openToc(q);
   }
   show("title");
@@ -2684,7 +2693,10 @@ function parseBank(text){
 }
 const qKey = q => q.tp + "|" + normKey(q.q);
 let STARTER_Q = [];
-function allQuestions(){ return STARTER_Q.concat(save.addedQ); }
+function allQuestions(){
+  if (CLASS) return (CLASS.b ? STARTER_Q.filter(q => CLASS.tp.includes(q.tp)) : []).concat(CLASS.q);
+  return STARTER_Q.concat(save.addedQ);
+}
 function countsBy(list){ const n = {}; list.forEach(q => { n[q.tp] = (n[q.tp] || 0) + 1; }); return n; }
 
 /* topic buttons, grouped by quarter; the student taps to highlight */
@@ -2818,6 +2830,7 @@ STUDENT NOTES
 ${ids.map(id => `=== ${id}: ${CARDS[id].title} ===\n${cardText(id)}`).join("\n\n")}`;
 }
 function cogSheet(){
+  if (CLASS) return;   // students on a class link can't change the questions
   const all = [...Object.keys(CARDS)].filter(id => Object.values(TEACHER_ORDER).some(l => l.includes(id)));
   const selected = new Set(all);
   openSheet(`<h3 id="sheetTitle">${T("Review questions", "Preguntas de repaso")}</h3>
@@ -2841,7 +2854,11 @@ function cogSheet(){
     <div class="msg" id="cAddMsg"></div>
     <hr>
     <p class="small" id="cTotal"></p>
-    <div class="row"><button class="btn ghost" id="cClear">${T("Clear my added questions", "Borrar mis preguntas agregadas")}</button><button class="btn ghost" data-close>${T("Close", "Cerrar")}</button></div>`, { tall: true });
+    <div class="row"><button class="btn ghost" id="cClear">${T("Clear my added questions", "Borrar mis preguntas agregadas")}</button><button class="btn ghost" data-close>${T("Close", "Cerrar")}</button></div>
+    <hr>
+    <span class="field">${T("Class link", "Enlace de clase")}</span>
+    <p class="small" style="margin:0">${T("Make a link that opens the notebook with only the topics, games, and questions you pick. Post it on Canvas or your class website.", "Haz un enlace que abre el cuaderno solo con los temas, juegos y preguntas que elijas. Publícalo en Canvas o en el sitio web de tu clase.")}</p>
+    <div class="row"><button class="btn" id="cLink">${T("Make a class link", "Hacer un enlace de clase")}</button></div>`, { tall: true });
   const drawPick = () => {
     const box = $("#cPick"), fresh = box.cloneNode(false);
     box.replaceWith(fresh);
@@ -2852,6 +2869,7 @@ function cogSheet(){
     $("#cClear").disabled = !added;
   };
   drawPick();
+  $("#cLink").addEventListener("click", linkSheet);
   $("#cCopy").addEventListener("click", () => {
     const per = Math.min(50, Math.max(1, parseInt($("#cPer").value, 10) || 20));
     save.game = Object.assign(save.game || {}, { perTopic: per }); writeSave();
@@ -2898,6 +2916,146 @@ function cogSheet(){
   });
 }
 
+/* =========================================================
+   CLASS LINK  (made from the cog)
+   A link that opens the notebook with only the teacher's chosen topics,
+   games, and questions. Everything rides inside the link itself, like
+   Quiz Quest's solo practice link, so there's no server. The student's
+   device keeps the class link (and stays locked out of the cog) until they
+   open a different class link. To get the full notebook back on a device,
+   open the notebook with #teacher at the end of its address.
+   ========================================================= */
+const CLASS_KEY = "essNotebook.classLink";
+const GAMES = ["hoops", "derby", "paint", "snake", "blasteroids", "zombie"];
+let CLASS = null;   // { t: name, tp: topic ids, g: games, b: 1 = use built-in questions, q: questions carried in the link }
+function topicOn(id){ return !CLASS || CLASS.tp.includes(id); }
+function checkClass(d){
+  if (!d || typeof d !== "object" || !Array.isArray(d.tp) || !Array.isArray(d.g)) return null;
+  const tp = d.tp.filter(id => CARDS[id]), g = GAMES.filter(s => d.g.includes(s));
+  if (!tp.length) return null;
+  const okC = c => Array.isArray(c) && c.length >= 2 && c.every(x => typeof x === "string");
+  const q = (Array.isArray(d.q) ? d.q : []).filter(x => x && tp.includes(x.tp) && typeof x.q === "string" && okC(x.c) && x.a >= 0 && x.a < x.c.length)
+    .map(x => { const o = { tp: x.tp, q: x.q, c: x.c, a: x.a }; if (x.es && typeof x.es.q === "string" && okC(x.es.c) && x.es.c.length === x.c.length) o.es = { q: x.es.q, c: x.es.c }; return o; });
+  return { v: 1, t: String(d.t || "").slice(0, 40), tp, g, b: d.b ? 1 : 0, q };
+}
+function loadClass(){ try { CLASS = checkClass(JSON.parse(localStorage.getItem(CLASS_KEY))); } catch(e){ CLASS = null; } }
+
+/* link text: "z" + deflated JSON, or "j" + plain JSON where the browser can't compress; both base64url */
+function b64url(bytes){
+  let bin = "";
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function unb64url(t){
+  t = t.replace(/-/g, "+").replace(/_/g, "/");
+  while (t.length % 4) t += "=";
+  const bin = atob(t), out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+function packLink(obj, cb){
+  const bytes = new TextEncoder().encode(JSON.stringify(obj));
+  if (!window.CompressionStream) return cb("j" + b64url(bytes));
+  new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate-raw"))).arrayBuffer()
+    .then(buf => cb("z" + b64url(new Uint8Array(buf))), () => cb("j" + b64url(bytes)));
+}
+function unpackLink(t, cb){
+  try {
+    const bytes = unb64url(t.slice(1));
+    if (t[0] === "j") return cb(JSON.parse(new TextDecoder().decode(bytes)));
+    if (t[0] !== "z" || !window.DecompressionStream) return cb(null);
+    new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).text()
+      .then(txt => { try { cb(JSON.parse(txt)); } catch(e){ cb(null); } }, () => cb(null));
+  } catch(e){ cb(null); }
+}
+
+/* title screen while a class link is on: banner, only the chosen quarters and games, no cog */
+function applyClass(){
+  const bar = $("#classBar");
+  bar.hidden = !CLASS;
+  $("#cogBtn").hidden = !!CLASS;
+  [...$("#quarter").options].forEach(o => { if (o.value){ o.hidden = o.disabled = !!CLASS && !hasTopics(o.value); } });
+  [...$("#game").options].forEach(o => { if (o.value){ o.hidden = o.disabled = !!CLASS && !CLASS.g.includes(o.value); } });
+  if ($("#quarter").selectedOptions[0] && $("#quarter").selectedOptions[0].disabled){ $("#quarter").value = ""; $("#openQ").disabled = true; }
+  const noGames = !!CLASS && !CLASS.g.length;
+  $(".games-label").hidden = noGames; $("#game").closest(".picker").hidden = noGames;
+  if (!CLASS) return;
+  bar.innerHTML = `<b>${T("Class link", "Enlace de clase")}${CLASS.t ? ": " + esc(CLASS.t) : ""}</b><br>${T(`${CLASS.tp.length} ${CLASS.tp.length === 1 ? "topic" : "topics"}`, `${CLASS.tp.length} ${CLASS.tp.length === 1 ? "tema" : "temas"}`)}${CLASS.g.length ? T(`, ${CLASS.g.length} ${CLASS.g.length === 1 ? "game" : "games"}`, `, ${CLASS.g.length} ${CLASS.g.length === 1 ? "juego" : "juegos"}`) : ""}${CLASS.g.length ? T(`, ${allQuestions().length} questions`, `, ${allQuestions().length} preguntas`) : ""}`;
+}
+
+/* the cog's link maker */
+function linkSheet(){
+  const counts = countsBy(allQuestions()), selected = new Set(), games = new Set(GAMES);
+  const gName = s => UI[s][LANG === "es" ? 1 : 0];
+  openSheet(`<h3 id="sheetTitle">${T("Make a class link", "Hacer un enlace de clase")}</h3>
+    <p>${T("Students who open this link see only the topics, games, and questions you pick here. Post it on Canvas or your class website. Their device remembers it and hides the cog until they open a different class link.</p><p class=\"small\">Testing it yourself? Open it in a private window. If you open it on this device, the cog disappears here too: go to the notebook's address with <b>#teacher</b> at the end to get it back.", "Los estudiantes que abran este enlace solo verán los temas, juegos y preguntas que elijas aquí. Publícalo en Canvas o en el sitio web de tu clase. Su aparato lo recuerda y esconde el engranaje hasta que abran otro enlace de clase.</p><p class=\"small\">¿Lo quieres probar? Ábrelo en una ventana privada. Si lo abres en este aparato, el engranaje también desaparece aquí: ve a la dirección del cuaderno con <b>#teacher</b> al final para recuperarlo.")}</p>
+    <label class="field" for="lName">${T("Link name (optional)", "Nombre del enlace (opcional)")}</label>
+    <input class="inp" id="lName" maxlength="40" placeholder="${T("Unit 2 test review", "Repaso del examen 2")}">
+    <span class="field">${T("Topics students can open (the number is how many questions each has now)", "Temas que pueden abrir (el número es cuántas preguntas tiene cada uno ahora)")}</span>
+    <div id="lPick">${topicPicker(selected, counts, { needQ: false, showCount: true })}</div>
+    <span class="field">${T("Games students can play", "Juegos que pueden jugar")}</span>
+    <div class="tchips" id="lGames">${GAMES.map(s => `<button type="button" class="tchip" data-g="${s}" aria-pressed="true">${esc(gName(s))}</button>`).join("")}</div>
+    <span class="field">${T("Questions in the games", "Preguntas de los juegos")}</span>
+    <label class="check"><input type="checkbox" id="lBuilt" checked><span>${T("Built-in questions for these topics", "Preguntas incluidas de estos temas")} (<span id="lBuiltN">0</span>)</span></label>
+    <label class="check"><input type="checkbox" id="lMine"${save.addedQ.length ? " checked" : " disabled"}><span>${T("Questions added on this device for these topics", "Preguntas agregadas en este aparato de estos temas")} (<span id="lMineN">0</span>)</span></label>
+    <label class="field" for="lPaste">${T("Extra questions just for this link (optional, same format as the cog)", "Preguntas extra solo para este enlace (opcional, mismo formato que el engranaje)")}</label>
+    <textarea class="inp" id="lPaste" spellcheck="false" placeholder="Topic: water-cycle&#10;Question: …&#10;A: …&#10;B: …&#10;C: …&#10;D: …&#10;Answer: B&#10;Pregunta: …&#10;A: …"></textarea>
+    <div class="row"><button class="btn" id="lMake">${T("Make link", "Hacer enlace")}</button><button class="btn ghost" id="lCopy" hidden>${T("Copy link", "Copiar enlace")}</button></div>
+    <div class="msg" id="lMsg"></div>
+    <textarea class="inp link" id="lLink" readonly hidden></textarea>
+    <div class="row"><button class="btn ghost" id="lBack">${T("Back", "Atrás")}</button><button class="btn ghost" data-close>${T("Close", "Cerrar")}</button></div>`, { tall: true });
+  const stale = () => { $("#lLink").hidden = true; $("#lCopy").hidden = true; $("#lMsg").innerHTML = ""; };
+  const recount = () => {
+    $("#lBuiltN").textContent = STARTER_Q.filter(q => selected.has(q.tp)).length;
+    $("#lMineN").textContent = save.addedQ.filter(q => selected.has(q.tp)).length;
+    stale();
+  };
+  bindPicker($("#lPick"), selected, recount);
+  $("#lGames").addEventListener("click", e => {
+    const c = e.target.closest(".tchip"); if (!c) return;
+    const s = c.dataset.g;
+    if (games.has(s)) games.delete(s); else games.add(s);
+    c.setAttribute("aria-pressed", games.has(s)); stale();
+  });
+  ["lName", "lBuilt", "lMine", "lPaste"].forEach(id => $("#" + id).addEventListener("input", stale));
+  $("#lBack").addEventListener("click", cogSheet);
+  $("#lMake").addEventListener("click", () => {
+    const msg = $("#lMsg"), warn = t => { msg.className = "msg warn"; msg.innerHTML = t; };
+    stale();
+    if (!selected.size) return warn(T("Pick at least one topic.", "Elige por lo menos un tema."));
+    const tp = topicsInOrder(selected), built = $("#lBuilt").checked;
+    // questions the link has to carry: this device's added ones plus the pasted ones (built-in ones are already in the app)
+    const r = parseBank($("#lPaste").value), seen = new Set(built ? STARTER_Q.filter(q => selected.has(q.tp)).map(qKey) : []), carry = [];
+    let other = 0;
+    ($("#lMine").checked ? save.addedQ : []).concat(r.questions).forEach(q => {
+      if (!selected.has(q.tp)){ if (r.questions.includes(q)) other++; return; }
+      const k = qKey(q); if (!seen.has(k)){ seen.add(k); carry.push(q); }
+    });
+    const total = seen.size, g = GAMES.filter(s => games.has(s));
+    const notes = [];
+    if (other) notes.push(T(`${other} pasted questions are for topics you didn’t pick, so they were left out.`, `${other} preguntas pegadas son de temas que no elegiste, así que se dejaron fuera.`));
+    if (r.unknown.length) notes.push(T("These Topic labels don’t match a notebook topic, so their questions were left out: ", "Estas etiquetas de Topic no coinciden con ningún tema, así que se dejaron fuera sus preguntas: ") + r.unknown.map(esc).join(", "));
+    if (r.problems.length) notes.push(T(`${r.problems.length} pasted questions couldn’t be read (each needs a question, A–D choices, and an Answer: letter).`, `${r.problems.length} preguntas pegadas no se pudieron leer (cada una necesita la pregunta, opciones A–D y una línea Answer:).`));
+    if (g.length && total < 3) return warn(T("The games need at least 3 questions. Turn on the built-in questions, paste some in, or turn off all the games.", "Los juegos necesitan por lo menos 3 preguntas. Activa las preguntas incluidas, pega algunas o quita todos los juegos.") + notes.map(n => `<p style="margin:6px 0 0">${n}</p>`).join(""));
+    const obj = { v: 1, t: $("#lName").value.trim().slice(0, 40), tp, g, b: built ? 1 : 0, q: carry };
+    packLink(obj, code => {
+      const url = location.href.split("#")[0] + "#class=" + code, box = $("#lLink");
+      box.value = url; box.hidden = false; $("#lCopy").hidden = false;
+      if (!/^https?:$/.test(location.protocol)) notes.push(T("This notebook is open from a file on this device, so the link won’t work for students. Open the notebook from your website first, then make the link.", "Este cuaderno está abierto desde un archivo en este aparato, así que el enlace no funcionará para los estudiantes. Abre el cuaderno desde tu sitio web y luego haz el enlace."));
+      else if (url.length > 8000) notes.push(T(`This link is long (${url.length.toLocaleString()} characters). It works as a link on Canvas or a website, but email or text apps may cut it off. Built-in questions don’t add to the length.`, `Este enlace es largo (${url.length.toLocaleString()} caracteres). Funciona como enlace en Canvas o en un sitio web, pero el correo o los mensajes de texto pueden cortarlo. Las preguntas incluidas no lo alargan.`));
+      msg.className = "msg";
+      msg.innerHTML = `<b>${T("Link ready:", "Enlace listo:")}</b> ${T(`${tp.length} ${tp.length === 1 ? "topic" : "topics"}, ${g.length} ${g.length === 1 ? "game" : "games"}${g.length ? `, ${total} questions` : ""}.`, `${tp.length} ${tp.length === 1 ? "tema" : "temas"}, ${g.length} ${g.length === 1 ? "juego" : "juegos"}${g.length ? `, ${total} preguntas` : ""}.`)}` +
+        (notes.length ? `<div class="msg warn">${notes.map(n => `<p style="margin:0 0 6px">${n}</p>`).join("")}</div>` : "");
+    });
+  });
+  $("#lCopy").addEventListener("click", () => {
+    const box = $("#lLink"), b = $("#lCopy"), done = () => { b.textContent = T("Copied!", "¡Copiado!"); setTimeout(() => { b.textContent = T("Copy link", "Copiar enlace"); }, 2000); };
+    const fallback = () => { box.focus(); box.select(); b.textContent = T("Copy the selected link", "Copia el enlace seleccionado"); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(box.value).then(done, fallback); else fallback();
+  });
+  recount();
+}
+
 const sel = $("#quarter"), openBtn = $("#openQ");
 if (save.lastQuarter){ sel.value = save.lastQuarter; openBtn.disabled = false; }
 sel.addEventListener("change", () => { openBtn.disabled = !sel.value; });
@@ -2932,8 +3090,26 @@ window.addEventListener("hashchange", route);
 STARTER_Q = parseBank(STARTER_TEXT).questions;
 applyUI();
 renderMeLine();
-route();
-if (!save.profile) profileSheet(true);
+loadClass();
+(function start(){
+  const m = location.hash.match(/^#class=(.+)$/);
+  const ready = bad => {
+    applyClass(); route();
+    if (!save.profile) profileSheet(true);
+    else if (bad) openSheet(`<h3 id="sheetTitle">${T("Link not working", "El enlace no funciona")}</h3><p>${T("This class link didn’t open. It may have been cut off when it was copied. Ask your teacher for the link again.", "Este enlace de clase no se abrió. Puede que se haya cortado al copiarlo. Pídele el enlace otra vez a tu maestro.")}</p><div class="row"><button class="btn" data-close>OK</button></div>`);
+  };
+  if (location.hash === "#teacher"){   // teacher's way out of a class link on their own device
+    try { localStorage.removeItem(CLASS_KEY); } catch(e){}
+    CLASS = null; history.replaceState(null, "", location.href.split("#")[0]);
+  }
+  if (!m) return ready(false);
+  unpackLink(m[1], d => {
+    const c = checkClass(d);
+    if (c){ CLASS = c; try { localStorage.setItem(CLASS_KEY, JSON.stringify(c)); } catch(e){} }
+    history.replaceState(null, "", location.href.split("#")[0]);
+    ready(!c);
+  });
+})();
 </script>
 </body>
 </html>
