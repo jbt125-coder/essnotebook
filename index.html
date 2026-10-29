@@ -2438,7 +2438,7 @@ function cardTitle(id){ return cardL(id).title; }
 function hasTopics(q){ return (TEACHER_ORDER[q] || []).some(id => CARDS[id] && topicOn(id)); }
 
 function route(){
-  if (/^#class=/.test(location.hash)) return location.reload();   // a class link opened in a tab that already had the notebook
+  if (/^#(class=|teacher$)/.test(location.hash)) return location.reload();   // a class link (or #teacher) opened in a tab that already had the notebook
   const [q, id] = location.hash.replace(/^#/, "").split("/");
   if (TEACHER_ORDER[q] && hasTopics(q)){
     if (id && CARDS[id] && TEACHER_ORDER[q].includes(id) && topicOn(id)) return openCard(q, id);
@@ -2830,6 +2830,7 @@ STUDENT NOTES
 ${ids.map(id => `=== ${id}: ${CARDS[id].title} ===\n${cardText(id)}`).join("\n\n")}`;
 }
 function cogSheet(){
+  if (CLASS) return;   // students on a class link can't change the questions
   const all = [...Object.keys(CARDS)].filter(id => Object.values(TEACHER_ORDER).some(l => l.includes(id)));
   const selected = new Set(all);
   openSheet(`<h3 id="sheetTitle">${T("Review questions", "Preguntas de repaso")}</h3>
@@ -2920,7 +2921,9 @@ function cogSheet(){
    A link that opens the notebook with only the teacher's chosen topics,
    games, and questions. Everything rides inside the link itself, like
    Quiz Quest's solo practice link, so there's no server. The student's
-   device keeps the class link until they open a different one or leave it.
+   device keeps the class link (and stays locked out of the cog) until they
+   open a different class link. To get the full notebook back on a device,
+   open the notebook with #teacher at the end of its address.
    ========================================================= */
 const CLASS_KEY = "essNotebook.classLink";
 const GAMES = ["hoops", "derby", "paint", "snake", "blasteroids", "zombie"];
@@ -2977,11 +2980,7 @@ function applyClass(){
   const noGames = !!CLASS && !CLASS.g.length;
   $(".games-label").hidden = noGames; $("#game").closest(".picker").hidden = noGames;
   if (!CLASS) return;
-  bar.innerHTML = `<b>${T("Class link", "Enlace de clase")}${CLASS.t ? ": " + esc(CLASS.t) : ""}</b><br>${T(`${CLASS.tp.length} ${CLASS.tp.length === 1 ? "topic" : "topics"}`, `${CLASS.tp.length} ${CLASS.tp.length === 1 ? "tema" : "temas"}`)}${CLASS.g.length ? T(`, ${CLASS.g.length} ${CLASS.g.length === 1 ? "game" : "games"}`, `, ${CLASS.g.length} ${CLASS.g.length === 1 ? "juego" : "juegos"}`) : ""}${CLASS.g.length ? T(`, ${allQuestions().length} questions`, `, ${allQuestions().length} preguntas`) : ""} · <button class="linkish" id="leaveClass">${T("Leave class link", "Salir del enlace de clase")}</button>`;
-  $("#leaveClass").addEventListener("click", () => {
-    openSheet(`<h3 id="sheetTitle">${T("Leave the class link?", "¿Salir del enlace de clase?")}</h3><p>${T("You’ll see the whole notebook again. Your progress stays saved. To come back, open the link from your teacher again.", "Verás todo el cuaderno otra vez. Tu progreso sigue guardado. Para volver, abre otra vez el enlace de tu maestro.")}</p><div class="row"><button class="btn" id="leaveGo">${T("Leave", "Salir")}</button><button class="btn ghost" data-close>${T("Cancel", "Cancelar")}</button></div>`);
-    $("#leaveGo").addEventListener("click", () => { try { localStorage.removeItem(CLASS_KEY); } catch(e){} CLASS = null; closeSheet(); applyClass(); go(""); });
-  });
+  bar.innerHTML = `<b>${T("Class link", "Enlace de clase")}${CLASS.t ? ": " + esc(CLASS.t) : ""}</b><br>${T(`${CLASS.tp.length} ${CLASS.tp.length === 1 ? "topic" : "topics"}`, `${CLASS.tp.length} ${CLASS.tp.length === 1 ? "tema" : "temas"}`)}${CLASS.g.length ? T(`, ${CLASS.g.length} ${CLASS.g.length === 1 ? "game" : "games"}`, `, ${CLASS.g.length} ${CLASS.g.length === 1 ? "juego" : "juegos"}`) : ""}${CLASS.g.length ? T(`, ${allQuestions().length} questions`, `, ${allQuestions().length} preguntas`) : ""}`;
 }
 
 /* the cog's link maker */
@@ -2989,7 +2988,7 @@ function linkSheet(){
   const counts = countsBy(allQuestions()), selected = new Set(), games = new Set(GAMES);
   const gName = s => UI[s][LANG === "es" ? 1 : 0];
   openSheet(`<h3 id="sheetTitle">${T("Make a class link", "Hacer un enlace de clase")}</h3>
-    <p>${T("Students who open this link see only the topics, games, and questions you pick here. Post it on Canvas or your class website. Their device remembers it until they open a different class link.", "Los estudiantes que abran este enlace solo verán los temas, juegos y preguntas que elijas aquí. Publícalo en Canvas o en el sitio web de tu clase. Su aparato lo recuerda hasta que abran otro enlace de clase.")}</p>
+    <p>${T("Students who open this link see only the topics, games, and questions you pick here. Post it on Canvas or your class website. Their device remembers it and hides the cog until they open a different class link.</p><p class=\"small\">Testing it yourself? Open it in a private window. If you open it on this device, the cog disappears here too: go to the notebook's address with <b>#teacher</b> at the end to get it back.", "Los estudiantes que abran este enlace solo verán los temas, juegos y preguntas que elijas aquí. Publícalo en Canvas o en el sitio web de tu clase. Su aparato lo recuerda y esconde el engranaje hasta que abran otro enlace de clase.</p><p class=\"small\">¿Lo quieres probar? Ábrelo en una ventana privada. Si lo abres en este aparato, el engranaje también desaparece aquí: ve a la dirección del cuaderno con <b>#teacher</b> al final para recuperarlo.")}</p>
     <label class="field" for="lName">${T("Link name (optional)", "Nombre del enlace (opcional)")}</label>
     <input class="inp" id="lName" maxlength="40" placeholder="${T("Unit 2 test review", "Repaso del examen 2")}">
     <span class="field">${T("Topics students can open (the number is how many questions each has now)", "Temas que pueden abrir (el número es cuántas preguntas tiene cada uno ahora)")}</span>
@@ -3099,6 +3098,10 @@ loadClass();
     if (!save.profile) profileSheet(true);
     else if (bad) openSheet(`<h3 id="sheetTitle">${T("Link not working", "El enlace no funciona")}</h3><p>${T("This class link didn’t open. It may have been cut off when it was copied. Ask your teacher for the link again.", "Este enlace de clase no se abrió. Puede que se haya cortado al copiarlo. Pídele el enlace otra vez a tu maestro.")}</p><div class="row"><button class="btn" data-close>OK</button></div>`);
   };
+  if (location.hash === "#teacher"){   // teacher's way out of a class link on their own device
+    try { localStorage.removeItem(CLASS_KEY); } catch(e){}
+    CLASS = null; history.replaceState(null, "", location.href.split("#")[0]);
+  }
   if (!m) return ready(false);
   unpackLink(m[1], d => {
     const c = checkClass(d);
