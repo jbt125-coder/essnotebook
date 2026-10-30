@@ -223,6 +223,7 @@ a.back{color:rgba(255,160,100,0.6);font-size:10px;letter-spacing:2px;margin-top:
 
 <div id="ytPlayerContainer"></div>
 
+<script src="rewards.js"></script>
 <script>
 "use strict";
 
@@ -234,6 +235,8 @@ var MAX_BOMBS=3, BOMB_STEP=40000;
 var ESS=null, LANG='en';
 var qRight=0, qTotal=0, tpStats={}, deck=[], lastQ=-1, curQ=null, quiz=null;
 var startAt=0, endAt=0, clockInt=null, timeUp=false, bestWave=0;
+// free play from the Reward Center (no questions, 3 squads, pauses when the app is closed), the Laser Squad prize, and this game's coin and trophy
+var FREE=null, freeT=null, freeNext=null, freeMode=null, FREE_MEN=6, LASER=false, REWARD=null;
 
 var TX={
   sub:['SURVIVE THE HORDE · NOTEBOOK REVIEW','SOBREVIVE A LA HORDA · REPASO DEL CUADERNO'],
@@ -315,20 +318,35 @@ function essInit(){
   LANG=d&&d.lang==='es'?'es':'en';
   document.documentElement.lang=LANG;
   document.querySelectorAll('[data-t]').forEach(function(el){ var v=TX[el.dataset.t]; if(v) el.textContent=v[LANG==='es'?1:0]; });
-  if(!d||!Array.isArray(d.q)||!d.q.length){
+  freeT=d&&d.free?NBR.ticket('zombie'):null;
+  if(d&&d.free&&!freeT){
+    $('essErr').textContent=T('This free play is used up. Go back to the notebook.','Este juego gratis ya se usó. Vuelve al cuaderno.');
+    $('howto').style.display='none'; $('startBtn').style.display='none';
+    return;
+  }
+  if(!d||(!freeT&&(!Array.isArray(d.q)||!d.q.length))){
     $('essErr').textContent=T('Go back to the notebook and pick the topics to review.','Vuelve al cuaderno y elige los temas para repasar.');
     $('howto').style.display='none'; $('startBtn').style.display='none';
     return;
   }
-  ESS={name:String(d.name||''),per:String(d.per||''),m:Math.min(60,Math.max(1,parseInt(d.m,10)||5)),topics:Array.isArray(d.topics)?d.topics:[],q:d.q};
+  ESS={name:String(d.name||''),per:String(d.per||''),m:freeT?NBR.FREE_SECS/60:Math.min(60,Math.max(1,parseInt(d.m,10)||5)),topics:Array.isArray(d.topics)?d.topics:[],q:d.q||[],free:!!freeT};
   var n=ESS.topics.length;
   $('essInfo').innerHTML=(ESS.name?'<strong>'+esc(ESS.name)+'</strong>':'')+
     (ESS.per?' · '+T('Period','Período')+' '+esc(ESS.per):'')+(ESS.name||ESS.per?'<br>':'')+
-    n+' '+T(n===1?'topic':'topics',n===1?'tema':'temas')+', '+ESS.q.length+' '+T('questions','preguntas')+' · '+ESS.m+' min';
+    (ESS.free?T('Free play: no questions, 3 squads','Juego gratis: sin preguntas, 3 escuadrones')+'<br>'+NBR.fmt(freeT.left)+' '+T('left','restantes')+' · ♥ '+freeT.lives
+      :n+' '+T(n===1?'topic':'topics',n===1?'tema':'temas')+', '+ESS.q.length+' '+T('questions','preguntas')+' · '+ESS.m+' min');
+  if(ESS.free) $('howto').innerHTML='<li>'+T('No questions in a free play: every wave gets '+FREE_MEN+' men','En un juego gratis no hay preguntas: cada oleada tiene '+FREE_MEN+' soldados')+'</li>'+
+    '<li>'+T('Lose 3 squads and the game is over','Si pierdes 3 escuadrones se acaba el juego')+'</li><li>'+T('It pauses if you close the app','Se pone en pausa si cierras la app')+'</li>';
 }
 
 // after the audio choice: clock starts, then 3 right for wave 1
 function beginReview(){
+  LASER=NBR.wearing('zombie');
+  if(LASER){ WEAPONS.bullet.color='#40fff0'; WEAPONS.bullet.glow='#00ffee'; }
+  if(ESS.free){
+    FREE=NBR.freeRun({game:'zombie',lang:LANG,pause:freePause,resume:freeResume,timeUp:function(){endGame('time');}});
+    if(!FREE){ $('essErr').textContent=T('This free play is used up. Go back to the notebook.','Este juego gratis ya se usó. Vuelve al cuaderno.'); return; }
+  }
   startClock();
   $('essBar').classList.remove('hidden');
   checkpoint('start',function(men){ startGame(null,men); });
@@ -344,6 +362,14 @@ function waveQuiz(prev){
 // START WAVE unlocks at 3 right, 3 wrong in a row sends the squad out (needs at least 1 right)
 function checkpoint(kind,onDone,n){
   if(timeUp) return;
+  if(FREE){
+    // no questions: a lost squad costs a life, and every wave gets the same squad
+    var lives=FREE.lives();
+    if(kind==='dead'){ lives=FREE.loseLife(); if(!lives){ endGame('quit'); return; } }
+    var go=function(){ onDone(FREE_MEN); if(kind==='dead') addFloat(W/2,H*0.45,'♥ '+lives+(lives===1?' LIFE LEFT':' LIVES LEFT'),'#ffd700',true); };
+    if(FREE.paused()) freeNext=go; else go();
+    return;
+  }
   gameMode='quiz';
   sfxStopAllHorns();
   ['airBtn','cogBtn'].forEach(function(id){ $(id).style.display='none'; });
@@ -471,6 +497,7 @@ function startClock(){
   clockInt=setInterval(tickClock,250);
 }
 function tickClock(){
+  if(FREE) endAt=Date.now()+FREE.left()*1000;
   var t=Math.max(0,Math.ceil((endAt-Date.now())/1000)), s=Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
   ['hudTime','qTime'].forEach(function(id){ var el=$(id); el.textContent='⏱ '+s; el.classList.toggle('low',t<60); });
   if(t<=0) endGame('time');
@@ -483,7 +510,8 @@ function playedText(){
 // leaving early still ends with the score card
 function quitGame(){
   if(timeUp||!startAt) return;
-  if(!window.confirm(T('End the game now and see your score card?','¿Terminar el juego ahora y ver tu tarjeta de puntaje?'))) return;
+  if(!window.confirm(FREE?T('End your free play now? It cannot be picked up again.','¿Terminar tu juego gratis ahora? No se puede retomar.')
+    :T('End the game now and see your score card?','¿Terminar el juego ahora y ver tu tarjeta de puntaje?'))) return;
   endGame('quit');
 }
 
@@ -492,6 +520,8 @@ function endGame(how){
   if(timeUp) return;
   timeUp=true; clearInterval(clockInt);
   gameMode='ended';
+  REWARD=FREE?{free:true}:NBR.award('zombie',qRight,qTotal);
+  if(FREE){ FREE.end(); $('againBtn').style.display='none'; }
   if(gameState){ gameState.running=false; gameState.gameOver=true; }
   sfxStopAllHorns();
   ['airBtn','cogBtn'].forEach(function(id){ $(id).style.display='none'; });
@@ -524,15 +554,24 @@ function scoreCard(){
   $('scard').innerHTML=
     '<div class="scName">'+esc(ESS.name||T('Soldier','Soldado'))+'</div>'+
     '<div class="scLine">'+(ESS.per?T('Period','Período')+' '+esc(ESS.per)+' · ':'')+T('Zombie Horde Review','Repaso con la horda zombi')+'</div>'+
-    '<div class="scBig">'+pct(qRight,qTotal)+'% '+T('correct','correctas')+'</div>'+
-    '<div class="scLine">'+qRight+'/'+qTotal+' '+T('questions right','preguntas bien')+' · '+playedText()+'</div>'+
+    (FREE?'<div class="scBig">'+T('Free play','Juego gratis')+'</div><div class="scLine">'+playedText()+'</div>'
+    :'<div class="scBig">'+pct(qRight,qTotal)+'% '+T('correct','correctas')+'</div>'+
+    '<div class="scLine">'+qRight+'/'+qTotal+' '+T('questions right','preguntas bien')+' · '+playedText()+'</div>')+
     '<div class="scLine">'+(st?st.score:0).toLocaleString()+' '+T('pts','pts')+' · '+T('reached wave','llegó a la oleada')+' '+bestWave+
       ' · '+(st?st.kills:0)+' '+T('kills','zombis eliminados')+'</div>'+
-    '<table><tr><th>'+T('Topic','Tema')+'</th><th class="n">'+T('Right','Bien')+'</th><th class="n">%</th></tr>'+rows+'</table>'+
+    NBR.cardHtml(REWARD,LANG)+
+    (FREE?'':'<table><tr><th>'+T('Topic','Tema')+'</th><th class="n">'+T('Right','Bien')+'</th><th class="n">%</th></tr>'+rows+'</table>')+
     '<div class="scDate">'+T('Earth Space Science Notebook','Cuaderno de Ciencias de la Tierra y el Espacio')+', '+
     d.toLocaleDateString(es?'es':[],{month:'short',day:'numeric',year:'numeric'})+' '+d.toLocaleTimeString(es?'es':[],{hour:'numeric',minute:'2-digit'})+'</div>';
 }
 
+// the app was closed or the phone turned off: freeze the game until KEEP PLAYING
+function freePause(){ if(gameMode!=='paused'){ freeMode=gameMode; gameMode='paused'; } }
+function freeResume(){
+  if(timeUp) return;
+  if(gameMode==='paused') gameMode=freeMode;
+  if(freeNext){ var f=freeNext; freeNext=null; f(); }
+}
 $('qNext').addEventListener('click',showQuestion);
 $('qGo').addEventListener('click',finishQuiz);
 $('quitBtn').addEventListener('click',quitGame);
@@ -1019,7 +1058,9 @@ function drawSoldier(x, y, scale) {
   var st = gameState;
   ctx.fillStyle = 'rgba(0,0,0,0.2)';
   ctx.beginPath(); ctx.ellipse(0, 20, 8, 3, 0, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#5c7a3e'; ctx.beginPath(); rr(-7, 0, 14, 18, 3); ctx.fill();
+  if (LASER) { ctx.shadowColor = '#00ffee'; ctx.shadowBlur = 10; }
+  ctx.fillStyle = LASER ? '#1fb8a8' : '#5c7a3e'; ctx.beginPath(); rr(-7, 0, 14, 18, 3); ctx.fill();
+  ctx.shadowBlur = 0;
   ctx.fillStyle = '#f4c68a'; ctx.beginPath(); ctx.ellipse(0, -7, 8, 9, 0, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = '#3d5228';
   ctx.beginPath(); ctx.ellipse(0, -12, 9, 6, 0, Math.PI, Math.PI * 2); ctx.fill();
@@ -1130,6 +1171,9 @@ function drawBullet(b) {
     ctx.fillRect(b.x - 2, b.y - 7, 4, 14);
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(b.x - 1, b.y - 3, 2, 4);
+  } else if (LASER) {
+    ctx.fillStyle = '#40fff0'; ctx.shadowColor = '#00ffee'; ctx.shadowBlur = 8;
+    ctx.fillRect(b.x - 1, b.y - 9, 3, 18);
   } else {
     ctx.fillStyle = '#ffee44';
     ctx.fillRect(b.x - 1, b.y - 7, 3, 14);
@@ -3000,7 +3044,7 @@ function loop() {
     if (BR) brTick_inner();
   } else if (gameMode === 'rewardChoice') {
     drawRewardChoice();
-  } else if (gameMode === 'quiz' || gameMode === 'ended') {
+  } else if (gameMode === 'quiz' || gameMode === 'ended' || gameMode === 'paused') {
     // questions or score card are up; the game waits
   } else {
     if (gameState && !gameState.gameOver) update();

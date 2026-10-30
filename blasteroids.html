@@ -563,6 +563,7 @@ a.back{position:relative;z-index:2;color:rgba(180,140,255,0.6);font-size:10px;le
 </div>
 <div id="toast"></div>
 
+<script src="rewards.js"></script>
 <script>
 "use strict";
 
@@ -574,6 +575,8 @@ var ESS=null, LANG='en';
 var tripRight=0, qRight=0, qTotal=0, tpStats={}, deck=[], lastQ=-1, curQ=null, quizDone=null;
 var startAt=0, endAt=0, clockInt=null, timeUp=false, gameGen=0;
 var runOpen=false, runs=0, bestScore=0, bestWave=0;
+// free play from the Reward Center (no questions, 3 ships, pauses when the app is closed), the Gold Star Fighter prize, and this game's coin and trophy
+var FREE=null, freeT=null, freeNext=null, freeWasActive=false, GOLDSHIP=false, REWARD=null;
 
 var TX={
   sub:['ALL 4 MODES · NOTEBOOK REVIEW','LOS 4 MODOS · REPASO DEL CUADERNO'],
@@ -660,16 +663,25 @@ function essInit(){
   LANG=d&&d.lang==='es'?'es':'en';
   document.documentElement.lang=LANG;
   document.querySelectorAll('[data-t]').forEach(function(el){ var v=TX[el.dataset.t]; if(v) el.textContent=v[LANG==='es'?1:0]; });
-  if(!d||!Array.isArray(d.q)||!d.q.length){
+  freeT=d&&d.free?NBR.ticket('blasteroids'):null;
+  if(d&&d.free&&!freeT){
+    $('essErr').textContent=T('This free play is used up. Go back to the notebook.','Este juego gratis ya se usó. Vuelve al cuaderno.');
+    $('howto').style.display='none'; $('launchBtn').style.display='none';
+    return;
+  }
+  if(!d||(!freeT&&(!Array.isArray(d.q)||!d.q.length))){
     $('essErr').textContent=T('Go back to the notebook and pick the topics to review.','Vuelve al cuaderno y elige los temas para repasar.');
     $('howto').style.display='none'; $('launchBtn').style.display='none';
     return;
   }
-  ESS={name:String(d.name||''),per:String(d.per||''),m:Math.min(60,Math.max(1,parseInt(d.m,10)||5)),topics:Array.isArray(d.topics)?d.topics:[],q:d.q};
+  ESS={name:String(d.name||''),per:String(d.per||''),m:freeT?NBR.FREE_SECS/60:Math.min(60,Math.max(1,parseInt(d.m,10)||5)),topics:Array.isArray(d.topics)?d.topics:[],q:d.q||[],free:!!freeT};
   var n=ESS.topics.length;
   $('essInfo').innerHTML=(ESS.name?'<strong>'+esc(ESS.name)+'</strong>':'')+
     (ESS.per?' · '+T('Period','Período')+' '+esc(ESS.per):'')+(ESS.name||ESS.per?'<br>':'')+
-    n+' '+T(n===1?'topic':'topics',n===1?'tema':'temas')+', '+ESS.q.length+' '+T('questions','preguntas')+' · '+ESS.m+' min';
+    (ESS.free?T('Free play: no questions, 3 ships','Juego gratis: sin preguntas, 3 naves')+'<br>'+NBR.fmt(freeT.left)+' '+T('left','restantes')+' · 🚀 × '+freeT.lives
+      :n+' '+T(n===1?'topic':'topics',n===1?'tema':'temas')+', '+ESS.q.length+' '+T('questions','preguntas')+' · '+ESS.m+' min');
+  if(ESS.free) $('howto').innerHTML='<li>'+T('No questions in a free play','En un juego gratis no hay preguntas')+'</li><li>'+T('Lose all your ships and the game is over','Si pierdes todas tus naves se acaba el juego')+'</li>'+
+    '<li>'+T('It pauses if you close the app','Se pone en pausa si cierras la app')+'</li>';
 }
 
 // runs fn after ms, unless the game ended or restarted in the meantime
@@ -678,6 +690,7 @@ function later(fn,ms){ var g=gameGen; setTimeout(function(){ if(g===gameGen&&!ti
 // ---- question checkpoints (the game is paused while they're up) ----
 function checkpoint(kind,onDone,n){
   if(timeUp) return;
+  if(FREE){ if(FREE.paused()) freeNext=onDone; else if(onDone) onDone(); return; }
   gameActive=false;
   btn.left=btn.right=btn.thrust=btn.fire=false; keys={};
   quizDone=onDone; tripRight=0;
@@ -759,6 +772,7 @@ function startClock(){
   clockInt=setInterval(tickClock,250);
 }
 function tickClock(){
+  if(FREE) endAt=Date.now()+FREE.left()*1000;
   var t=Math.max(0,Math.ceil((endAt-Date.now())/1000)), s=Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
   ['hudTime','qTime'].forEach(function(id){ var el=$(id); el.textContent='⏱ '+s; el.classList.toggle('low',t<60); });
   if(t<=0) endGame();
@@ -782,7 +796,8 @@ function playedText(){
 // leaving early still ends with the score card
 function quitGame(){
   if(timeUp||!startAt) return;
-  if(!window.confirm(T('End the game now and see your score card?','¿Terminar el juego ahora y ver tu tarjeta de puntaje?'))) return;
+  if(!window.confirm(FREE?T('End your free play now? It cannot be picked up again.','¿Terminar tu juego gratis ahora? No se puede retomar.')
+    :T('End the game now and see your score card?','¿Terminar el juego ahora y ver tu tarjeta de puntaje?'))) return;
   endGame(true);
 }
 
@@ -791,6 +806,8 @@ function endGame(quit){
   $('repTitle').textContent=quit?T('GAME OVER','FIN DEL JUEGO'):T("TIME'S UP!",'¡SE ACABÓ EL TIEMPO!');
   endRun();
   timeUp=true; gameActive=false; gameGen++;
+  REWARD=FREE?{free:true}:NBR.award('blasteroids',qRight,qTotal);
+  if(FREE){ FREE.end(); $('againBtn').style.display='none'; }
   clearInterval(clockInt);
   btn.left=btn.right=btn.thrust=btn.fire=false; keys={};
   ['quizScreen','helpOverlay','cogMenuOverlay','audioPermModal'].forEach(function(id){ $(id).classList.remove('show'); });
@@ -815,11 +832,13 @@ function scoreCard(){
   $('scard').innerHTML=
     '<div class="scName">'+esc(ESS.name||T('Pilot','Piloto'))+'</div>'+
     '<div class="scLine">'+(ESS.per?T('Period','Período')+' '+esc(ESS.per)+' · ':'')+T('Blasteroids Review','Repaso con Blasteroids')+'</div>'+
-    '<div class="scBig">'+p(qRight,qTotal)+'% '+T('correct','correctas')+'</div>'+
-    '<div class="scLine">'+qRight+'/'+qTotal+' '+T('questions right','preguntas bien')+' · '+playedText()+'</div>'+
+    (FREE?'<div class="scBig">'+T('Free play','Juego gratis')+'</div><div class="scLine">'+playedText()+'</div>'
+    :'<div class="scBig">'+p(qRight,qTotal)+'% '+T('correct','correctas')+'</div>'+
+    '<div class="scLine">'+qRight+'/'+qTotal+' '+T('questions right','preguntas bien')+' · '+playedText()+'</div>')+
     '<div class="scLine">'+T('Best run','Mejor partida')+': '+bestScore+' '+T('pts','pts')+' · '+T('reached wave','llegó a la oleada')+' '+bestWave+
       ' · '+runs+' '+T(runs===1?'run':'runs',runs===1?'partida':'partidas')+'</div>'+
-    '<table><tr><th>'+T('Topic','Tema')+'</th><th class="n">'+T('Right','Bien')+'</th><th class="n">%</th></tr>'+rows+'</table>'+
+    NBR.cardHtml(REWARD,LANG)+
+    (FREE?'':'<table><tr><th>'+T('Topic','Tema')+'</th><th class="n">'+T('Right','Bien')+'</th><th class="n">%</th></tr>'+rows+'</table>')+
     '<div class="scDate">'+T('Earth Space Science Notebook','Cuaderno de Ciencias de la Tierra y el Espacio')+', '+
     d.toLocaleDateString(es?'es':[],{month:'short',day:'numeric',year:'numeric'})+' '+d.toLocaleTimeString(es?'es':[],{hour:'numeric',minute:'2-digit'})+'</div>';
 }
@@ -1202,14 +1221,26 @@ function startGame(){
   document.getElementById('hiVal').textContent='0';
   document.getElementById('reportScreen').classList.add('hidden');
   document.getElementById('touchControls').style.visibility='';
+  GOLDSHIP=NBR.wearing('blasteroids');
+  if(ESS.free){
+    FREE=NBR.freeRun({game:'blasteroids',lang:LANG,pause:freePause,resume:freeResume,timeUp:function(){endGame();}});
+    if(!FREE){ toast(T('This free play is used up. Go back to the notebook.','Este juego gratis ya se usó. Vuelve al cuaderno.'),4000); return; }
+  }
   lives=SHIPS;updateLives();
   startClock();
   checkpoint('start',startRun);
 }
+// the app was closed or the phone turned off: freeze the game until KEEP PLAYING
+function freePause(){ freeWasActive=gameActive; gameActive=false; btn.left=btn.right=btn.thrust=btn.fire=false; keys={}; }
+function freeResume(){
+  if(timeUp) return;
+  if(freeNext){ var f=freeNext; freeNext=null; f(); }
+  else if(freeWasActive) gameActive=true;
+}
 
 // one run: wave 1, score 0, 3 ships
 function startRun(){
-  score=0;lives=SHIPS;wave=1;gameOver=false;runOpen=true;
+  score=0;lives=FREE?FREE.lives():SHIPS;wave=1;gameOver=false;runOpen=true;
   waveTrans=false;fireCool=0;ufoTimer=0;fireLast=false;transitionShield=0;alertTimer=0;
   document.getElementById('scoreVal').textContent='0';
   document.getElementById('waveVal').textContent='1';
@@ -1242,7 +1273,9 @@ function killShip(){
   sfxShipExplosion();
   spawnParts(ship.x,ship.y,22,['#00d4ff','#ffffff','#88eeff'],4.5);
   lives--;updateLives();
+  if(FREE) FREE.loseLife();
   later(function(){
+    if(FREE&&lives<=0){ endGame(true); return; }
     if(lives>0) checkpoint('crash',function(){resetShip(true);transitionShield=3000;gameActive=true;});
     else{
       endRun();
@@ -1439,15 +1472,15 @@ function drawShip(){
   if(!ship.alive)return;
   if(ship.invincible>0&&Math.floor(ship.invincible/8)%2===0)return;
   var wt=waveType(wave);
-  for(var i=1;i<ship.trail.length;i++){var t2=i/ship.trail.length;ctx.beginPath();ctx.moveTo(ship.trail[i-1].x,ship.trail[i-1].y);ctx.lineTo(ship.trail[i].x,ship.trail[i].y);ctx.strokeStyle='rgba(0,180,255,'+t2*0.2+')';ctx.lineWidth=1.5;ctx.stroke();}
+  for(var i=1;i<ship.trail.length;i++){var t2=i/ship.trail.length;ctx.beginPath();ctx.moveTo(ship.trail[i-1].x,ship.trail[i-1].y);ctx.lineTo(ship.trail[i].x,ship.trail[i].y);ctx.strokeStyle=GOLDSHIP?'rgba(255,200,40,'+t2*0.55+')':'rgba(0,180,255,'+t2*0.2+')';ctx.lineWidth=GOLDSHIP?2.5:1.5;ctx.stroke();}
   ctx.save();ctx.translate(ship.x,ship.y);ctx.rotate(ship.angle+Math.PI/2);
   if(ship.thrusting){var fl=14+Math.random()*10;ctx.beginPath();ctx.moveTo(-6,10);ctx.lineTo(0,10+fl);ctx.lineTo(6,10);ctx.strokeStyle='rgba(255,'+rndI(100,200)+',0,0.85)';ctx.lineWidth=3;ctx.stroke();ctx.beginPath();ctx.moveTo(-3,10);ctx.lineTo(0,10+fl*0.5);ctx.lineTo(3,10);ctx.strokeStyle='rgba(255,255,200,0.65)';ctx.lineWidth=1.5;ctx.stroke();}
   ctx.beginPath();ctx.moveTo(0,-16);ctx.lineTo(-10,10);ctx.lineTo(-4,6);ctx.lineTo(0,9);ctx.lineTo(4,6);ctx.lineTo(10,10);ctx.closePath();
   ctx.fillStyle='rgba(0,22,42,0.92)';ctx.fill();
-  var sc=ship.carrying?'rgba(0,255,170,0.95)':'rgba(0,212,255,0.95)';ctx.strokeStyle=sc;ctx.lineWidth=2;ctx.stroke();
-  ctx.beginPath();ctx.arc(0,-5,4,0,Math.PI*2);ctx.fillStyle=ship.carrying?'rgba(0,255,150,0.6)':'rgba(0,212,255,0.5)';ctx.fill();
-  ctx.beginPath();ctx.moveTo(-4,0);ctx.lineTo(-12,-8);ctx.lineTo(-10,4);ctx.fillStyle='rgba(0,175,220,0.38)';ctx.fill();
-  ctx.beginPath();ctx.moveTo(4,0);ctx.lineTo(12,-8);ctx.lineTo(10,4);ctx.fillStyle='rgba(0,175,220,0.38)';ctx.fill();
+  var sc=ship.carrying?'rgba(0,255,170,0.95)':GOLDSHIP?'rgba(255,214,60,0.98)':'rgba(0,212,255,0.95)';ctx.strokeStyle=sc;ctx.lineWidth=2;ctx.stroke();
+  ctx.beginPath();ctx.arc(0,-5,4,0,Math.PI*2);ctx.fillStyle=ship.carrying?'rgba(0,255,150,0.6)':GOLDSHIP?'rgba(255,230,120,0.7)':'rgba(0,212,255,0.5)';ctx.fill();
+  ctx.beginPath();ctx.moveTo(-4,0);ctx.lineTo(-12,-8);ctx.lineTo(-10,4);ctx.fillStyle=GOLDSHIP?'rgba(240,180,30,0.6)':'rgba(0,175,220,0.38)';ctx.fill();
+  ctx.beginPath();ctx.moveTo(4,0);ctx.lineTo(12,-8);ctx.lineTo(10,4);ctx.fillStyle=GOLDSHIP?'rgba(240,180,30,0.6)':'rgba(0,175,220,0.38)';ctx.fill();
   ctx.restore();
   if(transitionShield>0){var frac=transitionShield/5000,pu=0.9+0.1*Math.sin(Date.now()*0.008),shR=32*pu;ctx.beginPath();ctx.arc(ship.x,ship.y,shR+8,0,Math.PI*2);ctx.strokeStyle='rgba(100,200,255,0.10)';ctx.lineWidth=10;ctx.stroke();ctx.beginPath();ctx.arc(ship.x,ship.y,shR,0,Math.PI*2);ctx.fillStyle='rgba(0,180,255,0.09)';ctx.fill();ctx.beginPath();ctx.arc(ship.x,ship.y,shR,0,Math.PI*2);ctx.strokeStyle='rgba(0,200,255,0.7)';ctx.lineWidth=2.5;ctx.stroke();ctx.beginPath();ctx.arc(ship.x,ship.y,shR+5,-Math.PI/2,-Math.PI/2+frac*Math.PI*2);ctx.strokeStyle='rgba(0,255,220,0.85)';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='rgba(0,230,255,0.8)';ctx.font='bold 11px Orbitron,monospace';ctx.textAlign='center';ctx.fillText(Math.ceil(transitionShield/1000)+'s',ship.x,ship.y-shR-10);}
   if(wt==='galaga'){try{var eg=ctx.createRadialGradient(ship.x,GALAGA_SHIP_Y+35,0,ship.x,GALAGA_SHIP_Y+35,34);eg.addColorStop(0,'rgba(0,200,255,0.14)');eg.addColorStop(1,'rgba(0,0,0,0)');ctx.beginPath();ctx.arc(ship.x,GALAGA_SHIP_Y+35,34,0,Math.PI*2);ctx.fillStyle=eg;ctx.fill();}catch(e){}}
