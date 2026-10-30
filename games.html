@@ -235,6 +235,19 @@ body.dby .ballDot.on { background: #fcfcfc; box-shadow: inset -4px -4px 0 #c8c0b
   font-family: inherit; font-size: 15px; font-weight: 700; box-shadow: inset -4px -4px 0 #8a1800; cursor: pointer; }
 .bpBtn.go { background: #1f9a50; box-shadow: inset -4px -4px 0 #0e5a2a; }
 .bpBtn b { display: block; font-size: 13px; font-weight: 400; margin-bottom: 7px; }
+.coinI { display: inline-block; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #000; vertical-align: middle; }
+.coinI.g { background: radial-gradient(circle at 35% 35%, #fff6a0, #f8c800 45%, #a87000); }
+.coinI.s { background: radial-gradient(circle at 35% 35%, #ffffff, #c8c8d8 45%, #707088); }
+.coinI.b { background: radial-gradient(circle at 35% 35%, #ffd8b0, #d08040 45%, #7a4010); }
+.coinI.big { width: 54px; height: 54px; border-width: 3px; }
+.rwCoins { display: flex; justify-content: center; gap: 26px; }
+.rwCoin div { font-family: "Press Start 2P", monospace; font-size: 15px; margin-top: 8px; color: #fff; }
+.rwCoin span.nm { display: block; font-family: "Press Start 2P", monospace; font-size: 8px; color: #c9b8ff; margin-top: 6px; }
+.shopRow { display: flex; gap: 14px; align-items: center; }
+.shopRow canvas { image-rendering: pixelated; background: #120a30; border-radius: 10px; border: 3px solid #000; flex-shrink: 0; }
+.shopT { color: #f8b800; font-size: 13px; margin-bottom: 6px; }
+.ocCoin { font-family: "Press Start 2P", monospace; font-size: 10px; line-height: 1.8; margin-top: 10px; color: #1b1040; }
+.ocCoin.no { font-size: 8px; color: #5a4a8a; }
 .tRow { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #3d2a80; }
 .tRow:last-child { border-bottom: none; }
 .tSt { flex: 0 0 78px; font-family: "Press Start 2P", monospace; font-size: 8px; padding: 6px 4px; border-radius: 6px; text-align: center; background: #3a2a70; color: #fff; }
@@ -281,6 +294,8 @@ body.dby .ballDot.on { background: #fcfcfc; box-shadow: inset -4px -4px 0 #c8c0b
     </div>
     <div id="jErr" class="err"></div>
     <button type="button" id="jGo" class="bigBtn go" data-l>JOIN GAME</button>
+    <button type="button" id="jFree" class="bigBtn" style="display:none"></button>
+    <div class="center"><button type="button" id="jRewards" class="ghostBtn" data-l>MY REWARDS</button></div>
     <div class="foot"><a href="#host" id="jHostLink" data-l>Teacher? Host a game</a><br><a href="#test" id="jTestLink" data-l>Connection trouble? Test this device</a></div>
   </div>
 </div>
@@ -338,6 +353,7 @@ body.dby .ballDot.on { background: #fcfcfc; box-shadow: inset -4px -4px 0 #c8c0b
     <p class="note" id="oMsg">Wait for your teacher to start the next game.</p>
     <button type="button" id="oAgain" class="bigBtn go" style="display:none" data-l>PLAY AGAIN</button>
     <a id="oBack" class="ghostBtn" href="index.html" style="display:none;margin-top:12px" data-l>BACK TO THE NOTEBOOK</a>
+    <button type="button" id="oRewards" class="ghostBtn" data-l>MY REWARDS</button>
     <div id="oNotes" style="display:none">
       <button type="button" id="oNotesBtn" class="bigBtn go" data-l>SAVE STUDY NOTES</button>
       <div id="oNotesOut" style="display:none">
@@ -357,6 +373,28 @@ body.dby .ballDot.on { background: #fcfcfc; box-shadow: inset -4px -4px 0 #c8c0b
     <p class="note center" id="hfMsg">Study up for the second half! It starts when your teacher is ready.</p>
     <div class="studySheet" id="hfNotes"></div>
     <button type="button" id="hfGo" class="bigBtn go" style="display:none" data-l>START THE SECOND HALF</button>
+  </div>
+</div>
+
+<!-- ================= STUDENT: rewards (coins saved on this device) ================= -->
+<div class="scr" id="scrRewards">
+  <div class="wrap center">
+    <h1 class="logo sm" data-l>MY REWARDS</h1>
+    <div class="card"><div class="rwCoins" id="rwCoins"></div></div>
+    <div class="card" style="text-align:left">
+      <span class="lab first" data-l>How to earn coins</span>
+      <div class="note" data-l>Answer at least 20 questions in one game. 90% or better earns a gold coin, 80% a silver coin, 70% a bronze coin.</div>
+      <div class="note" style="margin-top:6px" data-l>3 bronze coins turn into 1 silver, and 2 silver turn into 1 gold, all by themselves.</div>
+      <div class="note" style="margin-top:6px" data-l>Spend 1 gold coin for a free solo practice game with no questions. The button is on the solo practice page.</div>
+    </div>
+    <div class="card">
+      <div class="shopRow"><canvas id="rwShoe" width="80" height="60"></canvas>
+        <div style="text-align:left"><div class="pix shopT">AIR JORDANN'S</div>
+        <div class="note" data-l>High tops for the cloud court: jump higher and get a triple jump there. Wearing them in solo basketball practice takes you to the cloud court.</div></div></div>
+      <button type="button" id="rwBuy" class="bigBtn go"></button>
+      <div class="okMsg" id="rwMsg"></div>
+    </div>
+    <button type="button" id="rwBack" class="ghostBtn" data-l>Back</button>
   </div>
 </div>
 
@@ -381,6 +419,9 @@ body.dby .ballDot.on { background: #fcfcfc; box-shadow: inset -4px -4px 0 #c8c0b
       <span class="lab first">Game</span>
       <div class="seg" id="hSport"><button type="button" data-v="hoops">BASKETBALL</button><button type="button" data-v="derby">HOME RUN DERBY</button></div>
       <div class="note" id="hSportNote" style="margin-top:6px"></div>
+      <div id="hCourtWrap"><span class="lab">Basketball court</span>
+        <div class="seg" id="hCourt"><button type="button" data-v="beach">BEACH</button><button type="button" data-v="sky">CLOUDS</button></div>
+        <div class="note" style="margin-top:6px">CLOUDS: hoops floating on clouds, springy jumps, a golden sky hoop worth 7 that drifts across the top, and rain clouds that zap a player for half their points when a ball hits them. Students wearing Air Jordann's (from their rewards) jump higher and get a triple jump.</div></div>
       <label class="lab" for="hPw">Class password (make one up for this period)</label>
       <input id="hPw" class="inp" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="20">
       <div class="row2">
@@ -522,6 +563,7 @@ body.dby .ballDot.on { background: #fcfcfc; box-shadow: inset -4px -4px 0 #c8c0b
 <script>/*! qrcode-generator 1.4.4 | MIT License | Copyright (c) 2009 Kazuhiko Arase | https://github.com/kazuhikoarase/qrcode-generator */
 var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,(function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1}))},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(n*r,o*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(t,r){var e=n("友");if(2!=e.length||38726!=(e[0]<<8|e[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}((function(){return qrcode}));
 </script>
+<script src="rewards.js"></script>
 <script>
 (function(){
 'use strict';
@@ -546,6 +588,8 @@ var HOOPS = [
    unlimited jumps and a magic hoop high on the left to slam dunk on */
 var MAGIC_HOOP = { bx: 12, y: 26 };
 var MAGIC_SECS = 20, DUNK_PTS = 10;
+// the super dunk chain (low, middle, high, then the glass hoop) and the magic shot into all four baskets
+var CHAIN_PTS = [4, 6, 10, 25], MAGIC_SHOT_PTS = 20, CHAIN_DIR = [-1, 1, -1];
 var MAGIC_COLS = ['#f878f8', '#78f8f8', '#f8f878', '#b078ff', '#fcfcfc'];
 var CHEERS = ['NICE SHOT!', 'SWEET!', 'NOICE!!', 'BALLER!!', 'BUCKETS!', 'SPLASH!', 'ON FIRE!', 'CASH!', 'MONEY!', 'SWISH!'];
 var CHEER_COLS = ['#f8d800', '#58f878', '#58d8f8', '#f878d8', '#f89838', '#c078f8', '#fcfcfc'];
@@ -624,6 +668,10 @@ var AI_PROMPT = 'Write 20 multiple-choice questions about [TOPIC] for [GRADE LEV
    SPANISH (each student picks English or Español; the big screen stays English)
 ============================================================ */
 var ES = {
+  'FREE PLAY! 3 LIVES': '¡JUEGO GRATIS! 3 VIDAS', '2 LIVES LEFT': 'QUEDAN 2 VIDAS', '1 LIFE LEFT': 'QUEDA 1 VIDA',
+  'FREE PLAY': 'JUEGO GRATIS', 'NO QUESTIONS, 3 LIVES': 'SIN PREGUNTAS, 3 VIDAS', 'LIVES': 'VIDAS', 'LIFE': 'VIDA', 'LEFT': 'RESTANTES',
+  'This free play is used up. Go back to the notebook.': 'Este juego gratis ya se usó. Vuelve al cuaderno.',
+  'End your free play now? It cannot be picked up again.': '¿Terminar tu juego gratis ahora? No se puede retomar.',
   'Class password': 'Contraseña de la clase', 'From your teacher': 'De tu maestro', 'Class period': 'Período de clase', 'For example 3': 'Por ejemplo 3',
   'Player name (up to 8 letters)': 'Nombre de jugador (hasta 8 letras)', 'NAME': 'NOMBRE', 'Hat or hair': 'Gorra o peinado', 'Hat or hair color': 'Color de gorra o pelo',
   'Shirt': 'Camiseta', 'Skin': 'Piel', 'JOIN GAME': 'ENTRAR AL JUEGO', 'Teacher? Host a game': '¿Eres maestro? Organiza un juego',
@@ -656,7 +704,20 @@ var ES = {
   'UNLIMITED JUMPS! SLAM DUNK IT!': '¡SALTOS SIN LÍMITE! ¡CLÁVALA!', 'MAGIC FADED': 'SE ACABÓ LA MAGIA', 'WHAT A DUNK!': '¡QUÉ CLAVADA!',
   'BACK TO THE LOW HOOP': 'DE VUELTA AL ARO BAJO', 'REBOUND!': '¡REBOTE!', 'OUT OF BALLS!': '¡SIN BALONES!', '10 BUCKETS!': '¡10 CANASTAS!',
   'WATER BREAK: ANSWER 3 QUESTIONS': 'DESCANSO: CONTESTA 3 PREGUNTAS', 'STOMP! +1': '¡PISOTÓN! +1', 'SPLAT!': '¡PLAF!', 'OUCH!': '¡AY!',
-  'SLAM DUNK!!!': '¡¡¡CLAVADA!!!', 'Connection trouble? Test this device': '¿Problemas de conexión? Prueba este aparato', 'STUDY NOTES': 'NOTAS DE ESTUDIO',
+  'SLAM DUNK!!!': '¡¡¡CLAVADA!!!', 'ZAPPED!': '¡ZAS!', 'LIGHTNING! YOU LOST HALF YOUR POINTS!': '¡UN RAYO! ¡PERDISTE LA MITAD DE TUS PUNTOS!', 'MY REWARDS': 'MIS PREMIOS', 'FREE PLAY': 'JUEGO GRATIS', 'FREE PLAY: USE 1 GOLD COIN': 'JUEGO GRATIS: USA 1 MONEDA DE ORO',
+  'GOLD': 'ORO', 'SILVER': 'PLATA', 'BRONZE': 'BRONCE', 'How to earn coins': 'Cómo ganar monedas', 'Back': 'Volver',
+  'YOU EARNED A GOLD COIN!': '¡GANASTE UNA MONEDA DE ORO!', 'YOU EARNED A SILVER COIN!': '¡GANASTE UNA MONEDA DE PLATA!', 'YOU EARNED A BRONZE COIN!': '¡GANASTE UNA MONEDA DE BRONCE!',
+  '3 BRONZE = 1 SILVER!': '¡3 DE BRONCE = 1 DE PLATA!', '2 SILVER = 1 GOLD!': '¡2 DE PLATA = 1 DE ORO!',
+  'ANSWER 20 QUESTIONS IN A GAME TO EARN A COIN': 'CONTESTA 20 PREGUNTAS EN UN JUEGO PARA GANAR UNA MONEDA', 'GET 70% OR MORE TO EARN A COIN': 'SACA 70% O MÁS PARA GANAR UNA MONEDA',
+  'BUY FOR 3 GOLD COINS': 'COMPRAR POR 3 MONEDAS DE ORO', 'PUT THEM ON': 'PONÉRTELOS', 'TAKE THEM OFF': 'QUITÁRTELOS',
+  'You are wearing your Air Jordann\'s!': '¡Llevas puestos tus Air Jordann\'s!', 'You need a gold coin for a free play.': 'Necesitas una moneda de oro para un juego gratis.',
+  'Answer at least 20 questions in one game. 90% or better earns a gold coin, 80% a silver coin, 70% a bronze coin.': 'Contesta al menos 20 preguntas en un juego. 90% o más gana una moneda de oro, 80% una de plata, 70% una de bronce.',
+  '3 bronze coins turn into 1 silver, and 2 silver turn into 1 gold, all by themselves.': '3 monedas de bronce se convierten en 1 de plata, y 2 de plata en 1 de oro, solas.',
+  'Spend 1 gold coin for a free solo practice game with no questions. The button is on the solo practice page.': 'Usa 1 moneda de oro para un juego de práctica gratis sin preguntas. El botón está en la página de práctica individual.',
+  'High tops for the cloud court: jump higher and get a triple jump there. Wearing them in solo basketball practice takes you to the cloud court.': 'Tenis altos para la cancha de nubes: saltas más alto y tienes triple salto allí. Si los llevas en la práctica de básquetbol, juegas en la cancha de nubes.', 'SUPER DUNK!!!!': '¡¡¡¡SUPER CLAVADA!!!!', 'MAGIC SHOT!!!': '¡¡¡TIRO MÁGICO!!!', 'WHAT A SHOW!': '¡QUÉ ESPECTÁCULO!',
+  'DUNK THE LOW HOOP OR THE GLASS!': '¡CLÁVALA EN EL ARO BAJO O EN EL DE CRISTAL!', 'OR JUMP OFF THE PLATFORM AND SHOOT!': '¡O SALTA DE LA PLATAFORMA Y TIRA!',
+  'JUMP OFF THE PLATFORM, THEN SHOOT!': '¡SALTA DE LA PLATAFORMA Y LUEGO TIRA!', 'TOO SLOW!': '¡MUY LENTO!',
+  '<<< PRESS LEFT!': '<<< ¡IZQUIERDA!', 'PRESS RIGHT! >>>': '¡DERECHA! >>>', 'Connection trouble? Test this device': '¿Problemas de conexión? Prueba este aparato', 'STUDY NOTES': 'NOTAS DE ESTUDIO',
   'Answer 3 right<br>to step up to bat': 'Contesta 3 bien<br>para pasar al bate', 'PLAY BALL!': '¡A JUGAR!', 'BACK TO THE PLATE': 'VOLVER AL PLATO',
   'Correct! Batter up!': '¡Correcto! ¡Al bate!', 'SWING': 'BATEAR', 'BATTER UP!': '¡AL BATE!', 'BACK IN THE BOX!': '¡DE VUELTA AL BATE!',
   'HOME RUN!': '¡JONRÓN!', 'STRIKES': 'STRIKES', 'FOUL BALL!': '¡FOUL!', 'SWING AND A MISS!': '¡ABANICÓ!', 'STRIKE LOOKING!': '¡STRIKE CANTADO!', 'TOO EARLY!': '¡MUY TEMPRANO!',
@@ -687,7 +748,7 @@ var ES_PAT = [
   [/^Correct! (\d+) more to go\.$/, '¡Correcto! Te faltan $1.'],
   [/^NEXT: (LOW|MIDDLE|HIGH) HOOP$/, function(m, h){ return 'SIGUE: ARO ' + ES_HOOP[h]; }],
   [/^NEXT: (\d+) PTS$/, 'SIGUE: $1 PTS'], [/^MAGIC (\d+)$/, 'MAGIA $1'], [/^PLACE (\d+) OF (\d+)$/, 'LUGAR $1 DE $2'],
-  [/^STRIKE (\d)!$/, '¡STRIKE $1!'], [/^\+(\d+) {2}(\d+) FT$/, '+$1  $2 PIES'], [/^LIGHTS! \+(\d+)$/, '¡LUCES! +$1'],
+  [/^STRIKE (\d)!$/, '¡STRIKE $1!'], [/^Save up (\d+) more gold\.$/, 'Junta $1 de oro más.'], [/^DUNK! \+(\d+)$/, '¡CLAVADA! +$1'], [/^SKY HOOP \+(\d+)$/, '¡ARO DEL CIELO! +$1'], [/^\+(\d+) {2}(\d+) FT$/, '+$1  $2 PIES'], [/^LIGHTS! \+(\d+)$/, '¡LUCES! +$1'],
   [/^SCOREBOARD! \+(\d+)$/, '¡MARCADOR! +$1'], [/^BLIMP! \+(\d+)$/, '¡DIRIGIBLE! +$1'], [/^SAILBOAT SUNK! \+(\d+)$/, '¡VELERO HUNDIDO! +$1'],
   [/^NIGHT FALLS! \+(\d+)$/, '¡ANOCHECE! +$1'], [/^THE MOON BLINKED! \+(\d+)$/, '¡LA LUNA PARPADEÓ! +$1'], [/^WITCH! \+(\d+)$/, '¡BRUJA! +$1'],
   [/^UFO DOWN! \+(\d+)$/, '¡OVNI DERRIBADO! +$1'], [/^CRESCENT MOON! \+(\d+)$/, '¡LUNA CRECIENTE! +$1'], [/^SUNRISE! \+(\d+)$/, '¡AMANECE! +$1'],
@@ -732,7 +793,8 @@ function cleanLook(l){
     shirt: clamp(parseInt(l.shirt, 10) || 0, 0, SHIRTS.length - 1),
     skin: clamp(parseInt(l.skin, 10) || 0, 0, SKINS.length - 1),
     hat: clamp(parseInt(l.hat, 10) || 0, 0, HATS.length - 1),
-    hc: clamp(parseInt(l.hc, 10) || 0, 0, HAIRC.length - 1)
+    hc: clamp(parseInt(l.hc, 10) || 0, 0, HAIRC.length - 1),
+    shoe: l.shoe ? 1 : 0
   };
 }
 function showScreen(id){
@@ -952,11 +1014,11 @@ var BALL_IMGS = BALL_STYLES.map(function(st){
 
 var AV_CACHE = {};
 function avatarImg(look, legs, arms, face){
-  var key = look.shirt + ',' + look.skin + ',' + look.hat + ',' + look.hc + ',' + legs + ',' + (arms ? 1 : 0) + ',' + face;
+  var key = look.shirt + ',' + look.skin + ',' + look.hat + ',' + look.hc + ',' + (look.shoe ? 1 : 0) + ',' + legs + ',' + (arms ? 1 : 0) + ',' + face;
   if (AV_CACHE[key]) return AV_CACHE[key];
   var cv = document.createElement('canvas'); cv.width = 8; cv.height = 15;
   var c = cv.getContext('2d');
-  var pal = { s: SKINS[look.skin] || SKINS[0], S: SHIRTS[look.shirt] || SHIRTS[0], E: '#000000', P: '#283050', F: '#181818',
+  var pal = { s: SKINS[look.skin] || SKINS[0], S: SHIRTS[look.shirt] || SHIRTS[0], E: '#000000', P: '#283050', F: look.shoe ? '#e83020' : '#181818',
     h: HAIRC[look.hc] || HAIRC[0], k: '#2a1a10', w: '#fcfcfc', y: '#f8d800', r: '#d82800' };
   function put(rows, off){
     for (var j = 0; j < rows.length; j++){
@@ -1027,9 +1089,9 @@ var BG = (function(){
 })();
 
 function hoopGeo(i, t){
-  var h = HOOPS[i], off = Math.round(Math.sin(t * 1.1 + h.ph) * 3);
+  var h = HOOPS[i], sky = COURT === 'sky', off = Math.round(Math.sin(t * 1.1 + h.ph) * (sky ? 5 : 3));  // cloud hoops drift more
   var bx = h.bx + off, rl = h.side > 0 ? bx - 1 - RIM_W : bx + 4;
-  return { i: i, bx: bx, rl: rl, rr: rl + RIM_W, y: h.y + Math.round(Math.sin(t * 0.9 + h.ph)), side: h.side, base: h.base, pts: h.pts };
+  return { i: i, bx: bx, rl: rl, rr: rl + RIM_W, y: h.y + Math.round(Math.sin(t * 0.9 + h.ph) * (sky ? 3 : 1)), side: h.side, base: h.base, pts: h.pts };
 }
 
 function drawPlatform(c){
@@ -1070,6 +1132,10 @@ function drawPalm(c, g, active, t, netT){
   }
   c.fillStyle = '#000'; c.fillRect(Math.round(fx) - 4, fy, 5, 5); c.fillRect(Math.round(fx), fy + 1, 5, 5);
   c.fillStyle = '#6a4020'; c.fillRect(Math.round(fx) - 3, fy + 1, 3, 3); c.fillRect(Math.round(fx) + 1, fy + 2, 3, 3);
+  drawBoardRim(c, g, active, t, netT);
+}
+function drawBoardRim(c, g, active, t, netT){
+  var k;
   c.fillStyle = '#000'; c.fillRect(g.bx - 1, g.y - 21, 5, 28);
   c.fillStyle = active ? '#fcfcfc' : '#9a9aa8'; c.fillRect(g.bx, g.y - 20, 3, 26);
   c.fillStyle = active ? '#f83800' : '#606070'; c.fillRect(g.bx + 1, g.y - 8, 1, 6);
@@ -1170,6 +1236,7 @@ function drawScene(v, t, netH, netT, lit){
   gameXf(v);
   var c = v.c;
   if (lit == null) lit = -1;
+  if (COURT === 'sky'){ drawSkyScene(c, t, netH, netT, lit); return; }
   c.drawImage(BG, 0, 0);
   drawPlatform(c);
   for (var i = 0; i < 3; i++) drawPalm(c, hoopGeo(i, t), lit === -1 || lit === i, t, i === netH ? netT : 0);
@@ -1183,6 +1250,7 @@ function drawHoopLabels(v, t, lit){
     var g = hoopGeo(i, t);
     vText(v, HOOPS[i].pts + ' PTS', (g.rl + g.rr) / 2, g.y + 19, col, nameSize(v));
   }
+  if (COURT === 'sky'){ var sg = skyHoopGeo(t); vText(v, SKY_PTS + ' PTS', (sg.rl + sg.rr) / 2, sg.y + 16, '#f8d800', nameSize(v)); }
 }
 function magicGeo(t){
   var bx = MAGIC_HOOP.bx;
@@ -1295,7 +1363,7 @@ function randomPw(){ return pick(['palm', 'coco', 'surf', 'wave', 'reef', 'mango
 function hostInit(){
   var saved = load(HOST_KEY) || {};
   hst.cfg = { pw: saved.pw || randomPw(), mins: saved.mins || 10, view: saved.view || 'top', big: saved.big || 'me', period: saved.period || '', half: !!saved.half, studyNotes: saved.studyNotes || '', bank: saved.bank || SAMPLE_BANK,
-    picks: Array.isArray(saved.picks) ? saved.picks : [], sport: saved.sport === 'derby' ? 'derby' : 'hoops' };
+    picks: Array.isArray(saved.picks) ? saved.picks : [], sport: saved.sport === 'derby' ? 'derby' : 'hoops', court: saved.court === 'sky' ? 'sky' : 'beach' };
   $('hPw').value = hst.cfg.pw;
   $('hMins').value = hst.cfg.mins;
   $('hPeriod').value = hst.cfg.period;
@@ -1307,6 +1375,11 @@ function hostInit(){
     spBtns[sb].onclick = function(){ hst.cfg.sport = this.getAttribute('data-v'); sportSetup(); store(HOST_KEY, hst.cfg); };
   }
   sportSetup();
+  var ctBtns = $('hCourt').getElementsByTagName('button');
+  for (var cb = 0; cb < ctBtns.length; cb++){
+    ctBtns[cb].onclick = function(){ hst.cfg.court = this.getAttribute('data-v'); setSeg('hCourt', hst.cfg.court); store(HOST_KEY, hst.cfg); };
+  }
+  setSeg('hCourt', hst.cfg.court);
   var bigBtns = $('hBig').getElementsByTagName('button');
   for (var bi = 0; bi < bigBtns.length; bi++){
     bigBtns[bi].onclick = function(){ hst.cfg.big = this.getAttribute('data-v'); setSeg('hBig', hst.cfg.big); store(HOST_KEY, hst.cfg); };
@@ -1446,6 +1519,7 @@ function sportSetup(){
     'Answer 3 right to step up to bat, then swing at pitch after pitch until you strike out. Misses, fouls and pitches you let go by are all strikes. Homers score 1 to 3 points by distance, and hitting the stadium lights (+5), scoreboard (+5), sailboat (+10) or blimp (+20) adds bonus points. 3 homers in a row or hitting the lights gives the magic bat for 20 seconds: double points, high homers that curve toward the blimp, and the power to hit the sun and moon (+15). The night sky goes full moon, then crescent moon with a witch to hit (+15), then a giant eyeball and a UFO that tries to steal a fan (shoot it down with the magic bat for +20), and hitting the eyeball brings the sun back.' :
     'Shoot the lit hoop in order (2, 3, then 5 points) to open the magic round and slam dunk for 10.';
   $('hHalfLab').textContent = d ? '7th inning stretch study break' : 'Halftime study break';
+  $('hCourtWrap').style.display = d ? 'none' : '';
   $('hHalfNote').textContent = (d ? 'About 7/9 of the way through, the game pauses for the 7th inning stretch' : 'At the halfway point the game pauses') +
     ' and everyone reads the study sheet, on phones and the big screen, until you tap RESUME. At the end of the game students can save the sheet as a picture.';
 }
@@ -2019,7 +2093,7 @@ function hostData(conn, d){
     p.look = cleanLook(d.l);
     p.conn = conn; p.on = true; p.seen = performance.now();
     var arr = ranked();
-    conn.send({ t: 'w', q: hst.bank, n: hst.notes || '', ne: hst.notesEs || '', pr: hst.cfg.period, tt: hst.title || '', sp: hst.cfg.sport, m: hst.cfg.mins, g: statusFor(p, arr, arr.indexOf(p)) });
+    conn.send({ t: 'w', q: hst.bank, n: hst.notes || '', ne: hst.notesEs || '', pr: hst.cfg.period, tt: hst.title || '', sp: hst.cfg.sport, m: hst.cfg.mins, ct: hostDerby() ? 'beach' : hst.cfg.court, g: statusFor(p, arr, arr.indexOf(p)) });
     refreshLobby();
     return;
   }
@@ -2032,9 +2106,9 @@ function hostData(conn, d){
     if (d.bx == null){ p.bxr = null; } else if (p.bxr == null){ p.bxr = d.bx; p.byr = d.by; }
   } else if (d.t === 'bk'){
     var hi = d.h | 0;
-    if (hst.phase === 'play' && hi >= 0 && hi <= 3){
-      var dunk = hi === 3, pts = dunk ? DUNK_PTS : HOOPS[hi].pts + (d.j ? 1 : 0);
-      var g = dunk ? magicGeo(gameTimeMs() / 1000) : hoopGeo(hi, gameTimeMs() / 1000);
+    if (hst.phase === 'play' && hi >= 0 && hi <= (COURT === 'sky' ? 4 : 3)){
+      var dunk = hi === 3, pts = dunk ? DUNK_PTS : (hi === 4 ? SKY_PTS : HOOPS[hi].pts) + (d.j ? 1 : 0);
+      var g = dunk ? magicGeo(gameTimeMs() / 1000) : (hi === 4 ? skyHoopGeo(gameTimeMs() / 1000) : hoopGeo(hi, gameTimeMs() / 1000));
       p.score += pts;
       hst.netH = hi; hst.netT = 0.5;
       if (dunk && !p.local) addCheer(hst.pops, W / 2, H / 2 - 16, 'SLAM DUNK!!! ' + p.name);  // the big-screen player has its own banner
@@ -2048,6 +2122,40 @@ function hostData(conn, d){
     if (hst.phase === 'play'){ if (d.r) p.right++; else p.wrong++; }
   } else if (d.t === 'bn'){
     if (hst.phase === 'play'){ p.score += 1; }
+  } else if (d.t === 'zap'){
+    // hit a rain cloud on the cloud court: lightning takes half the points
+    if (hst.phase === 'play' && COURT === 'sky'){
+      var lost = Math.floor(p.score / 2), zt = gameTimeMs() / 1000;
+      p.score -= lost;
+      if (!p.local && p.rx != null){
+        var zc = rainClouds(zt).sort(function(a, b){ return Math.abs(a.x - p.rx) - Math.abs(b.x - p.rx); })[0];
+        hst.zaps.push({ x: zc.x, y: zc.y + 6, tx: p.rx, ty: p.ry - 10, t: 0.6 });
+      }
+      addPop(hst.pops, p.rx != null ? p.rx : W / 2, 40, 'ZAP! -' + lost + ' ' + p.name, '#f8f040', true);
+      hst.shake = 0.4;
+      hostBroadcast();
+    }
+  } else if (d.t === 'sd' || d.t === 'ms'){
+    // magic round: a super dunk chain dunk, or a magic shot into all four baskets
+    if (hst.phase === 'play'){
+      var cs = d.t === 'ms' ? -1 : clamp(d.s | 0, 0, 3), cp = cs < 0 ? MAGIC_SHOT_PTS : CHAIN_PTS[cs], ht = gameTimeMs() / 1000;
+      p.score += cp;
+      if (cs >= 0 && cs < 3){
+        var cg = hoopGeo(cs, ht);
+        hst.netH = cs; hst.netT = 0.6;
+        if (!p.local) addPop(hst.pops, (cg.rl + cg.rr) / 2, cg.y - 10, '+' + cp + ' ' + p.name + ' DUNK', '#fcfc78');
+        sfx.swish();
+      } else {
+        hst.shake = cs === 3 ? 1.4 : 0.6;
+        dbyFireworks(hst.parts, cs === 3 ? 4 : 3);
+        if (!p.local){
+          addCheer(hst.pops, W / 2, H / 2 - 16, (cs === 3 ? 'SUPER DUNK!!!! ' : 'MAGIC SHOT!!! ') + p.name);
+          if (cs < 0 && p.rx != null) spawnMagicBalls(hst.mballs, p.rx, p.ry - 17, ht, p.st ? p.st.k : 0);
+        }
+        sfx.bonus();
+      }
+      hostBroadcast();
+    }
   } else if (d.t === 'hr'){
     // a home run in the derby: the host works out the points from the distance
     if (hst.phase === 'play' && hst.dby){
@@ -2085,14 +2193,15 @@ function hostStartGame(){
   if (hst.cfg.big === 'none') removeTeacher(); else addTeacher(hst.cfg.big === 'ai');
   hst.phase = 'play'; hst.netH = -1; hst.netT = 0; hst.halfDone = !hst.cfg.half;
   hst.startPerf = performance.now(); hst.endAt = Date.now() + hst.cfg.mins * 60000;
-  hst.pops = []; hst.parts = []; hst.birds = []; hst.poops = []; hst.splats = []; hst.randT = 0; hst.lastSec = -1;
+  hst.pops = []; hst.parts = []; hst.birds = []; hst.poops = []; hst.splats = []; hst.randT = 0; hst.lastSec = -1; hst.mballs = []; hst.shake = 0; hst.zaps = [];
+  setCourt(hostDerby() ? 'beach' : hst.cfg.court);
   hst.dby = hostDerby() ? { S: dbyScene(), flys: [], bat: null, total: 0 } : null;
   document.body.classList.toggle('dby', hostDerby());
   keyHint();
   for (var k in hst.players){
     var p = hst.players[k];
     p.score = 0; p.right = 0; p.wrong = 0; p.st = null; p.rx = null; p.bxr = null;
-    hostSend(p, { t: 'start', q: hst.bank, n: hst.notes || '', ne: hst.notesEs || '', pr: hst.cfg.period, tt: hst.title || '', sp: hst.cfg.sport, m: hst.cfg.mins });
+    hostSend(p, { t: 'start', q: hst.bank, n: hst.notes || '', ne: hst.notesEs || '', pr: hst.cfg.period, tt: hst.title || '', sp: hst.cfg.sport, m: hst.cfg.mins, ct: hostDerby() ? 'beach' : hst.cfg.court });
   }
   $('hViewBtn').textContent = 'SHOW: ' + VIEW_LABELS[hst.cfg.view];
   showScreen('scrHGame');
@@ -2219,7 +2328,7 @@ function hostBoard(){
   var left = hostLeft();
   $('hTimer').textContent = fmt(left);
   $('hTimer').className = 'pix' + (left <= 30 ? ' low' : '');
-  $('hHoop').innerHTML = hostDerby() ? '' : 'LIT HOOP IN ORDER: 2, 3, 5<br>THEN MAGIC SLAM DUNK: 10';
+  $('hHoop').innerHTML = hostDerby() ? '' : (COURT === 'sky' ? 'LIT HOOP IN ORDER: 2, 3, 5, SKY HOOP 7<br>RAIN CLOUDS ZAP HALF YOUR POINTS' : 'LIT HOOP IN ORDER: 2, 3, 5<br>THEN MAGIC: DUNKS AND MAGIC SHOTS');
   hst.lastBoard = performance.now();
 }
 function hostUpdate(dt, now){
@@ -2266,6 +2375,9 @@ function hostUpdate(dt, now){
   }
   stepPoops(hst.poops, hst.splats, dt, null);
   stepFx(hst.parts, hst.pops, dt);
+  hst.shake = Math.max(0, (hst.shake || 0) - dt);
+  if (hst.mballs) stepMagicBalls(hst.mballs, hst.parts, dt);
+  for (i = hst.zaps.length - 1; i >= 0; i--){ hst.zaps[i].t -= dt; if (hst.zaps[i].t <= 0) hst.zaps.splice(i, 1); }
   if (hst.dby) dbyHostUpdate(dt);
   var k1 = Math.min(1, dt * 14), k2 = Math.min(1, dt * 18);
   for (var key in hst.players){
@@ -2282,6 +2394,7 @@ function hostUpdate(dt, now){
 function hostDraw(now){
   if (hst.dby){ dbyHostDraw(); return; }
   var v = hst.view, c = v.c, t = gameTimeMs() / 1000, i;
+  dbyShake(v, hst);
   // light only the big-screen player's hoop while they play; otherwise every student has their own lit hoop
   var lit = (stu.local && stu.mode === 'play' && stu.hero) ? stuLit() : -1;
   drawScene(v, t, hst.netH, hst.netT, lit);
@@ -2300,6 +2413,8 @@ function hostDraw(now){
     if (s.m >= 0) drawMeter(c, p.rx, p.ry, s.m / 100);
     if (p.bxr != null && s.bx != null) drawBall(c, p.bxr, p.byr, t * 6, s.fk);
   }
+  for (i = 0; i < hst.mballs.length; i++) drawBall(c, hst.mballs[i].x, hst.mballs[i].y, t * 12, hst.mballs[i].k);
+  for (i = 0; i < hst.zaps.length; i++){ var hz = hst.zaps[i]; drawBolt(c, hz.x, hz.y, hz.tx, hz.ty, hz.t); }
   drawParts(c, hst.parts);
   drawHoopLabels(v, t, lit);
   var ns = nameSize(v);
@@ -2335,7 +2450,7 @@ var stu = {
   peer: null, conn: null, joined: false, pw: '', mode: 'join', lastMode: 'wait', connTimer: null, retryT: null,
   G: { ph: 'lobby', l: 0, sc: 0, rk: 0, n: 0 }, lang: 'en', notesEs: '', lAt: 0, syncOff: 0,
   bank: [], deck: [], lastQ: -1, correct: 0, balls: 0, ballK: 0, seq: 0, magic: null, dunkBall: null, ai: false, aiS: null, aiQuizT: 0,
-  hero: null, flight: null, meter: null, birds: [], poops: [], splats: [], parts: [], pops: [],
+  hero: null, flight: null, meter: null, birds: [], poops: [], splats: [], parts: [], pops: [], mballs: [], shake: 0,
   birdT: 5, outT: 0, outShown: false, rimSnd: 0, netT: 0, netH: -1, lastSend: 0, lastHud: 0,
   input: { l: false, r: false, u: false, d: false, a: false, b: false }, view: null
 };
@@ -2372,6 +2487,10 @@ function studentInit(){
   $('jGo').onclick = studentJoin;
   $('jHostLink').onclick = function(e){ e.preventDefault(); location.hash = '#host'; location.reload(); };
   $('jTestLink').onclick = function(e){ e.preventDefault(); location.hash = '#test'; location.reload(); };
+  $('jRewards').onclick = function(){ showRewards('scrJoin'); };
+  $('oRewards').onclick = function(){ showRewards('scrOver'); };
+  $('rwBack').onclick = function(){ if (SOLO) freeBtn(); showScreen(rwFrom); };
+  me.look.shoe = (IS_ESS ? NBR.wearing('hoops') : coins().wear) ? 1 : 0;
   $('wEdit').onclick = function(){ stu.lastMode = stu.mode === 'join' ? stu.lastMode : stu.mode; stu.mode = 'join'; showScreen('scrJoin'); };
   $('qNext').onclick = quizNext;
   refreshLook();
@@ -2402,7 +2521,9 @@ function soloInit(){
     setStuSport(SOLO.s);
     soloTitle();
     $('jGo').textContent = L('PLAY'); $('jGo').disabled = false;
-    $('jGo').onclick = soloStart;
+    $('jGo').onclick = function(){ soloStart(); };
+    $('jFree').onclick = function(){ soloStart(true); };
+    freeBtn();
   });
   $('hfGo').onclick = soloResume;
   $('oAgain').onclick = function(){ soloStart(); };
@@ -2410,7 +2531,7 @@ function soloInit(){
 function soloTitle(){
   $('jSolo').innerHTML = L('SOLO PRACTICE') + (SOLO.t ? '<br>' + esc(SOLO.t.toUpperCase()) : '') + '<br>' + SOLO.q.length + ' ' + L('QUESTIONS') + ', ' + SOLO.m + ' MIN';
 }
-function soloStart(){
+function soloStart(free){
   ac();
   var name = cleanName($('jName').value);
   var per = $('jPer').value.replace(/^\s+|\s+$/g, '').slice(0, 12);
@@ -2423,6 +2544,12 @@ function soloStart(){
   stu.conn = { open: true, send: soloMsg };
   stu.bank = SOLO.q; stu.notes = SOLO.n; stu.notesEs = SOLO.ne;
   resetRun();
+  if (free === true){
+    var cc = coins();
+    if (cc.g < 1){ joinErr('You need a gold coin for a free play.'); return; }
+    cc.g--; coinsSave(cc); stu.free = true;
+  }
+  setCourt(SOLO.s === 'hoops' && coins().wear ? 'sky' : 'beach');
   stu.hero = null;
   stu.G = { ph: 'play', l: SOLO.m * 60, sc: 0, rk: 1, n: 1 }; stu.lAt = performance.now(); stu.syncOff = 0;
   goQuiz();
@@ -2432,9 +2559,12 @@ function soloMsg(m){
   var S = stu.solo;
   if (!S) return;
   if (m.t === 'bk'){
-    var h = m.h | 0, pts = h === 3 ? DUNK_PTS : HOOPS[clamp(h, 0, 2)].pts + (m.j ? 1 : 0);
+    var h = m.h | 0, pts = h === 3 ? DUNK_PTS : (h === 4 ? SKY_PTS : HOOPS[clamp(h, 0, 2)].pts) + (m.j ? 1 : 0);
     S.sc += pts; stu.G.sc = S.sc; stuData({ t: 'ok', p: pts }); stuHud(true);
   } else if (m.t === 'bn'){ S.sc += 1; stu.G.sc = S.sc; stuHud(true); }
+  else if (m.t === 'sd'){ S.sc += CHAIN_PTS[clamp(m.s | 0, 0, 3)]; stu.G.sc = S.sc; stuHud(true); }
+  else if (m.t === 'ms'){ S.sc += MAGIC_SHOT_PTS; stu.G.sc = S.sc; stuHud(true); }
+  else if (m.t === 'zap'){ S.sc -= Math.floor(S.sc / 2); stu.G.sc = S.sc; stuHud(true); }
   else if (m.t === 'hr'){ S.sc += dbyHrPts(m.d, m.g); stu.G.sc = S.sc; stuHud(true); }
   else if (m.t === 'tg' && DB_TG[m.k]){ S.sc += dbyTgPts(m.k, m.g); stu.G.sc = S.sc; stuHud(true); }
 }
@@ -2454,7 +2584,12 @@ function soloResume(){
   leaveHalf();
 }
 function soloOver(){
-  if (ESS){ stu.solo.played = SOLO.m * 60 - timeLeft(); stu.G.ph = 'over'; showOver({ top: [], sc: stu.solo.sc, rk: 1, n: 1 }); return; }
+  if (ESS){
+    if (stu.G.ph === 'over') return;
+    stu.solo.played = SOLO.m * 60 - timeLeft();
+    if (FREE){ FREE.end(); }
+    stu.G.ph = 'over'; showOver({ top: [], sc: stu.solo.sc, rk: 1, n: 1 }); return;
+  }
   var S = stu.solo, key = SOLO_BEST + location.hash.length + '_' + location.hash.slice(-24), best = load(key) || 0;
   var newBest = S.sc > best;
   if (newBest) store(key, S.sc);
@@ -2463,7 +2598,7 @@ function soloOver(){
   overCard(S.sc, newBest ? L('NEW PERSONAL BEST!') : L('BEST') + ' ' + best);
 }
 /* ---------- review game from the Earth Space Science Notebook ---------- */
-var ESS = null;
+var ESS = null, FREE = null;
 function essInit(){
   var d = load(ESS_LAUNCH);
   // the notebook already knows the name, period and language, so the first card (password, name) is not needed
@@ -2473,17 +2608,25 @@ function essInit(){
   foot.innerHTML = '<a href="index.html" id="jBack" data-l>Back to the notebook</a>';
   stu.lang = d && d.lang === 'es' ? 'es' : 'en';
   applyLang(); refreshLook();
-  if (!d || !d.q || !d.q.length){
+  $('jRewards').parentNode.style.display = 'none'; $('jFree').style.display = 'none';
+  var freeT = d && d.free ? NBR.ticket(d.s === 'derby' ? 'derby' : 'hoops') : null;
+  if (d && d.free && !freeT){
+    $('jGo').textContent = L('FREE PLAY'); $('jGo').disabled = true;
+    $('jErr').textContent = L('This free play is used up. Go back to the notebook.');
+    return;
+  }
+  if (!d || (!freeT && (!d.q || !d.q.length))){
     $('jGo').textContent = L('NO QUESTIONS'); $('jGo').disabled = true;
     $('jErr').textContent = L('Go back to the notebook and pick the topics to review.');
     return;
   }
-  ESS = { name: String(d.name || ''), first: String(d.first || ''), per: String(d.per || ''), topics: d.topics || [] };
-  SOLO = { t: '', q: d.q, n: '', ne: '', m: clamp(d.m | 0 || 5, 1, 60), h: false, s: d.s === 'derby' ? 'derby' : 'hoops' };
+  ESS = { name: String(d.name || ''), first: String(d.first || ''), per: String(d.per || ''), topics: d.topics || [], free: !!freeT };
+  SOLO = { t: '', q: d.q || [], n: '', ne: '', m: freeT ? NBR.FREE_SECS / 60 : clamp(d.m | 0 || 5, 1, 60), h: false, s: d.s === 'derby' ? 'derby' : 'hoops' };
   setStuSport(SOLO.s);
   $('jSolo').style.display = '';
   $('jSolo').innerHTML = esc(pixUp(ESS.name)) + (ESS.per ? '<br>' + L('PERIOD') + ' ' + esc(pixUp(ESS.per)) : '') +
-    '<br>' + ESS.topics.length + ' ' + L(ESS.topics.length === 1 ? 'TOPIC' : 'TOPICS') + ', ' + SOLO.m + ' MIN';
+    (ESS.free ? '<br>' + L('FREE PLAY') + '<br>' + L('NO QUESTIONS, 3 LIVES') + '<br>' + NBR.fmt(freeT.left) + ' ' + L('LEFT') + ', ' + freeT.lives + ' ' + L(freeT.lives === 1 ? 'LIFE' : 'LIVES')
+      : '<br>' + ESS.topics.length + ' ' + L(ESS.topics.length === 1 ? 'TOPIC' : 'TOPICS') + ', ' + SOLO.m + ' MIN');
   $('jGo').textContent = L('PLAY'); $('jGo').disabled = false;
   $('jGo').onclick = essStart;
   $('hfGo').onclick = soloResume;
@@ -2494,22 +2637,38 @@ function essInit(){
 // leaving early still ends with the score card
 function essQuit(){
   if (stu.mode !== 'quiz' && stu.mode !== 'play') return;
-  if (!window.confirm(L('End the game now and see your score card?'))) return;
+  if (!window.confirm(L(ESS.free ? 'End your free play now? It cannot be picked up again.' : 'End the game now and see your score card?'))) return;
   soloOver();
 }
 function essStart(){
   ac();
   me.name = cleanName(pixUp(ESS.first.split(' ')[0])) || 'PLAYER';
   // keep the player's look for next time, without touching the name or period saved for class games
-  var sv = load(ME_KEY) || {}; sv.look = me.look; if (!sv.pid) sv.pid = me.pid; store(ME_KEY, sv);
+  var sv = load(ME_KEY) || {}; sv.look = cleanLook(me.look); sv.look.shoe = 0; if (!sv.pid) sv.pid = me.pid; store(ME_KEY, sv);
   $('jErr').textContent = '';
   stu.solo = { sc: 0, halfDone: true, period: ESS.per };
   stu.conn = { open: true, send: soloMsg };
   stu.bank = SOLO.q; stu.notes = ''; stu.notesEs = '';
   resetRun();
+  if (ESS.free){
+    FREE = NBR.freeRun({ game: SOLO.s, lang: stu.lang, pause: essPause, resume: essResume, timeUp: soloOver });
+    if (!FREE){ $('jErr').textContent = L('This free play is used up. Go back to the notebook.'); return; }
+    stu.free = true; stu.freeGo = false;
+  }
+  // prizes from the Reward Center: Air Jordann's play on the cloud court, the Golden Bat shines
+  me.look.shoe = NBR.wearing('hoops') ? 1 : 0;
+  setCourt(SOLO.s === 'hoops' && me.look.shoe ? 'sky' : 'beach');
+  GOLD_BAT = SOLO.s === 'derby' && NBR.wearing('derby');
   stu.G = { ph: 'play', l: SOLO.m * 60, sc: 0, rk: 1, n: 1 }; stu.lAt = performance.now(); stu.syncOff = 0;
   goQuiz();
 }
+// a free play pauses when the app is closed or the phone is turned off
+function essPause(){
+  if (stu.mode !== 'play') return;
+  stu.mode = 'pause'; stu.meter = null;
+  stu.input.l = stu.input.r = stu.input.u = stu.input.d = stu.input.a = stu.input.b = false;
+}
+function essResume(){ if (stu.mode === 'pause'){ stu.mode = 'play'; lastNow = 0; } }
 // the pixel font has no accented capitals (it does have Ñ)
 function pixUp(t){ return String(t).toUpperCase().replace(/[\u00c1\u00c9\u00cd\u00d3\u00da\u00dc]/g, function(ch){ return 'AEIOUU'.charAt('\u00c1\u00c9\u00cd\u00d3\u00da\u00dc'.indexOf(ch)); }); }
 function essCard(sc){
@@ -2525,10 +2684,12 @@ function essCard(sc){
   $('oCard').innerHTML = '<div class="ocName">' + esc(pixUp(ESS.name)) + '</div>' +
     '<div class="ocLine">' + (ESS.per ? L('PERIOD') + ' ' + esc(pixUp(ESS.per)) + '<br>' : '') + L(isDerby() ? 'HOME RUN DERBY REVIEW' : 'BASKETBALL REVIEW') + '</div>' +
     '<div class="ocBig">' + L('SCORE') + ' ' + sc + '</div>' +
+    (ESS.free ? '<div class="ocPct">' + L('FREE PLAY') + '</div>' :
     '<div class="ocPct">' + pct(stu.qRight, stu.qTotal) + '%</div>' +
-    '<div class="ocLine">' + stu.qRight + '/' + stu.qTotal + ' ' + L('CORRECT') + '</div>' +
+    '<div class="ocLine">' + stu.qRight + '/' + stu.qTotal + ' ' + L('CORRECT') + '</div>') +
     '<div class="ocLine">' + L('PLAYED') + ' ' + fmt(Math.min(SOLO.m * 60, stu.solo.played || 0)) + ' ' + L('OF') + ' ' + SOLO.m + ' MIN</div>' +
-    '<table class="ocTbl"><tr><th>' + L('Topic') + '</th><th class="n">' + L('Right') + '</th><th class="n">%</th></tr>' + rows + '</table>' +
+    (stu.coinHtml || '') +
+    (ESS.free ? '' : '<table class="ocTbl"><tr><th>' + L('Topic') + '</th><th class="n">' + L('Right') + '</th><th class="n">%</th></tr>' + rows + '</table>') +
     '<div class="ocDate">' + L('Earth Space Science Notebook') + ', ' + d.toLocaleDateString(es ? 'es' : [], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' +
     d.toLocaleTimeString(es ? 'es' : [], { hour: 'numeric', minute: '2-digit' }) + '</div>';
 }
@@ -2642,7 +2803,7 @@ function stuSendMsg(m){ if (stu.conn && stu.conn.open){ try { stu.conn.send(m); 
 function stuData(d){
   if (!d || !d.t) return;
   if (d.t === 'w'){
-    setStuSport(d.sp); stu.gameMins = d.m || 0;
+    setStuSport(d.sp); stu.gameMins = d.m || 0; setCourt(d.ct);
     stu.bank = d.q || [];
     stu.notes = d.n || ''; stu.notesEs = d.ne || ''; stu.period = d.pr || ''; stu.title = d.tt || '';
     applyG(d.g);
@@ -2650,7 +2811,7 @@ function stuData(d){
     else if (d.g.ph === 'half'){}
     else if (stu.mode !== 'over' || d.g.ph === 'lobby') goWait();
   } else if (d.t === 'start'){
-    setStuSport(d.sp); stu.gameMins = d.m || 0;
+    setStuSport(d.sp); stu.gameMins = d.m || 0; setCourt(d.ct);
     stu.bank = d.q || stu.bank;
     stu.notes = d.n || ''; stu.notesEs = d.ne || ''; stu.period = d.pr || ''; stu.title = d.tt || '';
     resetRun();
@@ -2678,13 +2839,13 @@ function applyG(g){
   stuHud(true);
 }
 function syncT(){ return (performance.now() + stu.syncOff) / 1000; }
-function timeLeft(){ return Math.max(0, stu.G.l - (performance.now() - stu.lAt) / 1000); }
+function timeLeft(){ return stu.free && FREE ? FREE.left() : Math.max(0, stu.G.l - (performance.now() - stu.lAt) / 1000); }
 function resetRun(){
   stu.balls = 0; stu.ballK = 0; stu.correct = 0; stu.deck = []; stu.lastQ = -1;
   stu.seq = 0; stu.magic = null; stu.dunkBall = null; stu.aiS = null;
-  stu.made = 0; stu.water = null; stu.waterT = 0; stu.qRight = 0; stu.qTotal = 0; stu.tp = {};
+  stu.made = 0; stu.water = null; stu.waterT = 0; stu.qRight = 0; stu.qTotal = 0; stu.tp = {}; stu.free = false; stu.awarded = false; stu.coinHtml = '';
   stu.hero = null; stu.flight = null; stu.meter = null; stu.dby = null;
-  stu.birds = []; stu.poops = []; stu.splats = []; stu.parts = []; stu.pops = [];
+  stu.birds = []; stu.poops = []; stu.splats = []; stu.parts = []; stu.pops = []; stu.mballs = []; stu.shake = 0; stu.zap = null;
 }
 function goWait(){
   stu.mode = 'wait';
@@ -2725,22 +2886,24 @@ function overCard(sc, place){
   if (title) info.push(esc(title.toUpperCase()));
   $('oCard').innerHTML = '<div class="ocName">' + esc(me.name) + '</div>' +
     (info.length ? '<div class="ocLine">' + info.join('<br>') + '</div>' : '') +
-    '<div class="ocBig">' + stu.qRight + '/' + stu.qTotal + ' ' + L('CORRECT') + '</div>' +
-    '<div class="ocPct">' + pct + '%</div>' +
-    '<div class="ocLine">' + L('SCORE') + ' ' + sc + (place ? '<br>' + L(place) : '') + '</div>' +
+    (stu.free ? '<div class="ocBig">' + L('FREE PLAY') + '</div>' :
+      '<div class="ocBig">' + stu.qRight + '/' + stu.qTotal + ' ' + L('CORRECT') + '</div>' + '<div class="ocPct">' + pct + '%</div>') +
+    '<div class="ocLine">' + L('SCORE') + ' ' + sc + (place ? '<br>' + L(place) : '') + '</div>' + (stu.coinHtml || '') +
     '<div class="ocDate">' + (stu.solo ? L('Solo practice') + ', ' : '') + d.toLocaleDateString(stu.lang === 'es' ? 'es' : [], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' +
     d.toLocaleTimeString(stu.lang === 'es' ? 'es' : [], { hour: 'numeric', minute: '2-digit' }) + '</div>';
 }
 function showOver(d){
   stu.mode = 'over';
   if (stu.local){ localShow('none'); if (stu.ai) return; }
+  if (!stu.awarded){ stu.awarded = true; stu.coinHtml = awardCoin(); }
   overCard(d.sc, stu.solo ? '' : 'PLACE ' + d.rk + ' OF ' + d.n);
+  $('oRewards').style.display = stu.local || ESS ? 'none' : '';
   $('oNotes').style.display = notesFor() ? '' : 'none';
   $('oMsg').textContent = stu.local ? '' : L(stu.solo ? 'Play again to beat your best score!' : 'Wait for your teacher to start the next game.');
   $('oAgain').style.display = stu.solo || stu.local ? '' : 'none';
   if (stu.local){ $('oAgain').textContent = 'SEE RESULTS'; $('oAgain').onclick = function(){ showScreen('scrHOver'); }; }
   $('oTop').style.display = stu.solo ? 'none' : '';
-  if (ESS){ $('oMsg').textContent = L('Take a screenshot of your score card!'); $('oBack').style.display = ''; }
+  if (ESS){ $('oMsg').textContent = L('Take a screenshot of your score card!'); $('oBack').style.display = ''; if (ESS.free) $('oAgain').style.display = 'none'; }
   $('oNotesOut').style.display = 'none';
   $('oNotesBtn').style.display = '';
   $('oNotesBtn').onclick = function(){
@@ -2770,6 +2933,16 @@ function drawIdx(){
   return stu.lastQ;
 }
 function goQuiz(){
+  // free play: no questions, straight back to playing
+  if (stu.free){
+    stu.water = null; stu.made = 0;
+    // in the notebook's free play, running out of balls (or striking out) costs a life
+    var lives = FREE ? FREE.lives() : 0;
+    if (FREE && stu.freeGo){ lives = FREE.loseLife(); if (!lives){ soloOver(); return; } }
+    goPlay();
+    if (FREE){ addPop(stu.pops, W / 2, 58, stu.freeGo ? (lives === 1 ? '1 LIFE LEFT' : lives + ' LIVES LEFT') : 'FREE PLAY! 3 LIVES', '#f8d800', true); stu.freeGo = true; }
+    return;
+  }
   $('qHead').innerHTML = L(stu.water ? 'Water break!<br>Answer 3 questions' : (isDerby() ? 'Answer 3 right<br>to step up to bat' : 'Answer 3 right<br>to earn 3 balls'));
   if (stu.ai){
     // the computer player "answers" for a moment, then gets 3 more balls
@@ -2890,7 +3063,7 @@ function stepHero(p, dt, mv){
     if (!g || p.x + 3 <= g.x1 || p.x - 3 >= g.x2){ p.ground = null; p.vy = 0; } else p.y = g.y;
   }
   if (!p.ground){
-    p.vy = Math.min(p.vy + GRAV * dt, 400);
+    p.vy = Math.min(p.vy + GRAV * (COURT === 'sky' ? 0.88 : 1) * dt, 400);
     if (!p.jumpHeld && p.vy < -120) p.vy = -120;
     var py = p.y; p.y += p.vy * dt;
     if (p.vy >= 0){
@@ -2899,15 +3072,22 @@ function stepHero(p, dt, mv){
         var q = PLATS[i];
         if ((q.floor || p.drop <= 0) && py <= q.y + 0.5 && p.y >= q.y && p.x + 3 > q.x1 && p.x - 3 < q.x2 && (!best || q.y < best.y)) best = q;
       }
-      if (best){ p.y = best.y; p.vy = 0; p.ground = best.id; p.air2 = true; }
+      if (best && COURT === 'sky' && p.vy > 170){
+        // clouds are springy: a hard landing bounces you back up a little
+        p.y = best.y; p.vy = -p.vy * 0.42; p.air2 = true; p.air3 = shoeBonus();
+        tone(240, 0.1, 'sine', 0.04, 160);
+      } else if (best){ p.y = best.y; p.vy = 0; p.ground = best.id; p.air2 = true; p.air3 = shoeBonus(); }
     }
     if (p.y < 14){ p.y = 14; if (p.vy < 0) p.vy = 0; }
   }
+  if (p.ground) p.lastG = p.ground;
 }
 function heroJump(p){
-  if (stu.magic && stu.magic.dunk && !stu.magic.dunk.gone) return;
-  if (p.ground){ p.ground = null; p.vy = -JUMP_V; p.jumpHeld = true; sfx.jump(); return; }
+  if (dunkHanging()) return;
+  if (stu.magic && stu.magic.noJump && !p.ground) return;  // after a magic shot you just fall
+  if (p.ground){ p.ground = null; p.vy = -JUMP_V * jumpMul(); p.jumpHeld = true; sfx.jump(); return; }
   if (stu.magic) p.air2 = true;  // magic round: unlimited jumps
+  if (!p.air2 && p.air3){ p.air3 = false; p.air2 = true; }  // Air Jordann's on the clouds: a third jump
   if (!p.air2) return;
   p.air2 = false; p.vy = -JUMP_V * 0.85; p.jumpHeld = true; p.flipT = stu.magic ? 0 : 0.3;
   burst(stu.parts, p.x, p.y - 6, 6, stu.magic ? MAGIC_COLS : ['#fcfcfc', '#9cd8fc'], 30, 0, 0.3);
@@ -2926,9 +3106,15 @@ function heroHit(p, x, y, hw, hh){ return Math.abs(p.x - x) < hw + 3 && p.y > y 
 function pressShoot(){
   var p = stu.hero;
   if (!p) return;
+  if (stu.magic){
+    var M = stu.magic;
+    if (M.dunk || M.chain || stu.balls <= 0) return;
+    if (!p.ground && p.lastG === 'plat'){ if (M.msT <= 0) magicShot(p); return; }
+    addPop(stu.pops, p.x, p.y - 22, 'JUMP OFF THE PLATFORM, THEN SHOOT!', '#e0b0ff');
+    return;
+  }
   if (stu.flight){ addPop(stu.pops, p.x, p.y - 22, 'WAIT FOR IT', '#fcfcfc'); return; }
   if (stu.balls <= 0) return;
-  if (stu.magic){ addPop(stu.pops, p.x, p.y - 22, 'NO SHOTS. DUNK IT!', '#e0b0ff'); return; }
   if (stu.waterT > 0) return;
   stu.meter = { p: 0, dir: 1 };
 }
@@ -2963,7 +3149,13 @@ function ballScored(b, g){
   addCheer(stu.pops, W / 2, 34);
   burst(stu.parts, cx, g.y + 4, 14, ['#f8d800', '#fcfcfc', '#58f878'], 60, 40, 0.8);
   sfx.swish();
-  if (g.i === b.lit){
+  if (g.i === 4){
+    // the golden sky hoop counts any time, and does not change which hoop is lit
+    stu.ballK = (stu.ballK + 1) % BALL_STYLES.length;
+    addPop(stu.pops, cx, g.y + 16, 'SKY HOOP +' + (SKY_PTS + (b.jump ? 1 : 0)), '#f8d800', true);
+    stuSendMsg({ t: 'bk', h: 4, j: b.jump ? 1 : 0 });
+    stu.made++;
+  } else if (g.i === b.lit){
     stu.ballK = (stu.ballK + 1) % BALL_STYLES.length;
     if (b.jump) addPop(stu.pops, cx, g.y - 12, 'JUMP SHOT +1', '#58f878');
     stuSendMsg({ t: 'bk', h: g.i, j: b.jump ? 1 : 0 });
@@ -3007,7 +3199,7 @@ function stepBall(b, h, gs){
       var q = PLATS[i];
       if (py + BR <= q.y + 0.5 && b.y + BR >= q.y && b.x > q.x1 && b.x < q.x2){
         b.y = q.y - BR; b.live = false;
-        if (b.vy > 25){ if (fx) sfx.bounce(b.vy / 3000); b.vy = -b.vy * 0.55; b.vx *= 0.85; }
+        if (b.vy > 25){ if (fx) sfx.bounce(b.vy / 3000); b.vy = -b.vy * (COURT === 'sky' ? 0.7 : 0.55); b.vx *= 0.85; }
         else { b.vy = 0; b.vx *= Math.pow(0.35, h); if (Math.abs(b.vx) < 2) b.vx = 0; }
         break;
       }
@@ -3026,6 +3218,7 @@ function wrongHoopCheck(b, p){
    Never in the last minute of the game or the minute before halftime, so a hot streak is not broken. */
 var WATER_EVERY = 10;
 function waterBlocked(){
+  if (stu.free) return true;  // no water breaks in a free play
   var left = stu.local ? hostLeft() : timeLeft();
   var hl = stu.local ? (hst.halfDone ? 0 : halfMark(hst.cfg.mins, hst.cfg.sport)) : (stu.solo ? (stu.solo.halfDone ? 0 : halfMark(SOLO.m, SOLO.s)) : (stu.G.hl || 0));
   return left <= 60 || (hl > 0 && left - hl <= 60);
@@ -3040,10 +3233,11 @@ function endWater(){
   goPlay(isDerby() ? true : balls);
 }
 function startMagic(){
-  stu.magic = { left: MAGIC_SECS, dunk: null };
+  stu.magic = { left: MAGIC_SECS, dunk: null, chain: null, ms: 0, msT: 0, noJump: false };
   stu.meter = null;
   addCheer(stu.pops, W / 2, 50, 'MAGIC MODE!!');
-  addPop(stu.pops, W / 2, 66, 'UNLIMITED JUMPS! SLAM DUNK IT!', '#e0b0ff');
+  addPop(stu.pops, W / 2, 66, 'DUNK THE LOW HOOP OR THE GLASS!', '#e0b0ff');
+  addPop(stu.pops, W / 2, 76, 'OR JUMP OFF THE PLATFORM AND SHOOT!', '#e0b0ff');
   burst(stu.parts, (PLATFORM.x1 + PLATFORM.x2) / 2, PLATFORM.y, 24, MAGIC_COLS, 70, 0, 1);
   sfx.bonus();
 }
@@ -3053,15 +3247,104 @@ function endMagic(text){
   addPop(stu.pops, W / 2, 66, 'BACK TO THE LOW HOOP', '#58f8d0');
   stuHud(true);
 }
-function dunkHanging(){ return !!(stu.magic && stu.magic.dunk && !stu.magic.dunk.gone); }
+function dunkHanging(){ return !!(stu.magic && ((stu.magic.dunk && !stu.magic.dunk.gone) || stu.magic.chain)); }
+/* magic shot: from a jump off the platform, one press sends a ball into all four baskets at once */
+function spawnMagicBalls(list, x, y, t, k){
+  var gs = hoopGeos(t).concat([magicGeo(t)]);
+  for (var i = 0; i < 4; i++) list.push({ x0: x, y0: y, x1: (gs[i].rl + gs[i].rr) / 2, y1: gs[i].y - 2, u: 0, i: i, k: k || 0, x: x, y: y });
+}
+function stepMagicBalls(list, parts, dt){
+  for (var i = list.length - 1; i >= 0; i--){
+    var b = list[i];
+    b.u += dt / 0.5;
+    var u = Math.min(1, b.u);
+    b.x = b.x0 + (b.x1 - b.x0) * u; b.y = b.y0 + (b.y1 - b.y0) * u - Math.sin(Math.PI * u) * 28;
+    if (b.u >= 1){
+      burst(parts, b.x1, b.y1 + 4, 12, ['#f8d800', '#fcfcfc'].concat(MAGIC_COLS), 60, 40, 0.8);
+      if (b.i === 0) sfx.swish();
+      list.splice(i, 1);
+    }
+  }
+}
+function magicShot(p){
+  var M = stu.magic;
+  M.ms++; M.noJump = true; M.msT = 0.3;
+  spawnMagicBalls(stu.mballs, p.x, p.y - 17, syncT(), stu.ballK);
+  stuSendMsg({ t: 'ms' });
+  stu.made++;
+  addCheer(stu.pops, W / 2, 40, 'MAGIC SHOT!!!');
+  dbyFireworks(stu.parts, 3);
+  stu.shake = 0.6;
+  sfx.dribble(); sfx.bonus();
+}
+/* super dunk chain: dunk the low hoop, then turbo jump left to the middle hoop, right to the high hoop,
+   and left to the glass hoop for the SUPER DUNK */
+function chainDunk(i, p, t){
+  var M = stu.magic, g = i < 3 ? hoopGeo(i, t) : magicGeo(t), cx = (g.rl + g.rr) / 2;
+  p.x = cx; p.y = g.y + 15; p.vx = 0; p.vy = 0; p.ground = null; p.flipT = 0; p.lastG = null;
+  stu.dunkBall = { x: cx, y: g.y + 2, vy: 30, k: stu.ballK };
+  stu.ballK = (stu.ballK + 1) % BALL_STYLES.length;
+  stu.netH = i; stu.netT = 0.8;
+  stuSendMsg({ t: 'sd', s: i });
+  stu.made++;
+  burst(stu.parts, cx, g.y, 24, ['#f8d800', '#fcfcfc'].concat(MAGIC_COLS), 80, 40, 1);
+  sfx.swish();
+  if (i < 3){
+    M.chain = { i: i, t: 0, fly: null, armed: false };
+    addPop(stu.pops, cx, g.y - 14, 'DUNK! +' + CHAIN_PTS[i], '#fcfc78', true);
+    stu.shake = 0.25;
+    return;
+  }
+  M.chain = null;
+  M.dunk = { t: 0, cp: 0, gone: false, snd: 0, sup: true };
+  addCheer(stu.pops, W / 2, 34, 'SUPER DUNK!!!!');
+  addPop(stu.pops, W / 2, 50, '+' + CHAIN_PTS[3], '#fcfc78', true);
+  dbyFireworks(stu.parts, 4);
+  stu.shake = 1.4;
+  sfx.fanfare(); sfx.bonus();
+}
+function stepChain(p, dt, t){
+  var M = stu.magic, C = M.chain;
+  C.t += dt;
+  if (C.fly){
+    // turbo jump: a fast spinning arc to the next hoop with a rainbow trail
+    var F = C.fly, k = Math.min(1, C.t / 0.55), e = k * k * (3 - 2 * k);
+    var g = F.to < 3 ? hoopGeo(F.to, t) : magicGeo(t), x1 = (g.rl + g.rr) / 2, y1 = g.y + 15;
+    p.x = F.x0 + (x1 - F.x0) * e; p.y = F.y0 + (y1 - F.y0) * e - Math.sin(Math.PI * k) * 26;
+    p.vx = 0; p.vy = 0; p.flipT = 0.3 * (1 - k); p.face = F.dir;
+    burst(stu.parts, p.x, p.y - 7, 2, MAGIC_COLS, 12, 0, 0.5);
+    if (k >= 1) chainDunk(F.to, p, t);
+    return;
+  }
+  var g2 = hoopGeo(C.i, t);
+  p.x = (g2.rl + g2.rr) / 2; p.y = g2.y + 15; p.vx = 0; p.vy = 0;
+  var want = CHAIN_DIR[C.i], l = stu.input.l, r = stu.input.r;
+  if (!l && !r) C.armed = true;  // let go of the arrow you came in with before the next one counts
+  if (C.armed && ((want < 0 && l) || (want > 0 && r))){
+    C.fly = { to: C.i + 1, x0: p.x, y0: p.y, dir: want }; C.t = 0;
+    tone(300, 0.4, 'square', 0.05, 900); hiss(0.3, 0.05, 2500);
+  } else if (C.t > 3){
+    // waited too long: drop down, and the magic keeps going if there is time left
+    M.chain = null; p.ground = null; p.vy = 0;
+    addPop(stu.pops, p.x, p.y - 24, 'TOO SLOW!', '#e0b0ff');
+  }
+}
 function stepMagic(p, dt, t){
   var M = stu.magic, g = magicGeo(t), cx = (g.rl + g.rr) / 2;
   if (Math.random() < dt * 10) burst(stu.parts, p.x + rand(-4, 4), p.y - rand(0, 14), 1, MAGIC_COLS, 8, -20, 0.6);
+  M.msT = Math.max(0, M.msT - dt);
+  if (M.chain){ stepChain(p, dt, t); return; }  // the magic clock waits during the chain
+  // landing after a magic shot ends the magic
+  if (M.ms > 0 && p.ground){ endMagic('WHAT A SHOW!'); return; }
+  if (!M.dunk && M.ms === 0 && stu.balls > 0){
+    var lo = hoopGeo(0, t);
+    if (p.x > lo.rl - 3 && p.x < lo.rr + 3 && p.y > lo.y - 6 && p.y < lo.y + 16){ chainDunk(0, p, t); return; }
+  }
   if (!M.dunk){
     M.left -= dt;
     if (M.left <= 0){ endMagic('MAGIC FADED'); return; }
     // land on the magic hoop with the ball for the slam dunk
-    if (stu.balls > 0 && p.x > g.rl - 3 && p.x < g.rr + 3 && p.y > g.y - 6 && p.y < g.y + 16){
+    if (stu.balls > 0 && M.ms === 0 && p.x > g.rl - 3 && p.x < g.rr + 3 && p.y > g.y - 6 && p.y < g.y + 16){
       M.dunk = { t: 0, cp: 0, gone: false, snd: 0 };
       p.vx = 0; p.vy = 0; p.ground = null; p.flipT = 0; stu.meter = null;
       stu.dunkBall = { x: cx, y: g.y + 2, vy: 30, k: stu.ballK };
@@ -3083,15 +3366,19 @@ function stepMagic(p, dt, t){
   }
   if (!D.gone && D.t >= 2.3){
     D.gone = true; p.ground = null; p.vy = 0;
+    if (D.sup){ stu.shake = 1.2; dbyFireworks(stu.parts, 3); }
     burst(stu.parts, cx, g.y - 12, 34, ['#c8f0ff', '#fcfcfc', '#80d8f8'], 80, 220, 1.4);
     hiss(0.5, 0.08, 3000); tone(1600, 0.25, 'square', 0.04, -1300);
   }
-  if (D.t >= 3.4) endMagic('WHAT A DUNK!');
+  if (D.t >= 3.4) endMagic(D.sup ? 'SUPER DUNK!!!!' : 'WHAT A DUNK!');
 }
 function stuUpdate(dt){
   if (isDerby()){ dbyUpdate(dt); return; }
-  var p = stu.hero, t = syncT(), gs = hoopGeos(t), i;
+  var p = stu.hero, t = syncT(), gs = courtGeos(t), i;
   stu.rimSnd -= dt; stu.netT = Math.max(0, stu.netT - dt);
+  stu.shake = Math.max(0, (stu.shake || 0) - dt);
+  if (stu.zap){ stu.zap.t -= dt; if (stu.zap.t <= 0) stu.zap = null; }
+  stepMagicBalls(stu.mballs, stu.parts, dt);
   var holding = stu.balls > 0 && !stu.flight;
   var mv = (stu.meter && p.ground) ? 0 : (stu.input.l ? -1 : (stu.input.r ? 1 : 0));
   if (stu.meter && p.ground && (stu.input.l || stu.input.r)) p.face = stu.input.l ? -1 : 1;
@@ -3118,6 +3405,7 @@ function stuUpdate(dt){
     var b = stu.flight;
     b.age += dt;
     for (i = 0; i < 3; i++) stepBall(b, dt / 3, gs);
+    if (COURT === 'sky') skyZap(b, p, t);
     // rebound: grab your own ball once it is loose (falling, bounced, or through the net) to keep it
     var loose = b.scored || !b.live || (b.vy > 0 && b.age > 0.4);
     if (loose && Math.abs(b.x - p.x) < 7 && b.y > p.y - 20 && b.y < p.y + 3){
@@ -3191,6 +3479,7 @@ function stuUpdate(dt){
 function stuLit(){ return stu.magic ? -2 : stu.seq; }
 function stuDraw(){
   var v = stu.view, t = syncT();
+  if (!isDerby()) dbyShake(v, stu);
   if (isDerby()){ dbyDrawAll(v, stu.dby, t, ['HOMERS', String(stu.dby.hr)]); drawPops(v, stu.pops); return; }
   drawScene(v, t, stu.netH, stu.netT, stuLit());
   drawLocalLayer(v, t);
@@ -3213,10 +3502,18 @@ function drawLocalLayer(v, t){
   }
   if (stu.meter) drawMeter(c, p.x, p.y, stu.meter.p);
   if (stu.flight) drawBall(c, stu.flight.x, stu.flight.y, stu.flight.rot, stu.flight.k);
+  for (var mi = 0; mi < stu.mballs.length; mi++) drawBall(c, stu.mballs[mi].x, stu.mballs[mi].y, t * 12, stu.mballs[mi].k);
+  if (stu.zap) drawBolt(c, stu.zap.x, stu.zap.y, p.x, p.y - 10, stu.zap.t);
   drawParts(c, stu.parts);
   vText(v, me.name, p.x, Math.min(H - 5, p.y + 6), '#fcfcfc', nameSize(v));
   if (M && !D) vText(v, L('MAGIC ' + Math.ceil(M.left)), W / 2, H - 5, MAGIC_COLS[Math.floor(t * 6) % MAGIC_COLS.length], nameSize(v));
-  if (D && D.t < 2.6) vText(v, L('SLAM DUNK!!!'), W / 2, H / 2 - 8, CHEER_COLS[Math.floor(t * 10) % CHEER_COLS.length], Math.round(nameSize(v) * (3 + Math.sin(t * 20) * 0.25)));
+  var C = M && M.chain;
+  if (C && !C.fly){
+    var ac = Math.floor(t * 6) % 2 ? '#f8d800' : '#fcfcfc', ad = CHAIN_DIR[C.i];
+    vText(v, L(ad < 0 ? '<<< PRESS LEFT!' : 'PRESS RIGHT! >>>'), clamp(p.x + ad * 30, 50, W - 50), p.y - 30, ac, nameSize(v));
+    vText(v, String(Math.max(1, Math.ceil(3 - C.t))), p.x, p.y - 40, ac, nameSize(v));
+  }
+  if (D && D.t < 2.6) vText(v, L(D.sup ? 'SUPER DUNK!!!!' : 'SLAM DUNK!!!'), W / 2, H / 2 - 8, CHEER_COLS[Math.floor(t * 10) % CHEER_COLS.length], Math.round(nameSize(v) * (3 + Math.sin(t * 20) * 0.25)));
   if (stu.local) drawPops(v, stu.pops);
 }
 function stuSend(now){
@@ -3250,7 +3547,7 @@ function stuHud(force){
     $('pBalls').innerHTML = h;
     $('pHoop').textContent = L(stu.magic ? 'MAGIC ' + Math.ceil(stu.magic.left) : 'NEXT: ' + HOOPS[stu.seq].pts + ' PTS');
   }
-  $('pTime').textContent = fmt(timeLeft());
+  $('pTime').textContent = fmt(timeLeft()) + (stu.free && FREE ? ' \u2665' + FREE.lives() : '');
   $('pScore').textContent = stu.G.sc + ' PTS' + (stu.solo ? '' : ' #' + (stu.G.rk || '-'));
   $('qScore').textContent = stu.G.sc + ' PTS' + (stu.solo ? '' : '  #' + (stu.G.rk || '-'));
   $('qTime').textContent = fmt(timeLeft());
@@ -3314,13 +3611,29 @@ function aiThink(dt){
   inp.l = inp.r = inp.u = inp.d = inp.a = false;
   if (stu.outT > 0) return;
   if (stu.magic){
-    // magic round: head for the magic hoop, jumping again and again
-    if (stu.magic.dunk) return;
-    var mg = magicGeo(syncT()), mdx = (mg.rl + mg.rr) / 2 - p.x;
+    // magic round: the demo picks the glass dunk, the super dunk chain or magic shots
+    var M = stu.magic;
+    A.st = 'pick';
+    if (A.mmFor !== M){ A.mmFor = M; A.mm = pick(['glass', 'chain', 'shot']); A.ct = 0; }
+    if (M.dunk) return;
+    if (M.chain){
+      if (!M.chain.fly){ A.ct = (A.ct || 0) + dt; if (A.ct > 0.7){ if (CHAIN_DIR[M.chain.i] < 0) inp.l = true; else inp.r = true; } }
+      else A.ct = 0;
+      return;
+    }
+    if (A.mm === 'shot'){
+      if (M.ms > 0 || (!p.ground && p.lastG === 'plat' && p.vy > -60)){ pressShoot(); return; }
+      if (p.ground === 'plat'){ inp.a = true; heroJump(p); return; }
+      var px = (PLATFORM.x1 + PLATFORM.x2) / 2;
+      if (p.ground && Math.abs(px - p.x) > 3){ if (px < p.x) inp.l = true; else inp.r = true; return; }
+      inp.a = true;
+      if (p.ground || (p.vy > -40 && p.y > PLATFORM.y)) heroJump(p);
+      return;
+    }
+    var mg = A.mm === 'chain' ? hoopGeo(0, syncT()) : magicGeo(syncT()), mdx = (mg.rl + mg.rr) / 2 - p.x;
     if (Math.abs(mdx) > 2){ if (mdx < 0) inp.l = true; else inp.r = true; }
     inp.a = true;
     if (p.y > mg.y + 4 && (p.ground || p.vy > -60)) heroJump(p);
-    A.st = 'pick';
     return;
   }
   if (stu.flight){
@@ -3471,6 +3784,8 @@ var DB_BATS = {
   power: { w: 0.042, pow: 1.1, col: '#383848', dark: '#16161e' },
   contact: { w: 0.085, pow: 0.9, col: '#ecd8a8', dark: '#a88850' }
 };
+// the Golden Bat prize from the notebook's Reward Center (looks only)
+var GOLD_BAT = false, DB_GOLD_BAT = { col: '#f8d000', dark: '#b07800' };
 var DB_WIND = 0.75, DB_SW = 0.06, DB_FOUL = 0.07, DB_LOOK = 0.17, DB_GAP = 1.0, DB_PICK_AT = 120, LIGHT_OUT = 15, GOLD_SECS = 20;
 var DB_LIGHTS = [{ x1: 204, x2: 220, y1: 40, y2: 53 }, { x1: 238, x2: 254, y1: 58, y2: 71 }];
 var DB_SB = { x1: 222, x2: 252, y1: 74, y2: 95 };
@@ -3848,7 +4163,8 @@ function dbyDrawPeople(v, t, D, look, name, sw, faded){
   drawAvatar(c, look, DB.BAT_X + (swing ? 1 : 0), FLOOR, 1, swing ? 1 : 0, false, 0, faded ? 0.35 : null);
   if (faded) return;
   var broke = D && D.brokeT > 0, gold = D ? D.gold > 0 : false;
-  drawBat(c, DB.BAT_X + 2 + (swing ? 1 : 0), FLOOR - 7, batAng(sw, t), DB_BATS[(D && D.bat) || 'std'], gold, broke ? 4 : 12, t);
+  drawBat(c, DB.BAT_X + 2 + (swing ? 1 : 0), FLOOR - 7, batAng(sw, t), D && GOLD_BAT ? DB_GOLD_BAT : DB_BATS[(D && D.bat) || 'std'], gold, broke ? 4 : 12, t);
+  if (D && GOLD_BAT && !gold && Math.random() < 0.08) burst(stu.parts, DB.BAT_X + rand(2, 12), FLOOR - rand(8, 18), 1, ['#fff6a0', '#f8d000'], 6, -10, 0.4);
   if (gold && Math.random() < 0.5) burst(stu.parts, DB.BAT_X + rand(-4, 10), FLOOR - rand(4, 20), 1, MAGIC_COLS, 8, -20, 0.6);
   vText(v, name, DB.BAT_X, H - 5, '#fcfcfc', nameSize(v));
 }
@@ -4240,6 +4556,218 @@ function dbyAi(dt){
   if (A.take) return;
   var remain = D.st === 'wind' ? DB_WIND - D.t + D.pT : D.pT - D.t;
   if (remain <= DB_SW + A.err) dbySwing();
+}
+
+/* ============================================================
+   CLOUD COURT: basketball up in the sky
+============================================================ */
+var COURT = 'beach', SKY_PTS = 7, SKYBG = null;
+var CLOUD_PLATS = [{ x1: 22, x2: 60, y: 108, id: 'c1' }, { x1: 168, x2: 202, y: 112, id: 'c2' }];
+function setCourt(ct){
+  COURT = ct === 'sky' ? 'sky' : 'beach';
+  PLATS = COURT === 'sky' ? [FLOOR_PLAT, PLATFORM].concat(CLOUD_PLATS) : [FLOOR_PLAT, PLATFORM];
+}
+function shoeBonus(){ return COURT === 'sky' && !!me && !!me.look && me.look.shoe === 1 && !stu.ai; }
+function jumpMul(){ return COURT === 'sky' ? (shoeBonus() ? 1.2 : 1.08) : 1; }
+// the golden hoop that wanders back and forth along the top of the screen, worth 7 any time
+function skyHoopGeo(t){
+  var x = 128 + 104 * Math.sin(t * 0.42 + 0.7 * Math.sin(t * 0.13)), rl = Math.round(x - RIM_W / 2);
+  return { i: 4, bx: x, rl: rl, rr: rl + RIM_W, y: 20 + Math.round(Math.sin(t * 1.7) * 2), side: 0, pts: SKY_PTS };
+}
+function courtGeos(t){ var gs = hoopGeos(t); if (COURT === 'sky') gs.push(skyHoopGeo(t)); return gs; }
+// two dark rain clouds drift all the way across and off the screen, wait out of sight, then float back in from
+// the side they left or from the other side. The choice comes from the game clock, so every screen agrees.
+var RAIN_HW = 10;
+function skyRand(k, n){ var v = Math.sin(k * 127.1 + n * 311.7) * 43758.5453; return v - Math.floor(v); }
+function rainClouds(t){
+  return [0, 1].map(function(k){
+    var slot = 21 + k * 5, tt = t + k * 9, n = Math.floor(tt / slot), u = tt - n * slot;
+    var dir = skyRand(k, n) < 0.5 ? 1 : -1, cross = slot - 2 - skyRand(k + 5, n) * 4;  // a 2 to 6 second wait off screen
+    var from = dir > 0 ? -RAIN_HW - 8 : W + RAIN_HW + 8, to = -from + W;
+    var x = from + (to - from) * Math.min(1, u / cross);
+    return { x: x, y: 50 + k * 12 + Math.sin(t * 0.5 + k) * 2, k: k };
+  });
+}
+function skyZap(b, p, t){
+  if (!b.live || b.scored || b.zap || stu.magic) return;  // no lightning during magic time
+  var rcs = rainClouds(t);
+  for (var i = 0; i < rcs.length; i++){
+    var rc = rcs[i];
+    if (Math.abs(b.x - rc.x) < RAIN_HW && Math.abs(b.y - rc.y) < 6){
+      // the ball is lost, lightning strikes the shooter, and half their points go with it
+      b.zap = true; b.age = 99;
+      stu.zap = { x: rc.x, y: rc.y + 6, t: 0.6 };
+      hurtHero(p, rc.x, 'ZAPPED!');
+      addPop(stu.pops, W / 2, 44, 'LIGHTNING! YOU LOST HALF YOUR POINTS!', '#f8f040', true);
+      stuSendMsg({ t: 'zap' });
+      stu.shake = 0.6;
+      hiss(0.7, 0.1, 400); tone(90, 0.6, 'sawtooth', 0.06, -50); tone(1600, 0.15, 'square', 0.04, -1200);
+      return;
+    }
+  }
+}
+function drawBolt(c, x0, y0, x1, y1, life){
+  var n = 7, k, pts = [[x0, y0]];
+  for (k = 1; k < n; k++) pts.push([x0 + (x1 - x0) * k / n + rand(-5, 5), y0 + (y1 - y0) * k / n]);
+  pts.push([x1, y1]);
+  if (life > 0.45){ c.fillStyle = 'rgba(255,255,220,0.25)'; c.fillRect(0, 0, W, H); }
+  for (var pass = 0; pass < 2; pass++){
+    c.strokeStyle = pass ? '#fcfcfc' : '#f8e040'; c.lineWidth = pass ? 1 : 3;
+    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]);
+    for (k = 1; k < pts.length; k++) c.lineTo(pts[k][0], pts[k][1]);
+    c.stroke();
+  }
+}
+// a puffy cloud whose top is at y (a platform you can stand on, or a rain cloud)
+function drawCloud(c, x1, x2, y, dark){
+  var n = Math.max(2, Math.round((x2 - x1) / 8)), w = (x2 - x1) / n, i, pass;
+  for (pass = 0; pass < 3; pass++){
+    for (i = 0; i < n; i++){
+      var cx = x1 + (i + 0.5) * w, r = w * 0.62 + (i % 2) * 1.5, cy = y + r - (i % 2);
+      c.fillStyle = pass === 0 ? '#000' : (pass === 1 ? (dark ? '#4a5068' : '#fcfcfc') : (dark ? '#383c52' : '#d4e8fa'));
+      c.beginPath(); c.arc(cx, pass === 2 ? cy + r * 0.45 : cy, pass === 0 ? r + 1 : (pass === 2 ? r * 0.7 : r), 0, Math.PI * 2); c.fill();
+    }
+    if (pass === 0) c.fillRect(x1 - 1, y + w * 0.6, x2 - x1 + 2, w * 0.6 + 1);
+    if (pass === 1){ c.fillStyle = dark ? '#4a5068' : '#fcfcfc'; c.fillRect(x1, y + w * 0.6, x2 - x1, w * 0.6); }
+  }
+}
+function skyBg(){
+  if (SKYBG) return SKYBG;
+  var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  var c = cv.getContext('2d'), i, seed = 5;
+  function r(){ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  var sky = ['#2a6ae0', '#3478e8', '#3e86ee', '#4a94f2', '#58a2f6', '#68b0f8', '#7abcfa', '#8ec8fc', '#a2d4fc', '#b8e0fe', '#cceafe'];
+  var bh = (FLOOR + 4) / sky.length;
+  for (i = 0; i < sky.length; i++){ c.fillStyle = sky[i]; c.fillRect(0, Math.floor(i * bh), W, Math.ceil(bh) + 1); }
+  // the sun, up high in a clear sky
+  c.fillStyle = 'rgba(255,250,200,0.35)'; c.beginPath(); c.arc(70, 26, 17, 0, Math.PI * 2); c.fill();
+  c.fillStyle = '#fff4a0'; c.beginPath(); c.arc(70, 26, 11, 0, Math.PI * 2); c.fill();
+  c.fillStyle = '#fffbe0'; c.beginPath(); c.arc(67, 23, 5, 0, Math.PI * 2); c.fill();
+  // faraway clouds
+  c.fillStyle = '#e4f2fe';
+  for (i = 0; i < 16; i++){ c.beginPath(); c.arc(Math.floor(r() * W), 100 + Math.floor(r() * 18), 6 + r() * 9, 0, Math.PI * 2); c.fill(); }
+  c.fillStyle = '#f4faff';
+  for (i = 0; i < 12; i++){ c.beginPath(); c.arc(Math.floor(r() * W), 112 + Math.floor(r() * 10), 7 + r() * 8, 0, Math.PI * 2); c.fill(); }
+  // the cloud floor
+  c.fillStyle = '#000';
+  for (i = -6; i < W + 12; i += 12){ c.beginPath(); c.arc(i, FLOOR + 6 - (i % 24 ? 0 : 2), 9, 0, Math.PI * 2); c.fill(); }
+  c.fillRect(0, FLOOR + 2, W, H);
+  c.fillStyle = '#fcfcfc';
+  for (i = -6; i < W + 12; i += 12){ c.beginPath(); c.arc(i, FLOOR + 6 - (i % 24 ? 0 : 2), 8, 0, Math.PI * 2); c.fill(); }
+  c.fillRect(0, FLOOR + 3, W, H);
+  c.fillStyle = '#d4e8fa';
+  for (i = 0; i < W; i += 7) c.fillRect(i, FLOOR + 9 + (i % 3), 4, 1);
+  SKYBG = cv;
+  return cv;
+}
+// a hoop standing on its own little cloud
+function drawSkyHoop(c, g, active, t, netT){
+  c.fillStyle = '#000'; c.fillRect(g.bx - 1, g.y + 5, 5, 14);
+  c.fillStyle = active ? '#fcfcfc' : '#9a9aa8'; c.fillRect(g.bx, g.y + 5, 3, 13);
+  drawCloud(c, g.bx - 13, g.bx + 16, g.y + 17, false);
+  drawBoardRim(c, g, active, t, netT);
+}
+// the golden sky hoop: a ring with flapping wings and no backboard
+function drawSkyRing(c, g, t, netT){
+  var cx = (g.rl + g.rr) / 2, fl = Math.round(Math.sin(t * 9) * 2), k, side;
+  for (side = -1; side <= 1; side += 2){
+    var wx = side < 0 ? g.rl - 2 : g.rr + 2;
+    for (k = 0; k < 4; k++){ c.fillStyle = '#000'; c.fillRect(side < 0 ? wx - 3 - k * 2 : wx + k * 2, g.y - 3 - k + fl * (k / 3), 4, 3); }
+    for (k = 0; k < 4; k++){ c.fillStyle = k % 2 ? '#e8f0ff' : '#fcfcfc'; c.fillRect(side < 0 ? wx - 2 - k * 2 : wx + 1 + k * 2, g.y - 2 - k + fl * (k / 3), 2, 1); }
+  }
+  var wob = netT > 0 ? Math.sin(netT * 40) * 1.5 : 0;
+  c.strokeStyle = 'rgba(252,252,252,.9)'; c.lineWidth = 1; c.beginPath();
+  for (k = 0; k <= 4; k++){ c.moveTo(g.rl + (g.rr - g.rl) * k / 4, g.y + 1); c.lineTo(g.rl + 4 + (g.rr - g.rl - 8) * k / 4 + wob, g.y + 10); }
+  c.moveTo(g.rl + 2, g.y + 5); c.lineTo(g.rr - 2, g.y + 5);
+  c.stroke();
+  c.fillStyle = '#000'; c.fillRect(Math.round(g.rl) - 1, g.y - 1, RIM_W + 3, 4);
+  c.fillStyle = Math.floor(t * 6) % 2 ? '#f8d800' : '#f8a000'; c.fillRect(Math.round(g.rl), g.y, RIM_W + 1, 2);
+  if (Math.random() < 0.3){ c.fillStyle = '#fff6a0'; c.fillRect(Math.round(cx + rand(-12, 12)), Math.round(g.y + rand(-6, 6)), 1, 1); }
+}
+function drawRainCloud(c, rc, t){
+  var flash = Math.floor(t * 3 + rc.k * 5) % 11 === 0, k;
+  c.fillStyle = 'rgba(150,190,240,0.7)';
+  for (k = 0; k < 5; k++) c.fillRect(Math.round(rc.x - 8 + k * 4), Math.round(rc.y + 9 + ((t * 60 + k * 7) % 14)), 1, 3);
+  drawCloud(c, rc.x - RAIN_HW, rc.x + RAIN_HW, rc.y - 5, true);
+  if (flash){ c.fillStyle = '#f8f040'; c.fillRect(Math.round(rc.x) - 1, Math.round(rc.y + 6), 2, 5); c.fillRect(Math.round(rc.x) + 1, Math.round(rc.y + 10), 2, 4); }
+}
+function drawSkyScene(c, t, netH, netT, lit){
+  c.drawImage(skyBg(), 0, 0);
+  drawCloud(c, PLATFORM.x1 - 2, PLATFORM.x2 + 2, PLATFORM.y, false);
+  for (var i = 0; i < CLOUD_PLATS.length; i++) drawCloud(c, CLOUD_PLATS[i].x1, CLOUD_PLATS[i].x2, CLOUD_PLATS[i].y, false);
+  for (i = 0; i < 3; i++) drawSkyHoop(c, hoopGeo(i, t), lit === -1 || lit === i, t, i === netH ? netT : 0);
+  drawSkyRing(c, skyHoopGeo(t), t, netH === 4 ? netT : 0);
+  var rcs = rainClouds(t);
+  for (i = 0; i < rcs.length; i++) drawRainCloud(c, rcs[i], t);
+}
+
+/* ============================================================
+   REWARDS: coins saved on this device, and what they buy
+============================================================ */
+var COIN_KEY = 'palmHoopsCoins_v1', COIN_MIN_Q = 20, SHOE_COST = 3, rwFrom = 'scrJoin';
+var COIN_NAMES = { g: 'GOLD', s: 'SILVER', b: 'BRONZE' };
+function coins(){ var c = load(COIN_KEY) || {}; return { g: c.g | 0, s: c.s | 0, b: c.b | 0, shoes: !!c.shoes, wear: !!c.wear }; }
+// 3 bronze make a silver and 2 silver make a gold, all by themselves
+function coinsSave(c){
+  var up = [];
+  while (c.b >= 3){ c.b -= 3; c.s++; up.push('3 BRONZE = 1 SILVER!'); }
+  while (c.s >= 2){ c.s -= 2; c.g++; up.push('2 SILVER = 1 GOLD!'); }
+  store(COIN_KEY, c);
+  return up;
+}
+function coinFor(right, total){
+  if (total < COIN_MIN_Q) return '';
+  var pct = right * 100 / total;
+  return pct >= 90 ? 'g' : (pct >= 80 ? 's' : (pct >= 70 ? 'b' : ''));
+}
+// the coin line on the game over card (and the coin itself, saved on this device)
+function awardCoin(){
+  if (ESS) return NBR.cardHtml(stu.free ? { free: true } : NBR.award(isDerby() ? 'derby' : 'hoops', stu.qRight, stu.qTotal), stu.lang);
+  if (stu.local || stu.free) return '';
+  var k = coinFor(stu.qRight, stu.qTotal);
+  if (!k) return '<div class="ocCoin no">' + L(stu.qTotal < COIN_MIN_Q ? 'ANSWER 20 QUESTIONS IN A GAME TO EARN A COIN' : 'GET 70% OR MORE TO EARN A COIN') + '</div>';
+  var c = coins();
+  c[k]++;
+  var up = coinsSave(c);
+  setTimeout(function(){ sfx.bonus(); }, 700);
+  return '<div class="ocCoin"><span class="coinI ' + k + '"></span> ' + L('YOU EARNED A ' + COIN_NAMES[k] + ' COIN!') +
+    up.map(function(u){ return '<br>' + L(u); }).join('') + '</div>';
+}
+function freeBtn(){
+  var b = $('jFree'), g = coins().g;
+  b.style.display = SOLO && g > 0 ? '' : 'none';
+  b.textContent = L('FREE PLAY: USE 1 GOLD COIN') + ' (' + g + ')';
+}
+var SHOE_IMG = makeSpriteP([
+  '......kkkk......', '.....kwwwwk.....', '.....kwrrwk.....', '.....kwrrwkk....', '....kwwrrwwwk...',
+  '...kwwwrrrwwwk..', '..kwwwwrrrrwwwk.', '.kwrrrrrrrrrrrrk', '.kkkkkkkkkkkkkkk', '..sssssssssssss.'
+], { k: '#000000', w: '#fcfcfc', r: '#e83020', s: '#d0d0d0' });
+function showRewards(from){
+  rwFrom = from;
+  var c = coins(), h = '', k;
+  for (k in COIN_NAMES) h += '<div class="rwCoin"><span class="coinI big ' + k + '"></span><div>' + c[k] + '</div><span class="nm">' + L(COIN_NAMES[k]) + '</span></div>';
+  $('rwCoins').innerHTML = h;
+  var cv = $('rwShoe'), x = cv.getContext('2d');
+  x.imageSmoothingEnabled = false; x.clearRect(0, 0, cv.width, cv.height); x.drawImage(SHOE_IMG, 0, 5, 80, 50);
+  var b = $('rwBuy'), msg = $('rwMsg');
+  msg.textContent = '';
+  if (!c.shoes){
+    b.textContent = L('BUY FOR 3 GOLD COINS'); b.disabled = c.g < SHOE_COST; b.style.opacity = c.g < SHOE_COST ? 0.5 : 1;
+    if (c.g < SHOE_COST) msg.textContent = L('Save up ' + (SHOE_COST - c.g) + ' more gold.');
+  } else { b.disabled = false; b.style.opacity = 1; b.textContent = L(c.wear ? 'TAKE THEM OFF' : 'PUT THEM ON'); }
+  b.onclick = function(){
+    var cc = coins();
+    if (!cc.shoes){
+      if (cc.g < SHOE_COST) return;
+      cc.g -= SHOE_COST; cc.shoes = true; cc.wear = true; sfx.fanfare();
+    } else cc.wear = !cc.wear;
+    store(COIN_KEY, cc);
+    me.look.shoe = cc.wear ? 1 : 0; saveMe(); refreshLook();
+    showRewards(rwFrom);
+    if (cc.wear) $('rwMsg').textContent = L('You are wearing your Air Jordann\'s!');
+  };
+  showScreen('scrRewards');
+  $('scrRewards').scrollTop = 0;
 }
 
 /* ============================================================

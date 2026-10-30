@@ -153,6 +153,7 @@ a.back { color:#6a8f99; font-size:11px; letter-spacing:2px; margin-top:24px; tex
 </div>
 <div id="toast"></div>
 
+<script src="rewards.js"></script>
 <script>
 // ============================================================
 // NOTEBOOK REVIEW: questions come from the Earth Space Science Notebook
@@ -161,6 +162,8 @@ const ESS_LAUNCH='essNotebook.launch', NEED_RIGHT=3;
 let ESS=null, LANG='en';
 let tripRight=0, qRight=0, qTotal=0, tpStats={}, deck=[], lastQ=-1, curQ=null, quizDone=null;
 let startAt=0, endAt=0, clockInt=null, timeUp=false, runs=0, best=null;
+// free play from the Reward Center (no questions, 3 lives, pauses when the app is closed), the Rainbow Snake prize, and this game's coin and trophy
+let FREE=null, freeT=null, freeTick=null, freeNext=null, RAINBOW=false, REWARD=null;
 
 const TX={
   h1:['Answer 3 questions right to start','Contesta 3 preguntas bien para empezar'],
@@ -274,21 +277,31 @@ function essInit(){
   LANG=d&&d.lang==='es'?'es':'en';
   document.documentElement.lang=LANG;
   document.querySelectorAll('[data-t]').forEach(el=>{ const v=TX[el.dataset.t]; if(v) el.textContent=v[LANG==='es'?1:0]; });
-  if(!d||!Array.isArray(d.q)||!d.q.length){
+  freeT=d&&d.free?NBR.ticket('snake'):null;
+  if(d&&d.free&&!freeT){
+    $('essErr').textContent=T('This free play is used up. Go back to the notebook.','Este juego gratis ya se usó. Vuelve al cuaderno.');
+    $('howto').style.display='none'; $('startBtn').style.display='none';
+    return;
+  }
+  if(!d||(!freeT&&(!Array.isArray(d.q)||!d.q.length))){
     $('essErr').textContent=T('Go back to the notebook and pick the topics to review.','Vuelve al cuaderno y elige los temas para repasar.');
     $('howto').style.display='none'; $('startBtn').style.display='none';
     return;
   }
-  ESS={name:String(d.name||''),per:String(d.per||''),m:Math.min(60,Math.max(1,parseInt(d.m,10)||5)),topics:Array.isArray(d.topics)?d.topics:[],q:d.q};
+  ESS={name:String(d.name||''),per:String(d.per||''),m:freeT?NBR.FREE_SECS/60:Math.min(60,Math.max(1,parseInt(d.m,10)||5)),topics:Array.isArray(d.topics)?d.topics:[],q:d.q||[],free:!!freeT};
   const n=ESS.topics.length;
   $('essInfo').innerHTML=(ESS.name?'<strong>'+esc(ESS.name)+'</strong>':'')+
     (ESS.per?' · '+T('Period','Período')+' '+esc(ESS.per):'')+(ESS.name||ESS.per?'<br>':'')+
-    n+' '+T(n===1?'topic':'topics',n===1?'tema':'temas')+', '+ESS.q.length+' '+T('questions','preguntas')+' · '+ESS.m+' min';
+    (ESS.free?T('Free play: no questions, 3 lives','Juego gratis: sin preguntas, 3 vidas')+'<br>'+NBR.fmt(freeT.left)+' '+T('left','restantes')+' · ♥ '+freeT.lives
+      :n+' '+T(n===1?'topic':'topics',n===1?'tema':'temas')+', '+ESS.q.length+' '+T('questions','preguntas')+' · '+ESS.m+' min');
+  if(ESS.free) $('howto').innerHTML='<li>'+T('No questions in a free play','En un juego gratis no hay preguntas')+'</li><li>'+T('Crash 3 times and the game is over','Si chocas 3 veces se acaba el juego')+'</li>'+
+    '<li>'+T('It pauses if you close the app','Se pone en pausa si cierras la app')+'</li>';
 }
 
 // ---- question checkpoints ----
 function checkpoint(kind,onDone,n){
   if(timeUp) return;
+  if(FREE){ killLoop(); if(FREE.paused()) freeNext=onDone; else if(onDone) onDone(); return; }
   killLoop();
   quizDone=onDone; tripRight=0;
   $('qHead').innerHTML=L(HEADS[kind],n);
@@ -370,6 +383,7 @@ function startClock(){
   clockInt=setInterval(tickClock,250);
 }
 function tickClock(){
+  if(FREE) endAt=Date.now()+FREE.left()*1000;
   const t=Math.max(0,Math.ceil((endAt-Date.now())/1000)), s=Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
   ['hudTime','qTime'].forEach(id=>{ const el=$(id); el.textContent='⏱ '+s; el.classList.toggle('low',t<60); });
   if(t<=0) endGame(false);
@@ -386,13 +400,16 @@ function endRun(){
 // leaving early still ends with the score card
 function quitGame(){
   if(timeUp||!startAt) return;
-  if(!window.confirm(T('End the game now and see your score card?','¿Terminar el juego ahora y ver tu tarjeta de puntaje?'))) return;
+  if(!window.confirm(FREE?T('End your free play now? It cannot be picked up again.','¿Terminar tu juego gratis ahora? No se puede retomar.')
+    :T('End the game now and see your score card?','¿Terminar el juego ahora y ver tu tarjeta de puntaje?'))) return;
   endGame(true);
 }
 function endGame(quit){
   if(timeUp) return;
   timeUp=true; killLoop(); clearInterval(clockInt);
   endRun();
+  REWARD=FREE?{free:true}:NBR.award('snake',qRight,qTotal);
+  if(FREE){ FREE.end(); $('againBtn').style.display='none'; }
   ['startScreen','msgScreen','quizScreen'].forEach(id=>$(id).classList.add('hidden'));
   $('repTitle').textContent=quit?T('GAME OVER','FIN DEL JUEGO'):T("TIME'S UP!",'¡SE ACABÓ EL TIEMPO!');
   scoreCard();
@@ -412,11 +429,13 @@ function scoreCard(){
   $('scard').innerHTML=
     '<div class="scName">'+esc(ESS.name||T('Player','Jugador'))+'</div>'+
     '<div class="scLine">'+(ESS.per?T('Period','Período')+' '+esc(ESS.per)+' · ':'')+T('Snake Review','Repaso con la serpiente')+'</div>'+
-    '<div class="scBig">'+p(qRight,qTotal)+'% '+T('correct','correctas')+'</div>'+
-    '<div class="scLine">'+qRight+'/'+qTotal+' '+T('questions right','preguntas bien')+' · '+playedText()+'</div>'+
+    (FREE?'<div class="scBig">'+T('Free play','Juego gratis')+'</div><div class="scLine">'+playedText()+'</div>'
+    :'<div class="scBig">'+p(qRight,qTotal)+'% '+T('correct','correctas')+'</div>'+
+    '<div class="scLine">'+qRight+'/'+qTotal+' '+T('questions right','preguntas bien')+' · '+playedText()+'</div>')+
     '<div class="scLine">'+T('Best run','Mejor partida')+': '+best.score+' '+T('pts','pts')+' · '+T('level','nivel')+' '+best.level+
       (best.round>1?' ('+T('loop','vuelta')+' '+best.round+')':'')+' · '+runs+' '+T(runs===1?'run':'runs',runs===1?'partida':'partidas')+'</div>'+
-    '<table><tr><th>'+T('Topic','Tema')+'</th><th class="n">'+T('Right','Bien')+'</th><th class="n">%</th></tr>'+rows+'</table>'+
+    NBR.cardHtml(REWARD,LANG)+
+    (FREE?'':'<table><tr><th>'+T('Topic','Tema')+'</th><th class="n">'+T('Right','Bien')+'</th><th class="n">%</th></tr>'+rows+'</table>')+
     '<div class="scDate">'+T('Earth Space Science Notebook','Cuaderno de Ciencias de la Tierra y el Espacio')+', '+
     d.toLocaleDateString(es?'es':[],{month:'short',day:'numeric',year:'numeric'})+' '+d.toLocaleTimeString(es?'es':[],{hour:'numeric',minute:'2-digit'})+'</div>';
 }
@@ -509,7 +528,20 @@ function resize() {
 function startGame()   {
   $('startScreen').classList.add('hidden'); $('repScreen').classList.add('hidden');
   timeUp=false; qRight=0; qTotal=0; tpStats={}; deck=[]; lastQ=-1; runs=0; best=null;
+  RAINBOW=NBR.wearing('snake');
+  if(ESS.free){
+    FREE=NBR.freeRun({game:'snake',lang:LANG,pause:freePause,resume:freeResume,timeUp:()=>endGame(false)});
+    if(!FREE){ $('startScreen').classList.remove('hidden'); $('essErr').textContent=T('This free play is used up. Go back to the notebook.','Este juego gratis ya se usó. Vuelve al cuaderno.'); $('startBtn').style.display='none'; return; }
+  }
   resetAll(); startClock(); checkpoint('start',()=>startClassic(true,true));
+}
+// the app was closed or the phone turned off: stop the snake until KEEP PLAYING
+function freePause(){ if(alive){ freeTick=gameMode==='arena'?tickArena:tickClassic; killLoop(); } }
+function freeResume(){
+  if(timeUp) return;
+  if(freeNext){ const f=freeNext; freeNext=null; f(); }
+  else if(freeTick){ go(freeTick,900); }
+  freeTick=null;
 }
 function restartGame() { if(timeUp) return; endRun(); $('msgScreen').classList.add('hidden'); resetAll(); startClassic(true,true); }
 function resetAll()    { stars=0; score=0; phase=0; lvStars=0; round=1; snake=null; foods=[]; evil=null; evilFoods=[]; }
@@ -539,16 +571,18 @@ function levelDone() {
 function die(kind) {
   alive=false; killLoop(); lastDeath=kind;
   if(gameMode==='arena') drawArena(); else drawClassic();
+  const lives=FREE?FREE.loseLife():0;
   setTimeout(()=>{
     if(timeUp) return;
+    if(FREE&&!lives){ endGame(true); return; }
     const col=kind==='race'||kind==='evil'?EVIL_COLOR:phase===5?'#00ffcc':((theme&&theme.snakeHead)||'#fff');
     $('msgTitle').textContent=kind==='race'?T('THE EVIL SNAKE WINS','GANÓ LA SERPIENTE MALVADA'):T('GAME OVER','SE ACABÓ');
     $('msgTitle').style.color=col;
     $('msgTitle').style.textShadow=`0 0 20px ${col}`;
     $('msgSnark').textContent=say(kind);
     $('msgSub').innerHTML=T('Level','Nivel')+' '+(phase+1)+(round>1?' · '+T('Loop','Vuelta')+' '+round:'')+' · ★ '+stars+' · '+score+' '+T('pts','pts')+
-      '<br>'+qRight+'/'+qTotal+' '+T('questions right','preguntas bien');
-    $('contBtn').textContent=kind==='race'?T('ANSWER 3 FOR A REMATCH','CONTESTA 3 PARA LA REVANCHA'):T('ANSWER 3 TO CONTINUE','CONTESTA 3 PARA CONTINUAR');
+      (FREE?'<br>♥ '+lives+' '+T(lives===1?'life left':'lives left',lives===1?'vida restante':'vidas restantes'):'<br>'+qRight+'/'+qTotal+' '+T('questions right','preguntas bien'));
+    $('contBtn').textContent=FREE?T('CONTINUE','CONTINUAR'):kind==='race'?T('ANSWER 3 FOR A REMATCH','CONTESTA 3 PARA LA REVANCHA'):T('ANSWER 3 TO CONTINUE','CONTESTA 3 PARA CONTINUAR');
     $('msgScreen').classList.remove('hidden');
   },400);
 }
@@ -716,6 +750,7 @@ function drawEvil(toPx,sz) {
 // ============================================================
 // DRAW CLASSIC
 // ============================================================
+function rainbowCol(i){ return `hsl(${(i*28+Date.now()*0.12)%360},100%,${i===0?72:60}%)`; }
 function drawClassic() {
   const t=theme||THEMES[0];
   if(phase>=1) ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -726,7 +761,7 @@ function drawClassic() {
   for(let y=0;y<=rows;y++){ctx.beginPath();ctx.moveTo(0,y*CELL);ctx.lineTo(canvas.width,y*CELL);ctx.stroke();}
 
   snake.forEach((seg,i)=>{
-    const col=i===0?t.snakeHead:t.snakeBody(i);
+    const col=RAINBOW?rainbowCol(i):i===0?t.snakeHead:t.snakeBody(i);
     ctx.save(); if(t.glow){ctx.shadowColor=col;ctx.shadowBlur=phase>=4?18:10;}
     ctx.fillStyle=col; const pad=i===0?1:2,rad=i===0?5:3;
     rrect(ctx,seg.x*CELL+pad,seg.y*CELL+pad,CELL-pad*2,CELL-pad*2,rad);
@@ -911,8 +946,9 @@ function drawArena() {
   // player snake
   snake.forEach((seg,i)=>{
     const {sx,sy,ok}=inView(seg.x,seg.y); if(!ok) return;
-    ctx.save();ctx.shadowColor='#00ffcc';ctx.shadowBlur=14;
-    ctx.fillStyle=i===0?'#00ffcc':`hsl(${160+i*3},100%,${Math.max(55-i,20)}%)`;
+    const col=RAINBOW?rainbowCol(i):i===0?'#00ffcc':`hsl(${160+i*3},100%,${Math.max(55-i,20)}%)`;
+    ctx.save();ctx.shadowColor=RAINBOW?col:'#00ffcc';ctx.shadowBlur=14;
+    ctx.fillStyle=col;
     const pad=i===0?1:2,r=i===0?5:3;
     rrect(ctx,sx+pad,sy+pad,AC-pad*2,AC-pad*2,r);ctx.fill();ctx.restore();
   });

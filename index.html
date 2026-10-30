@@ -144,6 +144,26 @@ td.nw{white-space:nowrap}
 
 .sheet.tall{max-height:calc(92vh - env(safe-area-inset-top,0px));max-height:calc(92dvh - env(safe-area-inset-top,0px));overflow-y:auto;-webkit-overflow-scrolling:touch}
 
+/* Reward Center */
+.rw-open{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:14px;border:1.5px solid var(--amber);background:rgba(244,184,96,.1);color:var(--text);border-radius:14px;padding:12px 16px;font-weight:700;cursor:pointer}
+.rw-open .rw-mini{display:inline-flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600}
+.rw-wallet{display:flex;justify-content:center;gap:22px;margin:10px 0 4px;text-align:center}
+.rw-wallet b{display:block;font-size:1.5rem;font-variant-numeric:tabular-nums;margin-top:4px}
+.rw-wallet small{color:var(--muted);font-size:12.5px}
+.rw-rules{font-size:14px;color:var(--muted);padding-left:20px;margin:10px 0 0}
+.rw-rules li{margin-bottom:4px}
+.rw-resume{background:rgba(244,184,96,.1);border:1.5px solid var(--amber);border-radius:14px;padding:12px 14px;margin:14px 0 0}
+.rw-game{background:var(--panel);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;margin:10px 0 0}
+.rw-head{display:flex;align-items:center;gap:12px}
+.rw-head h4{margin:0;font-size:1.05rem}
+.rw-head .small{display:block;margin-top:2px}
+.rw-prize{display:flex;gap:10px;align-items:flex-start;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:14px}
+.rw-prize .rw-ico{font-size:24px;line-height:1;flex:none;width:30px;text-align:center}
+.rw-prize.locked{opacity:.65}
+.rw-prize b{color:var(--amber)}
+.rw-acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.rw-acts .btn{padding:10px 14px;font-size:15px;flex:1}
+
 /* Cog, profile, games */
 .cog{position:absolute;top:12px;right:12px;z-index:2;width:46px;height:46px;border-radius:50%;border:1.5px solid var(--line);background:rgba(23,44,68,.8);display:grid;place-items:center;cursor:pointer;padding:0}
 .cog svg{width:24px;height:24px}
@@ -224,6 +244,7 @@ textarea.inp.link{min-height:0;height:90px;word-break:break-all}
       </div>
       <button class="btn" id="playG" disabled data-i18n="play">Play</button>
     </div>
+    <button type="button" class="rw-open" id="rwBtn">🏆 Reward Center</button>
   </div>
   <div class="title-foot"><p class="me-line" id="meLine"></p><button class="linkish" id="profileBtn" data-i18n="changeMe">Change name, period, or language</button> <button class="linkish" id="saveCheckBtn" data-i18n="saveCheck">Save check</button></div>
   <svg class="earth" viewBox="0 0 400 120" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
@@ -273,6 +294,7 @@ textarea.inp.link{min-height:0;height:90px;word-break:break-all}
 
 <div class="scrim" id="scrim" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><div class="sheet" id="sheet"></div></div>
 
+<script src="rewards.js"></script>
 <script>
 /* =========================================================
    MR. T'S TOPIC ORDER  (edit this list to change the default)
@@ -2978,7 +3000,7 @@ function applyClass(){
   [...$("#game").options].forEach(o => { if (o.value){ o.hidden = o.disabled = !!CLASS && !CLASS.g.includes(o.value); } });
   if ($("#quarter").selectedOptions[0] && $("#quarter").selectedOptions[0].disabled){ $("#quarter").value = ""; $("#openQ").disabled = true; }
   const noGames = !!CLASS && !CLASS.g.length;
-  $(".games-label").hidden = noGames; $("#game").closest(".picker").hidden = noGames;
+  $(".games-label").hidden = noGames; $("#game").closest(".picker").hidden = noGames; $("#rwBtn").hidden = noGames;
   if (!CLASS) return;
   bar.innerHTML = `<b>${T("Class link", "Enlace de clase")}${CLASS.t ? ": " + esc(CLASS.t) : ""}</b><br>${T(`${CLASS.tp.length} ${CLASS.tp.length === 1 ? "topic" : "topics"}`, `${CLASS.tp.length} ${CLASS.tp.length === 1 ? "tema" : "temas"}`)}${CLASS.g.length ? T(`, ${CLASS.g.length} ${CLASS.g.length === 1 ? "game" : "games"}`, `, ${CLASS.g.length} ${CLASS.g.length === 1 ? "juego" : "juegos"}`) : ""}${CLASS.g.length ? T(`, ${allQuestions().length} questions`, `, ${allQuestions().length} preguntas`) : ""}`;
 }
@@ -3067,6 +3089,70 @@ openBtn.addEventListener("click", () => {
 $("#saveCheckBtn").addEventListener("click", saveCheck);
 $("#profileBtn").addEventListener("click", () => profileSheet(false));
 $("#cogBtn").addEventListener("click", cogSheet);
+/* =========================================================
+   REWARD CENTER  (coins, trophies, prizes and free plays; rewards.js keeps them on this device)
+   ========================================================= */
+const RW_ICON = { hoops: "👟", derby: "⚾", paint: "🖌️", snake: "🌈", blasteroids: "🚀", zombie: "🔫" };
+function rwGames(){ return CLASS ? GAMES.filter(g => CLASS.g.includes(g)) : GAMES; }
+function rwTx(pair){ return pair[LANG === "es" ? 1 : 0]; }
+function rwButton(){
+  const st = NBR.read(), b = $("#rwBtn");
+  if (!b) return;
+  b.innerHTML = `<span>🏆 ${T("Reward Center", "Centro de premios")}</span><span class="rw-mini">${NBR.coinHtml("g", 16)} ${st.g} ${NBR.coinHtml("s", 16)} ${st.s} ${NBR.coinHtml("b", 16)} ${st.b}</span>`;
+}
+function rewardSheet(){
+  const st = NBR.read(), tk = NBR.ticket(), games = rwGames();
+  const coin = (k, name) => `<div>${NBR.coinHtml(k, 40)}<b>${st[k]}</b><small>${name}</small></div>`;
+  const rows = games.map(g => {
+    const tr = st.tr[g], won = !!st.won[g], wear = won && !!st.wear[g], pz = NBR.PRIZES[g];
+    return `<div class="rw-game">
+      <div class="rw-head">${NBR.trophyHtml(tr ? tr.k : "", 38)}<div><h4>${esc(rwTx(NBR.GAME_NAMES[g]))}</h4>
+        <span class="small">${tr ? T(`Best: ${rwTx(NBR.MEDAL[tr.k])} trophy, ${tr.pct}% on ${tr.n} questions`, `Mejor: trofeo de ${rwTx(NBR.MEDAL[tr.k])}, ${tr.pct}% en ${tr.n} preguntas`)
+          : T("No trophy yet", "Todavía no hay trofeo")}</span></div></div>
+      <div class="rw-prize${won ? "" : " locked"}"><span class="rw-ico">${won ? RW_ICON[g] : "🔒"}</span><div><b>${esc(rwTx(pz.name))}</b><br>${esc(rwTx(pz.about))}
+        ${won ? "" : `<br><span class="small">${T(`Win a gold trophy in ${rwTx(NBR.GAME_NAMES[g])} to unlock it.`, `Gana un trofeo de oro en ${rwTx(NBR.GAME_NAMES[g])} para desbloquearlo.`)}</span>`}</div></div>
+      <div class="rw-acts">
+        ${won ? `<button class="btn ghost" data-wear="${g}" aria-pressed="${wear}">${wear ? T("Take it off", "Quitártelo") : T("Put it on", "Ponértelo")}</button>` : ""}
+        <button class="btn" data-free="${g}"${st.g < 1 || tk ? " disabled" : ""}>${T("Free play", "Juego gratis")} · ${NBR.coinHtml("g", 16)} 1</button>
+      </div></div>`;
+  }).join("");
+  openSheet(`<h3 id="sheetTitle">🏆 ${T("Reward Center", "Centro de premios")}</h3>
+    <div class="rw-wallet">${coin("g", T("Gold", "Oro"))}${coin("s", T("Silver", "Plata"))}${coin("b", T("Bronze", "Bronce"))}</div>
+    <ul class="rw-rules">
+      <li>${T("Answer <b>20 or more</b> questions in one game: <b>90%</b> wins a gold coin and trophy, <b>80%</b> silver, <b>70%</b> bronze. Each game keeps its best trophy.",
+        "Contesta <b>20 o más</b> preguntas en un juego: <b>90%</b> gana una moneda y un trofeo de oro, <b>80%</b> de plata, <b>70%</b> de bronce. Cada juego guarda su mejor trofeo.")}</li>
+      <li>${T("3 bronze coins turn into 1 silver, and 2 silver turn into 1 gold, all by themselves.", "3 monedas de bronce se convierten en 1 de plata, y 2 de plata en 1 de oro, solas.")}</li>
+      <li>${T(`Spend 1 gold coin on a <b>free play</b>: no questions for up to ${NBR.FREE_SECS / 60} minutes, or until you lose all ${NBR.FREE_LIVES} lives. It pauses if you close the app. Free plays don’t earn coins or trophies.`,
+        `Usa 1 moneda de oro en un <b>juego gratis</b>: sin preguntas por hasta ${NBR.FREE_SECS / 60} minutos, o hasta que pierdas tus ${NBR.FREE_LIVES} vidas. Se pone en pausa si cierras la app. Los juegos gratis no ganan monedas ni trofeos.`)}</li>
+      <li>${T("A gold trophy in a game unlocks that game’s prize.", "Un trofeo de oro en un juego desbloquea el premio de ese juego.")}</li>
+    </ul>
+    ${tk ? `<div class="rw-resume"><b>${T("Your free play is paused", "Tu juego gratis está en pausa")}</b>: ${esc(rwTx(NBR.GAME_NAMES[tk.game]))}, ${NBR.fmt(tk.left)} ${T("left", "restantes")}${tk.game === "paint" ? "" : `, ♥ ${tk.lives}`}
+      <div class="rw-acts"><button class="btn" data-resume="${tk.game}">${T("Keep playing", "Seguir jugando")}</button></div></div>` : ""}
+    ${rows}
+    <div class="row"><button class="btn ghost" data-close>${T("Close", "Cerrar")}</button></div>`, { tall: true });
+  $("#sheet").querySelectorAll("[data-wear]").forEach(b => b.addEventListener("click", () => {
+    NBR.setWear(b.dataset.wear, b.getAttribute("aria-pressed") !== "true"); rewardSheet();
+  }));
+  $("#sheet").querySelectorAll("[data-free]").forEach(b => b.addEventListener("click", () => {
+    const g = b.dataset.free;
+    if (!window.confirm(T(`Use 1 gold coin for a free play of ${rwTx(NBR.GAME_NAMES[g])}?`, `¿Usar 1 moneda de oro para un juego gratis de ${rwTx(NBR.GAME_NAMES[g])}?`))) return;
+    if (!NBR.buyFree(g)) return rewardSheet();
+    rwButton(); playFree(g);
+  }));
+  $("#sheet").querySelectorAll("[data-resume]").forEach(b => b.addEventListener("click", () => playFree(b.dataset.resume)));
+}
+// a free play needs no questions, only the player and the language
+function playFree(sport){
+  const p = save.profile || {};
+  const data = { v: 1, s: sport, m: NBR.FREE_SECS / 60, lang: LANG, name: fullName(p), first: p.first || "", per: p.per || "", topics: [], q: [], free: 1 };
+  if (typeof courseTitle === "function") data.course = courseTitle();
+  try { localStorage.setItem(LAUNCH_KEY, JSON.stringify(data)); } catch(e){ return; }
+  location.href = sport === "paint" ? "paint.html#ess" : sport === "snake" ? "snake.html#ess" : sport === "blasteroids" ? "blasteroids.html#ess" : sport === "zombie" ? "zombie.html#ess" : "games.html#ess";
+}
+$("#rwBtn").addEventListener("click", rewardSheet);
+rwButton();
+window.addEventListener("pageshow", rwButton);
+
 const gameSel = $("#game"), playBtn = $("#playG");
 gameSel.addEventListener("change", () => { playBtn.disabled = !gameSel.value; if (gameSel.value) gameSheet(gameSel.value); });
 playBtn.addEventListener("click", () => { if (gameSel.value) gameSheet(gameSel.value); });

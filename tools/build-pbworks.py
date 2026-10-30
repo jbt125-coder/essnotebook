@@ -25,10 +25,16 @@ def read(name):
 
 pages = {p: read(p) for p in PAGES}
 
+# every page shares the Reward Center script; the single file carries it inside each page
+with open(os.path.join(ROOT, "rewards.js"), encoding="utf-8") as f:
+    rewards = "<script>\n" + f.read() + "</script>"
+for p in PAGES:
+    pages[p] = pages[p].replace('<script src="rewards.js"></script>', rewards)
+
 # the notebook starts a game by setting location.href; send it through the bundle instead
 launch = re.compile(r'location\.href = (sport === "paint" \? "paint\.html#ess" :.*?"games\.html#ess");')
 pages["index"], n = launch.subn(r'__nbGo(\1);', pages["index"])
-if n != 1:
+if n < 1:
     sys.exit("build-pbworks: couldn't find the game launch line in index.html; update this script")
 
 def js_string(s):
